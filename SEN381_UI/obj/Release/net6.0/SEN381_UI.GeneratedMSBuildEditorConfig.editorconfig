@@ -1,0 +1,92 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = SEN381_UI
+build_property.RootNamespace = SEN381_UI
+build_property.ProjectDir = C:\Users\Jander Kruger\OneDrive\Desktop\SEN381_Group3_UI_Blazor\SEN381_UI\
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\Jander Kruger\OneDrive\Desktop\SEN381_Group3_UI_Blazor\SEN381_UI
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/ClaimComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xhaW1Db21wb25lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/ClientComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50Q29tcG9uZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/CoveragesComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ292ZXJhZ2VzQ29tcG9uZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/FetchData.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRmV0Y2hEYXRhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/MedicalConditionsComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVkaWNhbENvbmRpdGlvbnNDb21wb25lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/MedicalSPComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVkaWNhbFNQQ29tcG9uZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/PackagesComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGFja2FnZXNDb21wb25lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/PolicyComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUG9saWN5Q29tcG9uZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/TreatmentComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHJlYXRtZW50Q29tcG9uZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-u9atlm93vq
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-5e8yozt5c3
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jander Kruger/OneDrive/Desktop/SEN381_Group3_UI_Blazor/SEN381_UI/Pages/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

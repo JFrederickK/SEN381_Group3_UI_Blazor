@@ -1,6 +1,6 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">SEN381_UI</a>
+        <a class="navbar-brand" href="">Ukupholisa Healthcare</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -15,17 +15,50 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="/ClientListView" Match="NavLinkMatch.All">
+                <span class="oi oi-client" aria-hidden="true"></span> Client View
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            <NavLink class="nav-link" href="/Claim" Match="NavLinkMatch.All">
+                <span class="oi oi-Claim" aria-hidden="true"></span> Claim view
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/Policy" Match="NavLinkMatch.All">
+                <span class="oi oi-Claim" aria-hidden="true"></span> Policy view
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/MedicalServiceProvider" Match="NavLinkMatch.All">
+                <span class="oi oi-Claim" aria-hidden="true"></span> Medical Provider view
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/MedicalConditions" Match="NavLinkMatch.All">
+                <span class="oi oi-Claim" aria-hidden="true"></span> Medical Conditions view
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/Treatment" Match="NavLinkMatch.All">
+                <span class="oi oi-Claim" aria-hidden="true"></span> Treatment view
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/Coverages" Match="NavLinkMatch.All">
+                <span class="oi oi-Claim" aria-hidden="true"></span> Coverages view
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/Packages" Match="NavLinkMatch.All">
+                <span class="oi oi-Claim" aria-hidden="true"></span> Packages view
+            </NavLink>
+        </div>
+
     </nav>
 </div>
+
+
 
 @code {
     private bool collapseNavMenu = true;
@@ -37,3 +70,4 @@
         collapseNavMenu = !collapseNavMenu;
     }
 }
+
