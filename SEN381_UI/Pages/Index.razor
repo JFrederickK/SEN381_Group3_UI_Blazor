@@ -35,7 +35,7 @@
 
 @code {
     RegisterAccountForm model = new RegisterAccountForm();
-    bool success;
+
 
     public class RegisterAccountForm
     {
@@ -55,7 +55,6 @@
 
     private void OnValidSubmit(EditContext context)
     {
-        success = true;
         StateHasChanged();
     }
 

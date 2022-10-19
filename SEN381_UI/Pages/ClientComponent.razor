@@ -1,6 +1,77 @@
 ﻿@page "/ClientListView"
+@using System.Net.Http.Json
+@using SEN381_API_Group3.shared.models
+
+
 <h3>ClientComponent</h3>
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Client,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Clients</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Nr</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Surname</MudTh>
+        <MudTh>Address</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Phone</MudTh>
+        <MudTh>Policies</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Notes</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.ClientName</MudTd>
+        <MudTd DataLabel="Sign">@context.ClientSurname</MudTd>
+        <MudTd DataLabel="Name">@context.ClientAddress</MudTd>
+        <MudTd DataLabel="Position">@context.ClientEmail</MudTd>
+        <MudTd DataLabel="Molar mass">@context.ClientPhoneNumber</MudTd>
+        <MudTd DataLabel="Nr">@context.Policies</MudTd>
+        <MudTd DataLabel="Sign">@context.ClientStatus</MudTd>
+        <MudTd DataLabel="Name">@context.ClientAdHocNotes</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
 
 @code {
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string searchString = "";
+    private Client selectedItem = null;
+    private HashSet<Client> selectedItems = new HashSet<Client>();
 
+    private IEnumerable<Client> Elements = new List<Client>();
+
+
+    private bool FilterFunc(Client element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(Client element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.ClientName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ClientSurname.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ClientAddress.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ClientEmail.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ClientPhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Policies.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ClientStatus.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ClientAdHocNotes.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.ClientName} {element.ClientSurname} {element.ClientAddress} {element.ClientEmail} {element.ClientPhoneNumber} {element.Policies} {element.ClientStatus} {element.ClientAdHocNotes}".Contains(searchString))
+            return true;
+        return false;
+    }
 }
