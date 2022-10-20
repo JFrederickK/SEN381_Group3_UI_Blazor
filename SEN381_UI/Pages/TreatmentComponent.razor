@@ -1,5 +1,6 @@
 ﻿@page "/Treatment"
 @using SEN381_API_Group3.shared.models
+@using SEN381_UI.Data
 <h3>Treatment Component</h3>
 <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Treatment,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" LoadingProgressColor="Color.Primary" FixedHeader="@Theader">
     <ToolBarContent>
@@ -42,6 +43,7 @@
     private HashSet<Treatment> selectedItems = new HashSet<Treatment>();
 
     private IEnumerable<Treatment> Elements = new List<Treatment>();
+    private Task OnInitialized() => Elements = new Treatment_Mock().GetTreatments();
 
 
     private bool FilterFunc(Treatment element) => FilterFunc(element, searchString);
