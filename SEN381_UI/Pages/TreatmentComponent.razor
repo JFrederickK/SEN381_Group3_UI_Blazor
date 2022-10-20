@@ -43,8 +43,10 @@
     private HashSet<Treatment> selectedItems = new HashSet<Treatment>();
 
     private IEnumerable<Treatment> Elements = new List<Treatment>();
-    private Task OnInitialized() => Elements = new Treatment_Mock().GetTreatments();
-
+    protected override void OnInitialized()
+    {
+        Elements = new Treatment_Mock().GetTreatments();
+    }
 
     private bool FilterFunc(Treatment element) => FilterFunc(element, searchString);
 
