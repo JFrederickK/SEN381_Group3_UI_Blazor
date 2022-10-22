@@ -1,7 +1,12 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\SEN381_UI"
   ],
+<<<<<<< HEAD
   "SelectedNode": "\\SEN381_UI.sln",
+=======
+  "SelectedNode": "\\SEN381_UI\\SEN381_UI.sln",
+>>>>>>> 519036a7125962ce440390be11d64938d1728d92
   "PreviewInSolutionExplorer": false
 }
