@@ -3,7 +3,7 @@
 <h3>MedicalSPComponent</h3>
 <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<MedicalServiceProvider,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Clients</MudText>
+        <MudText Typo="Typo.h6">Medical Service Provider</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
