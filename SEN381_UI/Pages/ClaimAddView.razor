@@ -56,11 +56,11 @@
         <MudPaper Elevation="3" Outlined="true">
     <MudGrid>
                 <MudItem xs="12" sm="6">
-                    <MudTable Items="@Elements" MultiSelection="true" @bind-SelectedItems="selectedItems" Hover="true">
+                    <MudTable Items="@MedicalElements" MultiSelection="true" @bind-SelectedItems="selectedMedicals" Hover="true">
                             <ToolBarContent>
         <MudText Typo="Typo.h6">Medical conditions</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="searchMedical" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>Nr</MudTh>
@@ -68,22 +68,22 @@
 
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Nr">@context.ClientID</MudTd>
-        <MudTd DataLabel="Sign">@context.ClientName</MudTd>
+        <MudTd DataLabel="Nr">@context.MedicalConditionID</MudTd>
+        <MudTd DataLabel="Sign">@context.MedicalConditionName</MudTd>
 
     </RowTemplate>
     <FooterContent>
         <MudTd colspan="5">Select All</MudTd>
     </FooterContent>
 </MudTable>
-                    <MudText Inline="true">Selected items: @(selectedItems == null ? "" : string.Join(", ", selectedItems.OrderBy(x => x.ClientName).Select(x => x.ClientName)))</MudText>
+                    <MudText Inline="true">Selected items: @(selectedMedicals == null ? "" : string.Join(", ", selectedMedicals.OrderBy(x => x.MedicalConditionName).Select(x => x.MedicalConditionName)))</MudText>
                 </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTable Items="@Elements" MultiSelection="true" @bind-SelectedItems="selectedItems" Hover="true">
+                        <MudTable Items="@TreatmentsElements" MultiSelection="true" @bind-SelectedItems="selectedTreatments" Hover="true">
                             <ToolBarContent>
-                                <MudText Typo="Typo.h6">Medical conditions</MudText>
+                                <MudText Typo="Typo.h6">Treatment list</MudText>
                                 <MudSpacer />
-                                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                                <MudTextField @bind-Value="searchTreatment" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                             </ToolBarContent>
                             <HeaderContent>
                                 <MudTh>Nr</MudTh>
@@ -91,15 +91,15 @@
 
                             </HeaderContent>
                             <RowTemplate>
-                                <MudTd DataLabel="Nr">@context.ClientID</MudTd>
-                                <MudTd DataLabel="Sign">@context.ClientName</MudTd>
+                                <MudTd DataLabel="Nr">@context.TreatmentID</MudTd>
+                                <MudTd DataLabel="Sign">@context.TreatmentName</MudTd>
 
                             </RowTemplate>
                             <FooterContent>
                                 <MudTd colspan="5">Select All</MudTd>
                             </FooterContent>
                         </MudTable>
-                        <MudText Inline="true">Selected items: @(selectedItems == null ? "" : string.Join(", ", selectedItems.OrderBy(x => x.ClientName).Select(x => x.ClientName)))</MudText>
+                        <MudText Inline="true">Selected items: @(selectedTreatments == null ? "" : string.Join(", ", selectedTreatments.OrderBy(x => x.TreatmentName).Select(x => x.TreatmentName)))</MudText>
                     </MudItem>
 
     </MudGrid>
@@ -120,6 +120,9 @@
     protected override void OnInitialized()
     {
         Elements = new ClientMock().GetClients();
+        MedicalElements = new MedicalConditionMock().GetMedicals();
+        TreatmentsElements = new TreatmentMock().GetTreatments();
+
     }
     private bool FilterFunc(Client element) => FilterFunc(element, searchString);
 
@@ -179,8 +182,48 @@
         return placeOfTreatment.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
     public string ReadOnly { get; set; } = "Call Duration";
+    // Medical condition dummy
+    private string searchMedical = "";
+    private MedicalCondition selectedMedical = null;
+    private HashSet<MedicalCondition> selectedMedicals = new HashSet<MedicalCondition>();
 
+    private IEnumerable<MedicalCondition> MedicalElements = new List<MedicalCondition>();
+    private bool Filter(MedicalCondition element) => Filter(element, searchMedical);
 
+    private bool Filter(MedicalCondition element, string searchMedical)
+    {
+
+        if (string.IsNullOrWhiteSpace(searchMedical))
+            return true;
+        if (element.MedicalConditionID.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
+        return true;
+        if (element.MedicalConditionName.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.MedicalConditionID} {element.MedicalConditionName}".Contains(searchMedical))
+            return true;
+        return false;
+    }
+    //Treatment dummy
+    private string searchTreatment = "";
+    private Treatment selectedTreatment = null;
+    private HashSet<Treatment> selectedTreatments = new HashSet<Treatment>();
+
+    private IEnumerable<Treatment> TreatmentsElements = new List<Treatment>();
+    private bool FilterTreatment(Treatment element) => FilterTreatment(element, searchTreatment);
+
+    private bool FilterTreatment(Treatment element, string searchMedical)
+    {
+
+        if (string.IsNullOrWhiteSpace(searchMedical))
+            return true;
+        if (element.TreatmentID.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.TreatmentName.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.TreatmentID} {element.TreatmentName}".Contains(searchTreatment))
+            return true;
+        return false;
+    }
 
 
 }
