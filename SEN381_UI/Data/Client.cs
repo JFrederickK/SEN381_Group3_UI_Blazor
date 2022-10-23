@@ -1,6 +1,4 @@
-
 namespace SEN381_UI.Data {
-
     public class Client
     {
         public string clientID;
@@ -46,4 +44,6 @@ namespace SEN381_UI.Data {
         }
     }
 }
+
+
 
