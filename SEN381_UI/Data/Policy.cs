@@ -1,22 +1,22 @@
-﻿namespace SEN381_API_Group3.shared.models;
+﻿namespace SEN381_UI.Data;
 
 public class Policy
 {
-    private String policyId = "";
-    private String policyName = "";
-    private String policyStatus = "";
+    private string policyId = "";
+    private string policyName = "";
+    private string policyStatus = "";
     private List<Package> package = new List<Package>();
 
     public Policy(string policyId, string policyName, string policyStatus, List<Package> package)
     {
-        this.PolicyId = policyId;
-        this.PolicyName = policyName;
-        this.PolicyStatus = policyStatus;
-        this.Package = package;
+        PolicyId = policyId;
+        PolicyName = policyName;
+        PolicyStatus = policyStatus;
+        Package = package;
     }
     public Policy()
     {
-        
+
     }
 
     public string PolicyId { get => policyId; set => policyId = value; }

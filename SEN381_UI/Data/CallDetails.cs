@@ -1,8 +1,8 @@
-﻿namespace SEN381_API_Group3.shared.models;
+﻿namespace SEN381_UI.Data;
 
 public class CallDetails
 {
-    String callDetailsID;
+    string callDetailsID;
     DateTime startTime;
     DateTime endTime;
 

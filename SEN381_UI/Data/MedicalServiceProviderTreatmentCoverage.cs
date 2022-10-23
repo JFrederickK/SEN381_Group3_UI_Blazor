@@ -1,11 +1,11 @@
-﻿namespace SEN381_API_Group3.shared.models;
+﻿namespace SEN381_UI.Data;
 
 public class MedicalServiceProvidorTreatmentCoverage
 {
-    String MSPTCID;
+    string MSPTCID;
     TreatmentCoverage TreatmentCoverage;
     MedicalServiceProvider medicalServiceProvider;
-    String MSPTCStatus;
+    string MSPTCStatus;
 
     public MedicalServiceProvidorTreatmentCoverage(string mSPTCID, TreatmentCoverage treatmentCoverage, MedicalServiceProvider medicalServiceProvider, string mSPTCStatus)
     {

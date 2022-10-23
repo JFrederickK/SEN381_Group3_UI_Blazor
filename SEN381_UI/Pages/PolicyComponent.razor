@@ -33,7 +33,7 @@
         <MudTablePager />
     </PagerContent>
 </MudTable>
-<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Href="/PolicyAdd" />
 
 @code {
     private bool dense = false;
@@ -48,6 +48,7 @@
 
     protected override void OnInitialized()
     {
+
         Elements = new Policy_Mock().getMockPolicies();
     }
 
