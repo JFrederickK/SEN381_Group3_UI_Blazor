@@ -22,14 +22,15 @@
         <MudTh>Notes</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Nr">@context.ClientName</MudTd>
-        <MudTd DataLabel="Sign">@context.ClientSurname</MudTd>
-        <MudTd DataLabel="Name">@context.ClientAddress</MudTd>
-        <MudTd DataLabel="Position">@context.ClientEmail</MudTd>
-        <MudTd DataLabel="Molar mass">@context.ClientPhoneNumber</MudTd>
-        <MudTd DataLabel="Nr">@context.Policies</MudTd>
-        <MudTd DataLabel="Sign">@context.ClientStatus</MudTd>
-        <MudTd DataLabel="Name">@context.ClientAdHocNotes</MudTd>
+        <MudTd DataLabel="Nr">@context.ClientID</MudTd>
+        <MudTd DataLabel="Name">@context.ClientName</MudTd>
+        <MudTd DataLabel="Surname">@context.ClientSurname</MudTd>
+        <MudTd DataLabel="Address">@context.clientAddress</MudTd>
+        <MudTd DataLabel="Email">@context.ClientEmail</MudTd>
+        <MudTd DataLabel="Phone">@context.clientPhoneNumber</MudTd>
+        <MudTd DataLabel="Polisies">@context.policies</MudTd>
+        <MudTd DataLabel="Status">@context.ClientStatus</MudTd>
+        <MudTd DataLabel="Notes">@context.ClientAdHocNotes</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
