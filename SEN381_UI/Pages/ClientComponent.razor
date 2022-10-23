@@ -1,6 +1,6 @@
 ﻿@page "/ClientListView"
 @using System.Net.Http.Json
-@using SEN381_API_Group3.shared.models
+@using SEN381_UI.Data
 
 
 <h3>ClientComponent</h3>
@@ -22,19 +22,21 @@
         <MudTh>Notes</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Nr">@context.ClientName</MudTd>
-        <MudTd DataLabel="Sign">@context.ClientSurname</MudTd>
-        <MudTd DataLabel="Name">@context.ClientAddress</MudTd>
-        <MudTd DataLabel="Position">@context.ClientEmail</MudTd>
-        <MudTd DataLabel="Molar mass">@context.ClientPhoneNumber</MudTd>
-        <MudTd DataLabel="Nr">@context.Policies</MudTd>
-        <MudTd DataLabel="Sign">@context.ClientStatus</MudTd>
-        <MudTd DataLabel="Name">@context.ClientAdHocNotes</MudTd>
+        <MudTd DataLabel="Nr">@context.ClientID</MudTd>
+        <MudTd DataLabel="Name">@context.ClientName</MudTd>
+        <MudTd DataLabel="Surname">@context.ClientSurname</MudTd>
+        <MudTd DataLabel="Address">@context.clientAddress</MudTd>
+        <MudTd DataLabel="Email">@context.ClientEmail</MudTd>
+        <MudTd DataLabel="Phone">@context.clientPhoneNumber</MudTd>
+        <MudTd DataLabel="Polisies">@context.policies</MudTd>
+        <MudTd DataLabel="Status">@context.ClientStatus</MudTd>
+        <MudTd DataLabel="Notes">@context.ClientAdHocNotes</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
     </PagerContent>
 </MudTable>
+<MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Add" />
 
 @code {
     private bool dense = false;
@@ -46,7 +48,10 @@
     private HashSet<Client> selectedItems = new HashSet<Client>();
 
     private IEnumerable<Client> Elements = new List<Client>();
-
+    protected override void OnInitialized()
+    {
+        Elements = new ClientMock().GetClients();
+    }
 
     private bool FilterFunc(Client element) => FilterFunc(element, searchString);
 
