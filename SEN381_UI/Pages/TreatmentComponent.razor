@@ -1,6 +1,70 @@
 ﻿@page "/Treatment"
-<h3>TreatmentComponent</h3>
+@using SEN381_API_Group3.shared.models
+@using SEN381_UI.Data
+<h3>Treatment Component</h3>
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Treatment,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" LoadingProgressColor="Color.Primary" FixedHeader="@Theader">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Treatment</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <ColGroup>
+        <col style="background-color:aqua"/>
+        <col style="background-color:aquamarine"/>
+        <col style="background-color:aqua"/>
+        <col style="background-color:aquamarine" />
+
+    </ColGroup>
+    <HeaderContent>
+        <MudTh>Nr</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>Medica lService Providers</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.TreatmentID</MudTd>
+        <MudTd DataLabel="Name">@context.TreatmentName</MudTd>
+        <MudTd DataLabel="Description">@context.TreatmentDescription</MudTd>
+        <MudTd DataLabel="Medica lService Providers">@context.MedicalServiceProviders</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+        <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" Href="/TreatmentAdd" />
+    </PagerContent>
+</MudTable>
 
 @code {
+    private bool Theader = true;
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string searchString = "";
+    private Treatment selectedItem = null;
+    private HashSet<Treatment> selectedItems = new HashSet<Treatment>();
 
+    private IEnumerable<Treatment> Elements = new List<Treatment>();
+    protected override void OnInitialized()
+    {
+        Elements = new Treatment_Mock().GetTreatments();
+    }
+
+    private bool FilterFunc(Treatment element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(Treatment element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.TreatmentID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.TreatmentName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.TreatmentDescription.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.MedicalServiceProviders.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.TreatmentID} {element.TreatmentName} {element.TreatmentDescription} {element.MedicalServiceProviders} ".Contains(searchString))
+            return true;
+        return false;
+    }
 }

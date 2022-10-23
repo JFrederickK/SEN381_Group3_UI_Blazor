@@ -1,6 +1,66 @@
 ﻿@page "/Coverages"
-<h3>CoveragesComponent</h3>
+@using SEN381_UI.Data
+<h3>Coverages Component</h3>
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<TreatmentCoverage,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Coverages</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Nr</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>General Visits</MudTh>
+        <MudTh>Specialists Visits</MudTh>
+        <MudTh>Coverage User</MudTh>
+
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.coverageID</MudTd>
+        <MudTd DataLabel="Description">@context.coverageDescription</MudTd>
+        <MudTd DataLabel="General Visits">@context.numberOfGeneralVisits</MudTd>
+        <MudTd DataLabel="Specialists Visits">@context.numberOfSpecialistsVisits</MudTd>
+        <MudTd DataLabel="Coverage User">@context.totalCoverageUser</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
 
 @code {
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string searchString = "";
+    private TreatmentCoverage selectedItem = null;
+    private HashSet<TreatmentCoverage> selectedItems = new HashSet<TreatmentCoverage>();
 
+    private IEnumerable<TreatmentCoverage> Elements = new List<TreatmentCoverage>();
+    protected override void OnInitialized()
+    {
+        Elements = new CoverageMock().GetCoverages();
+    }
+
+    private bool FilterFunc(TreatmentCoverage element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(TreatmentCoverage element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.coverageID == Int32.Parse(searchString))
+            return true;
+        if (element.coverageDescription.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.numberOfGeneralVisits == Int32.Parse(searchString))
+            return true;
+        if (element.numberOfSpecialistsVisits == Int32.Parse(searchString))
+            return true;
+        if (element.totalCoverageUser == Int32.Parse(searchString))
+            return true;
+        if ($"{element.coverageID} {element.coverageDescription} {element.numberOfGeneralVisits} {element.numberOfSpecialistsVisits} {element.totalCoverageUser}".Contains(searchString))
+            return true;
+        return false;
+    }
 }

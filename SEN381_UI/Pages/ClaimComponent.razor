@@ -1,6 +1,69 @@
 ﻿@page "/Claim"
+@using SEN381_UI.Data
 <h3>ClaimComponent</h3>
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Claim,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Claims</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Nr</MudTh>
+        <MudTh>Client</MudTh>
+        <MudTh>Medical Conditions</MudTh>
+        <MudTh>Place Of Treatment</MudTh>
+        <MudTh>Call Details</MudTh>
+        <MudTh>Claime Status</MudTh>
+
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.ClaimID</MudTd>
+        <MudTd DataLabel="Client">@context.Client</MudTd>
+        <MudTd DataLabel="Medical Conditions">@context.MedicalConditions</MudTd>
+        <MudTd DataLabel="Place Of Treatment">@context.PlaceOfTreatment</MudTd>
+        <MudTd DataLabel="Call Details">@context.CallDetails</MudTd>
+        <MudTd DataLabel="Claime Status">@context.ClaimeStatus</MudTd>
+
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+        <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" Href="/ClaimAddView" />
+    </PagerContent >
+</MudTable>
+
 
 @code {
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string searchString = "";
+    private Claim selectedItem = null;
+    private HashSet<Claim> selectedItems = new HashSet<Claim>();
 
+    private IEnumerable<Claim> Elements = new List<Claim>();
+
+
+    private bool FilterFunc(Claim element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(Claim element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+           return true;
+        if (element.ClaimID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Client.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.MedicalConditions.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.PlaceOfTreatment.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.CallDetails.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ClaimeStatus.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.ClaimID} {element.Client} {element.MedicalConditions} {element.PlaceOfTreatment} {element.CallDetails} {element.ClaimeStatus}".Contains(searchString))
+            return true;
+        return false;
+    }
 }
