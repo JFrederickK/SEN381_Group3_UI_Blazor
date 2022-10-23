@@ -1,7 +1,8 @@
 ﻿@page "/Coverages"
 @using SEN381_UI.Data
+@using SEN381_UI.Shared.MockData
 <h3>Coverages Component</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<TreatmentCoverage,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Coverage,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Coverages</MudText>
         <MudSpacer />
@@ -34,18 +35,18 @@
     private bool striped = true;
     private bool bordered = true;
     private string searchString = "";
-    private TreatmentCoverage selectedItem = null;
-    private HashSet<TreatmentCoverage> selectedItems = new HashSet<TreatmentCoverage>();
+    private Coverage selectedItem = null;
+    private HashSet<Coverage> selectedItems = new HashSet<Coverage>();
 
-    private IEnumerable<TreatmentCoverage> Elements = new List<TreatmentCoverage>();
+    private IEnumerable<Coverage> Elements = new List<Coverage>();
     protected override void OnInitialized()
     {
         Elements = new CoverageMock().GetCoverages();
     }
 
-    private bool FilterFunc(TreatmentCoverage element) => FilterFunc(element, searchString);
+    private bool FilterFunc(Coverage element) => FilterFunc(element, searchString);
 
-    private bool FilterFunc(TreatmentCoverage element, string searchString)
+    private bool FilterFunc(Coverage element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
