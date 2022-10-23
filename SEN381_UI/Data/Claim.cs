@@ -28,12 +28,6 @@
         public string ClaimeStatus { get => claimeStatus; set => claimeStatus = value; }
 
 
-        public Boolean isValid()//Make sure claim is valid
-        {
-            //Implement Logic
-            return true;
-        }
-
         public void approveClaim()
         {
             //Implement Logic
