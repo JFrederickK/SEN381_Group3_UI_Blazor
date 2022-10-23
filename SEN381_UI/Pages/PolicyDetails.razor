@@ -36,20 +36,29 @@
                         {
                             string text = $"Package ID:{@package.PackageID}";
                             <MudExpansionPanel Text="@text">
+                                @foreach (TreatmentCoverage item in package.TreatmentCoverages)
+                                {
+                                    
+                                    <MudCard class="mt-2 p-2">
+                                        <MudGrid>
+                                            <MudItem xs="9">
+                                                <MudText Align="Align.Center"> Treatment: @item.Treatment.TreatmentName </MudText>
+                                                <MudText Align="Align.Center"> Coverage Level: @item.Coverage.CoverageDescription </MudText>
+                                            </MudItem>
+                                            <MudItem xs="3">
+                                                <MudText Align="Align.Center">
+                                                    <MudButton>
+                                                        <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon>
+                                                    </MudButton>
+                                                </MudText>
+                                            </MudItem>
+                                        </MudGrid>
+                                        
+                                        
+                                    </MudCard>
 
-                                <MudCard class="p-1 mt-3 overflow-scroll h-25">
-
-                                    <MudCardContent>
-                                        @foreach (TreatmentCoverage item in package.TreatmentCoverages)
-                                        {
-                                            <MudCard class="mt-2 p-2">
-                                                <MudText> Treatment: @item.Treatment.TreatmentName </MudText>
-                                                <MudText> Coverage Level: @item.Coverage.CoverageDescription </MudText>
-                                            </MudCard>
-
-                                        }
-                                    </MudCardContent>
-                                </MudCard>
+                                }
+                                        
                             </MudExpansionPanel>
                             
                         }
@@ -65,17 +74,8 @@
                             {
                                 string text = $"Client ID: {@client.clientID}";
                                 <MudExpansionPanel Text="@text">
-
-                                    <MudCard class="p-1 mt-3 overflow-scroll h-25">
-
-                                        <MudCardContent>
-                                            <MudCard class="mt-2 p-2">
-                                                <MudText> Client Name: @client.ClientName </MudText>
-                                                <MudText> Client Surname: @client.ClientSurname </MudText>
-                                            </MudCard>
-                                        </MudCardContent>
-
-                                    </MudCard>
+                                    <MudText> Client Name: @client.ClientName </MudText>
+                                    <MudText> Client Surname: @client.ClientSurname </MudText>      
                                 </MudExpansionPanel>
 
                             }
