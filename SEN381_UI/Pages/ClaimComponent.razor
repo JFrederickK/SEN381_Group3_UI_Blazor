@@ -1,5 +1,6 @@
 ﻿@page "/Claim"
 @using SEN381_UI.Data
+@inject NavigationManager Urihelper
 <h3>ClaimComponent</h3>
 <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Claim,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" Rowper>
     <ToolBarContent>
@@ -79,6 +80,6 @@
     }
     private void OnClick()
     {
-        UriHelper.NavigateTo($"/DetailView/{selectedItem.ClaimID}");
+        Urihelper.NavigateTo($"/DetailView/{selectedItem.ClaimID}");
     }
 }
