@@ -1,8 +1,6 @@
 ﻿@page "/ClaimAddView"
 @using SEN381_UI.Data
-@using SEN381_UI.Shared.MockData
-
-<MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%">Back</MudIconButton>
+<MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Claim">Back</MudIconButton>
 
 <MudGrid >
 <MudItem xs="12" sm="6">
@@ -122,7 +120,7 @@
     {
         Elements = new ClientMock().GetClients();
         MedicalElements = new MedicalConditionMock().GetMedicals();
-        TreatmentsElements = new TreatmentMock().GetTreatments();
+        TreatmentsElements = new Treatment_Mock().GetTreatments();
 
     }
     private bool FilterFunc(Client element) => FilterFunc(element, searchString);

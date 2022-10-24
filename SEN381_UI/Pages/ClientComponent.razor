@@ -34,12 +34,13 @@
         <MudTd DataLabel="Notes">@context.ClientAdHocNotes</MudTd>
     </RowTemplate>
     <PagerContent>
-        <MudTablePager />
+        <MudTablePager PageSizeOptions="pageSizeOptions" />
     </PagerContent>
 </MudTable>
 <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Add" />
 
 @code {
+    private int[] pageSizeOptions = new int[] {5, 10, 15};
     private bool dense = false;
     private bool hover = true;
     private bool striped = true;
