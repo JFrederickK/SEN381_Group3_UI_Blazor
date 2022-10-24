@@ -1,0 +1,34 @@
+﻿@page "/CoverageDV/{id}"
+<h3>Coverage Detailed View</h3>
+<MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Coverages">Back</MudIconButton>
+<MudGrid>
+    <MudItem xs="6" sm="6">
+        <MudTextField T="string" Label="Coverage ID" ReadOnly="true" Text="@id" Variant="Variant.Outlined"></MudTextField>
+    </MudItem>
+    <MudItem xs="6" sm="6">
+        <MudTextField T="string" Label="Description" ReadOnly="true" HelperText="Gold, Silwer, Platinum" HelperTextOnFocus="true" Text="Coverage name"></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudTextField T="int" Label="General Visits" Text=""></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudTextField T="int" Label="Specialists Visits" Text=""></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudTextField T="int" Label="Coverage User" Text=""></MudTextField>
+    </MudItem>
+</MudGrid>
+
+<MudGrid Style="margin-top:auto">
+    <MudItem xs="12" sm="6">
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Changes</MudButton>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save Changes</MudButton>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public string? id { get; set; }
+}

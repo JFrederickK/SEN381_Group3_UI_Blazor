@@ -1,8 +1,14 @@
 {
   "ExpandedNodes": [
     "",
-    "\\SEN381_UI"
+    "\\SEN381_UI",
+    "\\SEN381_UI\\Data",
+    "\\SEN381_UI\\Pages"
   ],
+<<<<<<< HEAD
   "SelectedNode": "\\SEN381_UI.sln",
+=======
+  "SelectedNode": "\\SEN381_UI\\Pages\\TreatmentComponent.razor",
+>>>>>>> 0611a9306cc031275b21417de9851d4642a0e0c1
   "PreviewInSolutionExplorer": false
 }

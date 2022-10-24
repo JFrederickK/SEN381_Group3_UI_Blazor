@@ -1,9 +1,10 @@
 ﻿@page "/Claim"
-@using SEN381_API_Group3.shared.models
+@using SEN381_UI.Data
+@inject NavigationManager Urihelper
 <h3>ClaimComponent</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Claim,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Claim,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" Rowper>
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Clients</MudText>
+        <MudText Typo="Typo.h6">Claims</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
@@ -26,9 +27,16 @@
 
     </RowTemplate>
     <PagerContent>
-        <MudTablePager />
-    </PagerContent>
+        <MudTablePager PageSizeOptions="new int[] {5,10,20, 25, 30, 35, 40}" />
+    </PagerContent >
+
 </MudTable>
+<MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" Href="/ClaimAddView" Style="margin-top:1%"/>
+@if (selectedItem != null)
+{
+    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit" Style="margin-top:1%;margin-left:1%" OnClick="OnClick"/>
+}
+
 
 @code {
     private bool dense = false;
@@ -38,16 +46,22 @@
     private string searchString = "";
     private Claim selectedItem = null;
     private HashSet<Claim> selectedItems = new HashSet<Claim>();
+    private string id = "1";
+
+
 
     private IEnumerable<Claim> Elements = new List<Claim>();
-
+    protected override void OnInitialized()
+    {
+        Elements = new ClaimMock().GetClaims();
+    }
 
     private bool FilterFunc(Claim element) => FilterFunc(element, searchString);
 
     private bool FilterFunc(Claim element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
-            return true;
+           return true;
         if (element.ClaimID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if (element.Client.Contains(searchString, StringComparison.OrdinalIgnoreCase))
@@ -63,5 +77,9 @@
         if ($"{element.ClaimID} {element.Client} {element.MedicalConditions} {element.PlaceOfTreatment} {element.CallDetails} {element.ClaimeStatus}".Contains(searchString))
             return true;
         return false;
+    }
+    private void OnClick()
+    {
+        Urihelper.NavigateTo($"/DetailView/{selectedItem.ClaimID}");
     }
 }

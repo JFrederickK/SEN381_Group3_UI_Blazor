@@ -1,0 +1,87 @@
+﻿@page "/TreatmentAdd"
+@using SEN381_UI.Shared.MockData
+<h3>Add treatment</h3>
+<MudGrid>
+    <MudItem xs="12">
+        <MudTextField @bind-Value="treatmentName" Label="Treatment Name" Variant="Variant.Filled" HelperText="Please enter the name of the treatment" MaxLength="25" Counter="25" Immediate="true" Validation="@(new Func<string, IEnumerable<string>>(MaxCharacters))"></MudTextField>
+    </MudItem>
+    <MudItem xs="12">
+        <MudTable Items="@MedicalProviderElements" @bind-SelectedItem="selectedMedical" Hover="true" Style="margin-top:1%">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Medical Service Provider list</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchMedicalServiceProvider" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Nr</MudTh>
+                <MudTh>Name</MudTh>
+
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Nr">@context.PolicyProviderID</MudTd>
+                <MudTd DataLabel="Name">@context.PolicyProviderName</MudTd>
+
+            </RowTemplate>
+            <FooterContent>
+                <MudTd colspan="5">Select All</MudTd>
+            </FooterContent>
+        </MudTable>
+        <MudText Inline="true">Selected items: @(selectedMedicals == null ? "" : string.Join(", ", selectedMedicals.OrderBy(x => x.PolicyProviderName).Select(x => x.PolicyProviderName)))</MudText>
+        @if (selectedMedical !=null)
+        {
+            <MudTextField @bind-Value="displayDetails().PolicyProviderName" Label="Privder name" ReadOnly="true" Variant="Variant.Outlined" Style="margin-bottom:1%" />
+            <MudTextField @bind-Value="displayDetails().PolicyProviderAddresses" Label="Privder Adress" ReadOnly="true" Variant="Variant.Outlined" Style="margin-bottom:1%" />
+            <MudTextField @bind-Value="displayDetails().PolicyProviderEmail" Label="Privder Email" ReadOnly="true" Variant="Variant.Outlined" Style="margin-bottom:1%" />
+            <MudTextField @bind-Value="displayDetails().PolicProviderPhone" Label="Privder Phone number" ReadOnly="true" Variant="Variant.Outlined" Style="margin-bottom:1%" />
+        }
+
+    </MudItem>
+    <MudItem xs="12">
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" Style="margin-top:1%">Add new treatment</MudButton>
+
+    </MudItem>
+
+</MudGrid>
+
+
+
+
+@code {
+    public string treatmentName { get; set; }
+    private string searchMedicalServiceProvider = "";
+    private MedicalServiceProvider selectedMedical = null;
+    private HashSet<MedicalServiceProvider> selectedMedicals = new HashSet<MedicalServiceProvider>();
+
+    private IEnumerable<MedicalServiceProvider> MedicalProviderElements = new List<MedicalServiceProvider>();
+    private bool FilterTreatment(MedicalServiceProvider element) => FilterTreatment(element, searchMedicalServiceProvider);
+    protected override void OnInitialized()
+    {
+        MedicalProviderElements = new MedicalProviderMock().GetMedicalServiceProviders();
+
+    }
+
+    private bool FilterTreatment(MedicalServiceProvider element, string searchMedical)
+    {
+
+        if (string.IsNullOrWhiteSpace(searchMedical))
+            return true;
+        if (element.PolicyProviderID.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.PolicyProviderID} {element.PolicyProviderName}".Contains(searchMedicalServiceProvider))
+            return true;
+        return false;
+    }
+    private IEnumerable<string> MaxCharacters(string ch)
+    {
+        if (!string.IsNullOrEmpty(ch) && 25 < ch?.Length)
+            yield return "Max 25 characters";
+    }
+    public MedicalServiceProvider displayDetails()
+    {
+        MedicalServiceProvider selected = new MedicalServiceProvider(selectedMedical.PolicyProviderID, selectedMedical.PolicyProviderName, selectedMedical.PolicyProviderAddresses, selectedMedical.PolicyProviderEmail, selectedMedical.PolicProviderPhone);
+        return selected;
+
+    }
+
+}
+
