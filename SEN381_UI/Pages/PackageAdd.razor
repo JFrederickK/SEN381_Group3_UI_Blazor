@@ -1,0 +1,45 @@
+﻿@page "/PackagesAdd"
+@inject NavigationManager UriHelper
+
+<h3>Package Add</h3>
+
+
+
+<MudItem xs="6" sm="6">
+    <MudDateRangePicker Label="Package Availability Dates" @bind-DateRange="_dateRange"></MudDateRangePicker>
+</MudItem>
+
+
+<MudSelect T="string" Label="TreatmentNames" AnchorOrigin="Origin.BottomCenter">
+    
+    @foreach (Coverage coverage in coverages)
+    {
+        <MudSelectItem Value="@coverage.coverageDescription"/>
+    }
+    
+</MudSelect>
+
+
+<MudSelect T="string" Label="TreatmentNames" AnchorOrigin="Origin.BottomCenter">
+    
+    @foreach (Treatment treatment in treatments)
+    {
+        <MudSelectItem Value="@treatment.TreatmentName"/>
+    }
+    
+</MudSelect>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary">Create Package</MudButton>
+
+@code {
+    List<Treatment> treatments = new TreatmentMock().GetTreatments();
+    List<Coverage> coverages = new CoverageMock().GetCoverages();
+
+    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);//Used for date picker
+
+    public void ToTreatment(String id)
+    {
+        UriHelper.NavigateTo($"/Treatment/{id}");
+    }
+
+}
