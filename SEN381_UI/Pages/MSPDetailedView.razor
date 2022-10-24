@@ -1,0 +1,43 @@
+﻿@page "/MSPDetailedView/{id}"
+@using System.ComponentModel.DataAnnotations
+<h3>MSP Detailed View</h3>
+<MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/MedicalServiceProvider">Back</MudIconButton>
+<MudGrid>
+    <MudItem xs="6" sm="6">
+        <MudTextField T="string" Label="Provider ID" ReadOnly="true" Text="@id" Variant="Variant.Outlined"></MudTextField>
+    </MudItem>
+    <MudItem xs="6" sm="6">
+        <MudTextField T="string" Label="Name" ReadOnly="true" @bind-Value="providerName"></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudTextField T="string" Label="Address" @bind-Value="providerAddress"></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudTextField T="string" Label="Email" Text="" @bind-Value="Email"></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value="providerPhone"></MudTextField>
+    </MudItem>
+</MudGrid>
+
+<MudGrid Style="margin-top:auto">
+    <MudItem xs="12" sm="6">
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Changes</MudButton>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save Changes</MudButton>
+    </MudItem>
+</MudGrid>
+@code {
+    [Parameter]
+    public string? id { get; set; }
+
+    public string providerName { get; set; }
+
+    public string providerAddress { get; set; }
+
+    [EmailAddress]
+    public string Email { get; set; }
+
+    public string providerPhone { get; set; }
+}
