@@ -1,0 +1,64 @@
+﻿@using SEN381_UI.Data
+@using SEN381_UI.Shared.MockData
+@page "/MedicalConditions/{id}"
+
+<MudCard style="max-height:1000px; overflow: auto;">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h5" Align="Align.Center">Medical Condition Details</MudText>
+        </CardHeaderContent>
+        <CardHeaderAvatar>
+            <MudIconButton Icon="@Icons.Filled.KeyboardBackspace"></MudIconButton>
+        </CardHeaderAvatar>
+    </MudCardHeader>
+    <MudForm Class="p-5">
+        <MudGrid>
+
+            @*Medical Condition Basic Details*@
+            <MudItem xs="6" sm="6">
+                <MudTextField T="string" Label="Medical Condition ID" ReadOnly="true" Text="@id"></MudTextField>
+            </MudItem>
+            <MudItem xs="6" sm="6">
+                <MudTextField T="string" Label="Medical Condition name" @bind-status=name Text="@name"></MudTextField>
+            </MudItem>
+
+            @*Treatment Details *@
+            <MudItem lg="12" sm="6">
+                <MudExpansionPanel class="h-25" Text="Potential Treatment Details">
+
+                    <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
+                        @foreach (Treatment treatment in treatments)
+                        {
+                            string text = $"Treatment ID: {@treatment.TreatmentID}";
+                            <MudExpansionPanel Text="@text">
+                                <MudText> Treatment Name: @treatment.TreatmentName </MudText>
+                                <MudText> Treatment Description: @treatment.TreatmentDescription </MudText>
+                            </MudExpansionPanel>
+
+                        }
+                    </MudExpansionPanels>
+                </MudExpansionPanel>
+            </MudItem>
+
+            <MudItem xs="6" sm="6">
+                <MudButton>Cancel Changes</MudButton>
+            </MudItem>
+            <MudItem xs="6" sm="6">
+                <MudButton>Save Changes</MudButton>
+            </MudItem>
+
+        </MudGrid>
+    </MudForm>
+
+</MudCard>
+
+
+@code {
+
+    [Parameter]
+    public string? id { get; set; }
+    string name = "dasd";//Get from service
+
+    List<Treatment> treatments = new TreatmentMock().GetTreatments();//Replace with service
+}
+

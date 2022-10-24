@@ -5,9 +5,9 @@
         string medicalConditionID;
         string medicalConditionName;
         string medicalConditionDescription;
-        string treatments;
+        List<Treatment> treatments;
 
-        public MedicalCondition(string medicalConditionID, string medicalConditionName, string medicalConditionDescription, string treatments)
+        public MedicalCondition(string medicalConditionID, string medicalConditionName, string medicalConditionDescription, List<Treatment> treatments)
         {
             this.medicalConditionID = medicalConditionID;
             this.medicalConditionName = medicalConditionName;
@@ -19,7 +19,7 @@
         public string MedicalConditionID { get => medicalConditionID; set => medicalConditionID = value; }
         public string MedicalConditionName { get => medicalConditionName; set => medicalConditionName = value; }
         public string MedicalConditionDescription { get => medicalConditionDescription; set => medicalConditionDescription = value; }
-        public string Treatments { get => treatments; set => treatments = value; }
+        public List<Treatment> Treatments { get => treatments; set => treatments = value; }
 
     }
 }
