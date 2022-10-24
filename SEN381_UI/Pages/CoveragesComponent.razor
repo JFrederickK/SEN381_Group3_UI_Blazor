@@ -1,8 +1,10 @@
 ﻿@page "/Coverages"
 @using SEN381_UI.Data
+@using SEN381_UI.Shared.MockData
+@inject NavigationManager UriHelper
 
 <h3>Coverages Component</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<TreatmentCoverage,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Coverage,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Coverages</MudText>
         <MudSpacer />
@@ -28,7 +30,6 @@
         </PagerContent>
     </MudTable>
 
-</MudGrid>
 <MudItem Style="margin-top:1%">
     <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Style="margin-top:1%;margin-top:1%" Href="/AddCoverage"/>
     @if (selectedItem != null)
