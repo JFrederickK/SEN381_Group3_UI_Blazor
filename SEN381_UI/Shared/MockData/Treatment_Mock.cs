@@ -1,11 +1,12 @@
 ﻿using SEN381_API_Group3.shared.models;
 
-namespace SEN381_UI.Data
+namespace SEN381_UI.Shared.MockData
 {
     public class Treatment_Mock
     {
-        public List<Treatment> GetTreatments() { 
-        List<Treatment> result = new List<Treatment>();
+        public List<Treatment> GetTreatments()
+        {
+            List<Treatment> result = new List<Treatment>();
 
             result.Add(new Treatment("1", "temp1", "desctiption", "1"));
             result.Add(new Treatment("2", "temp2", "desctiption", "1"));
