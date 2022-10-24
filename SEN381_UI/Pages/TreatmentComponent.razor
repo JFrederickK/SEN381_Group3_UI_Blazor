@@ -1,6 +1,6 @@
 ﻿@page "/Treatment"
-@using SEN381_API_Group3.shared.models
 @using SEN381_UI.Data
+@using SEN381_UI.Shared.MockData
 <h3>Treatment Component</h3>
 <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Treatment,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" LoadingProgressColor="Color.Primary" FixedHeader="@Theader">
     <ToolBarContent>
@@ -9,10 +9,10 @@
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <ColGroup>
-        <col style="background-color:aqua"/>
+        @*<col style="background-color:aqua"/>
         <col style="background-color:aquamarine"/>
         <col style="background-color:aqua"/>
-        <col style="background-color:aquamarine" />
+        <col style="background-color:aquamarine" />*@
 
     </ColGroup>
     <HeaderContent>
@@ -25,7 +25,15 @@
         <MudTd DataLabel="Nr">@context.TreatmentID</MudTd>
         <MudTd DataLabel="Name">@context.TreatmentName</MudTd>
         <MudTd DataLabel="Description">@context.TreatmentDescription</MudTd>
-        <MudTd DataLabel="Medica lService Providers">@context.MedicalServiceProviders</MudTd>
+        <MudTd DataLabel="Medica lService Providers">
+            <MudChipSet>
+                @foreach (string item in getProviderNames(context.MedicalServiceProviders))
+                {
+                    <MudChip>@item</MudChip>
+                }
+            </MudChipSet>
+            @context.MedicalServiceProviders
+        </MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
@@ -51,20 +59,31 @@
 
     private bool FilterFunc(Treatment element) => FilterFunc(element, searchString);
 
-    private bool FilterFunc(Treatment element, string searchString)
+    private bool FilterFunc(Treatment element, string searchString)// Remove to filter with query
     {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.TreatmentID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.TreatmentName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.TreatmentDescription.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.MedicalServiceProviders.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{element.TreatmentID} {element.TreatmentName} {element.TreatmentDescription} {element.MedicalServiceProviders} ".Contains(searchString))
-            return true;
+        //if (string.IsNullOrWhiteSpace(searchString))
+        //    return true;
+        //if (element.TreatmentID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.TreatmentName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.TreatmentDescription.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        ////if (element.MedicalServiceProviders.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        ////    return true; 
+        //if ($"{element.TreatmentID} {element.TreatmentName} {element.TreatmentDescription} {element.MedicalServiceProviders} ".Contains(searchString))
+        //    return true;
         return false;
+    }
+
+    private List<string> getProviderNames(List<MedicalServiceProvider> providers){
+        List<string> name = new List<string>();
+
+        foreach (MedicalServiceProvider item in providers)
+        {
+            name.Add(item.PolicyProviderName);
+        }
+
+        return name;
     }
 }

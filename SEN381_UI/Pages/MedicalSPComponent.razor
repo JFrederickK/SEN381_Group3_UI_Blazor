@@ -1,5 +1,6 @@
 ﻿@page "/MedicalServiceProvider"
 @using SEN381_UI.Data
+@using SEN381_UI.Shared.MockData
 <h3>MedicalSPComponent</h3>
 <MudTable Items="@Elements"  Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<MedicalServiceProvider,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
     <ToolBarContent>
