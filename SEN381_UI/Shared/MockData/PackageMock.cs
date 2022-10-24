@@ -1,16 +1,19 @@
 ﻿using SEN381_UI.Data;
 
-namespace SEN381_UI.Shared.Mock_Data
+namespace SEN381_UI.Shared.MockData
 {
     public class PackageMock
     {
-        public List<Package> getMockPackages()
+        public List<Package> getPackages()
         {
-            List<Package> packages = new List<Package>();
-            packages.Add(new Package("1", "Sdsadl", "st"));
-            packages.Add(new Package("2", "Sd3", "st2"));
-            packages.Add(new Package("3", "S2", "st3"));
-            return packages;
+            return new List<Package>()
+            {
+                new Package("0",new TreatmentCoverageMock().getTreatmentCoverage()),
+                new Package("1",new TreatmentCoverageMock().getTreatmentCoverage()),
+                new Package("2",new TreatmentCoverageMock().getTreatmentCoverage()),
+                new Package("3",new TreatmentCoverageMock().getTreatmentCoverage()),
+                new Package("4",new TreatmentCoverageMock().getTreatmentCoverage())
+            };
         }
     }
 }

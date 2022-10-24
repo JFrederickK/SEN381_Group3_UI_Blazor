@@ -1,4 +1,4 @@
-﻿using SEN381_API_Group3.shared.models;
+﻿using SEN381_UI.Data;
 
 namespace SEN381_UI.Shared.MockData
 {
