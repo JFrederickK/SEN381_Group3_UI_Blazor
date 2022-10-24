@@ -23,7 +23,7 @@
         <MudTh>Status</MudTh>
         <MudTh>Notes</MudTh>
     </HeaderContent>
-    <RowTemplate>
+    <RowTemplate onclick="ToDetails(@context.ClientID)">
         <MudTd DataLabel="Nr">@context.ClientID</MudTd>
         <MudTd DataLabel="Name">@context.ClientName</MudTd>
         <MudTd DataLabel="Surname">@context.ClientSurname</MudTd>
@@ -91,5 +91,10 @@
 
     public void OnClick() {
         UriHelper.NavigateTo($"/ClientAddView");
+    }
+
+    public void ToDetails(String id)
+    {
+        UriHelper.NavigateTo($"/ClientDetails/{id}");
     }
 }
