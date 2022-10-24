@@ -1,6 +1,107 @@
 ﻿@page "/MedicalConditions"
-<h3>MedicalConditionsComponent</h3>
+@using SEN381_UI.Data
+@inject NavigationManager Urihelper
+
+<h3>Medical Conditions</h3>
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<MedicalCondition,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" 
+          SortLabel="Sort by" Rowper
+          T="MedicalCondition"
+          OnRowClick="@navigateToDetails" >
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Medical Conditions</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>ID</MudTh>
+        <MudTh>Condition Name</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>Treatments</MudTh>
+
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="ID">@context.MedicalConditionID</MudTd>
+        <MudTd DataLabel="NAME">@context.MedicalConditionName</MudTd>
+        <MudTd DataLabel="DESCRIPTION">@context.MedicalConditionDescription</MudTd>
+        <MudTd DataLabel="TREATMENTS">
+            <MudChipSet>
+                @foreach (string item in getTreatments(context.Treatments))
+                {
+                    <MudChip>@item</MudChip>
+                }
+            </MudChipSet>
+        </MudTd>
+
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] {5,10,20, 25, 30, 35, 40}" />
+    </PagerContent>
+
+</MudTable>
+<MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" OnClick="navigateToAdd" Style="margin-top:1%" />
+
 
 @code {
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string searchString = "";
+    private MedicalCondition selectedItem = null;
+    private HashSet<MedicalCondition> selectedItems = new HashSet<MedicalCondition>();
+    private string id = "1";
 
+
+
+    private IEnumerable<MedicalCondition> Elements = new List<MedicalCondition>();
+    protected override void OnInitialized()
+    {
+        Elements = new MedicalConditionMock().GetMedicals();
+    }
+    private bool FilterFunc(MedicalCondition element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(MedicalCondition element, string searchString)
+    {
+        //if (string.IsNullOrWhiteSpace(searchString))
+        //    return true;
+        //if (element.ClaimID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.Client.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.MedicalConditions.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.PlaceOfTreatment.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.CallDetails.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.ClaimeStatus.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if ($"{element.ClaimID} {element.Client} {element.MedicalConditions} {element.PlaceOfTreatment} {element.CallDetails} {element.ClaimeStatus}".Contains(searchString))
+        //    return true;
+        //return false;
+        return true;
+    }
+
+    private void OnClick()
+    {
+        Urihelper.NavigateTo($"/DetailView/{selectedItem.MedicalConditionID}");
+    }
+
+    private void navigateToAdd(){
+        Urihelper.NavigateTo($"/MedicalConditionAdd");
+    }
+
+    private void navigateToDetails(TableRowClickEventArgs<MedicalCondition> mc){
+        Urihelper.NavigateTo($"/medicalconditions/{mc.Item.MedicalConditionID}");
+    }
+
+    private List<string> getTreatments(List<Treatment> treatments){
+        List<string> text = new List<string>();
+        foreach (Treatment treat in treatments)
+        {
+            text.Add(treat.TreatmentName);
+        }
+        return text;
+    }
 }
+
