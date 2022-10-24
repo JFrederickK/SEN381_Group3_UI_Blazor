@@ -1,32 +1,21 @@
-﻿namespace SEN381_UI.Data
+﻿using SEN381_UI.Data;
+
+namespace SEN381_UI.Data
 {
     public class TreatmentCoverage
     {
-        public int coverageID;
-        public string coverageDescription;
-        public int numberOfGeneralVisits;
-        public int numberOfSpecialistsVisits;
-        public int totalCoverageUser;
+        Treatment treatment;
+        Coverage coverage;
 
-
-
-        public TreatmentCoverage(int coverageID, string coverageDescription, int numberOfGeneralVisits, int numberOfSpecialistsVisits, int totalCoverageUser)
+        public TreatmentCoverage()
+        {}
+        public TreatmentCoverage(Treatment treatment, Coverage coverage)
         {
-            this.coverageID = coverageID;
-            this.coverageDescription = coverageDescription;
-            this.numberOfGeneralVisits = numberOfGeneralVisits;
-            this.numberOfSpecialistsVisits = numberOfSpecialistsVisits;
-            this.totalCoverageUser = totalCoverageUser;
+            this.treatment = treatment;
+            this.coverage = coverage;
         }
 
-        public int CoverageID { get => coverageID; set => coverageID = value; }
-        public string CoverageDescription { get => coverageDescription; set => coverageDescription = value; }
-        public int NumberOfGeneralVisits { get => numberOfGeneralVisits; set => numberOfGeneralVisits = value; }
-        public int NumberOfSpecialistsVisits { get => numberOfSpecialistsVisits; set => numberOfSpecialistsVisits = value; }
-        public int TotalCoverageUser { get => totalCoverageUser; set => totalCoverageUser = value; }
-
-
-
+        public Treatment Treatment { get => treatment; set => treatment = value; }
+        public Coverage Coverage { get => coverage; set => coverage = value; }
     }
 }
-

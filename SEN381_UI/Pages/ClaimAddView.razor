@@ -1,6 +1,7 @@
 ﻿@page "/ClaimAddView"
-@using SEN381_API_Group3.shared.models
 @using SEN381_UI.Data
+@using SEN381_UI.Shared.MockData
+
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%">Back</MudIconButton>
 
 <MudGrid >
@@ -187,7 +188,7 @@
     private MedicalCondition selectedMedical = null;
     private HashSet<MedicalCondition> selectedMedicals = new HashSet<MedicalCondition>();
 
-    private IEnumerable<MedicalCondition> MedicalElements = new List<MedicalCondition>();
+    private List<MedicalCondition> MedicalElements = new List<MedicalCondition>();
     private bool Filter(MedicalCondition element) => Filter(element, searchMedical);
 
     private bool Filter(MedicalCondition element, string searchMedical)

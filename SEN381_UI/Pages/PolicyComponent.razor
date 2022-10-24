@@ -1,6 +1,91 @@
 ﻿@page "/Policy"
+@using SEN381_UI.Data
+@using SEN381_UI.Shared.MockData
+@inject NavigationManager Navigation
+
 <h3>PolicyComponent</h3>
 
-@code {
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+          Filter="new Func<Policy,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by"
+          T="Policy"
+          OnRowClick="@navigate">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Clients</MudText>
+        <MudSpacer/>
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Policy ID</MudTh>
+        <MudTh>Policy Name</MudTh>
+        <MudTh>Policy Status</MudTh>
+        <MudTh>Package Treatments</MudTh>
 
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Policy ID">@context.PolicyId</MudTd>
+        <MudTd DataLabel="Policy Name">@context.PolicyName</MudTd>
+        <MudTd DataLabel="Policy Status">@context.PolicyStatus</MudTd>
+        <MudTd DataLabel="Package Treatments">
+            @foreach (string item in @PackageTreatments(@context.Package))
+            {
+                <MudChip>item</MudChip>
+            } 
+        </MudTd>
+
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Href="/PolicyAdd" />
+
+@code {
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string searchString = "";
+    private Policy selectedItem = null;
+    private HashSet<Policy> selectedItems = new HashSet<Policy>();
+
+    private IEnumerable<Policy> Elements = new List<Policy>();
+
+    protected override void OnInitialized()
+    {
+
+        Elements = new PolicyMock().getMockPolicies();
+    }
+
+    private bool FilterFunc(Policy element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(Policy element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.PolicyId.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.PolicyName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.PolicyStatus.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private List<string> PackageTreatments(List<Package> pack){
+        List<string> treatments = new List<string>();
+
+        foreach (Package item in pack)
+        {
+            foreach (TreatmentCoverage tc in item.TreatmentCoverages)
+            {
+                treatments.Add(tc.Treatment.TreatmentName);
+            }
+        }
+        return treatments;
+    }
+
+    private void navigate(TableRowClickEventArgs<Policy> p)
+    {
+        Navigation.NavigateTo($"Policy/{p.Item.PolicyId}");
+    }
 }
