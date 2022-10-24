@@ -1,5 +1,4 @@
-﻿using SEN381_UI.Shared.MockData;
-using SEN381_UI.Data;
+﻿using SEN381_API_Group3.shared.models;
 
 namespace SEN381_UI.Shared.MockData
 {
@@ -8,7 +7,7 @@ namespace SEN381_UI.Shared.MockData
         public List<Treatment> GetTreatments()
         {
             List<Treatment> treatments = new List<Treatment>();
-            treatments.Add(new Treatment("1", "Covid", "Help kill covid", new MedicalProviderMock().GetMedicalServiceProviders()));
+            treatments.Add(new Treatment("1", "Covid", "Help kill covid", "2"));
             return treatments;
         }
     }
