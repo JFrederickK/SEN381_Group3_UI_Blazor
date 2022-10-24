@@ -1,0 +1,65 @@
+﻿@using SEN381_UI.Data
+@using SEN381_UI.Shared.MockData
+@page "/Treatment/{id}"
+
+<MudCard style="max-height:1000px; overflow: auto;">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h5" Align="Align.Center">Treatment Details</MudText>
+        </CardHeaderContent>
+        <CardHeaderAvatar>
+            <MudIconButton Icon="@Icons.Filled.KeyboardBackspace"></MudIconButton>
+        </CardHeaderAvatar>
+    </MudCardHeader>
+    <MudForm Class="p-5">
+        <MudGrid>
+
+            @*Medical Condition Basic Details*@
+            <MudItem xs="6" sm="6">
+                <MudTextField T="string" Label="Treatment ID" ReadOnly="true" Text="@id"></MudTextField>
+            </MudItem>
+            <MudItem xs="6" sm="6">
+                <MudTextField T="string" Label="Treatment Name" @bind-status=name Text="@name"></MudTextField>
+            </MudItem>
+
+            @*Provider Details *@
+            <MudItem lg="12" sm="6">
+                <MudExpansionPanel class="h-25" Text="Medical Service Providers">
+
+                    <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
+                        @foreach (MedicalServiceProvider provider in providers)
+                        {
+                            string text = $"Provider ID: {@provider.PolicyProviderID}";
+                            <MudExpansionPanel Text="@text">
+                                <MudText> Provider Name: @provider.PolicyProviderName </MudText>
+                                <MudText> Provider Address: @provider.PolicyProviderAddresses </MudText>
+                                <MudText> Provider Phone: @provider.PolicProviderPhone </MudText>
+                            </MudExpansionPanel>
+
+                        }
+                    </MudExpansionPanels>
+                </MudExpansionPanel>
+            </MudItem>
+
+            <MudItem xs="6" sm="6">
+                <MudButton>Cancel Changes</MudButton>
+            </MudItem>
+            <MudItem xs="6" sm="6">
+                <MudButton>Save Changes</MudButton>
+            </MudItem>
+
+        </MudGrid>
+    </MudForm>
+
+</MudCard>
+
+
+@code {
+
+    [Parameter]
+    public string? id { get; set; }
+    string name = "dasd";//Get from service
+
+    List<MedicalServiceProvider> providers = new MedicalProviderMock().GetMedicalServiceProviders();//Replace with service
+}
+
