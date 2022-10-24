@@ -1,6 +1,105 @@
 ﻿@page "/Packages"
-<h3>PackagesComponent</h3>
+@using SEN381_UI.Data
+@inject NavigationManager Urihelper
+
+<h3>Policy Packages</h3>
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Package,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
+          SortLabel="Sort by" Rowper
+          T="Package"
+          OnRowClick="@navigateToDetails">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Packages</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>ID</MudTh>
+        <MudTh>Treatment Coverages</MudTh>
+        <MudTh>Package Status</MudTh>
+
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="ID">@context.PackageID</MudTd>
+        <MudTd DataLabel="TreatmentCoverages">
+            <MudChipSet>
+                @foreach (string item in getCoverages(context.TreatmentCoverages))
+                {
+                    <MudChip>@item</MudChip>
+                }
+            </MudChipSet>
+        </MudTd>
+        <MudTd DataLabel="PackageStatus">@status</MudTd>
+
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] {5,10,20, 25, 30, 35, 40}" />
+    </PagerContent>
+
+</MudTable>
+<MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" OnClick="navigateToAdd" Style="margin-top:1%" />
+
 
 @code {
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string searchString = "";
+    private Package selectedItem = null;
+    private HashSet<Package> selectedItems = new HashSet<Package>();
+    private string id = "1";
+    private string status = "Active";
 
+
+
+    private IEnumerable<Package> Elements = new List<Package>();
+    protected override void OnInitialized()
+    {
+        Elements = new PackageMock().getPackages();
+    }
+    private bool FilterFunc(Package element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(Package element, string searchString)
+    {
+        //if (string.IsNullOrWhiteSpace(searchString))
+        //    return true;
+        //if (element.ClaimID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.Client.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.MedicalConditions.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.PlaceOfTreatment.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.CallDetails.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if (element.ClaimeStatus.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        //if ($"{element.ClaimID} {element.Client} {element.MedicalConditions} {element.PlaceOfTreatment} {element.CallDetails} {element.ClaimeStatus}".Contains(searchString))
+        //    return true;
+        //return false;
+        return true;
+    }
+
+    private void navigateToAdd()
+    {
+        Urihelper.NavigateTo($"/PackagesAdd");
+    }
+
+    private void navigateToDetails(TableRowClickEventArgs<Package> mc)
+    {
+        Urihelper.NavigateTo($"/Packages/{mc.Item.PackageID}");
+    }
+
+    private List<string> getCoverages(List<TreatmentCoverage> tcs)
+    {
+        List<string> text = new List<string>();
+        foreach (TreatmentCoverage treat in tcs)
+        {
+            text.Add($"{treat.Treatment.TreatmentName}\n{treat.Coverage.CoverageDescription}");
+        }
+        return text;
+    }
 }
+
+
