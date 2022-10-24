@@ -1,6 +1,8 @@
 ﻿@page "/Coverages"
 @using SEN381_UI.Data
 @using SEN381_UI.Shared.MockData
+@inject NavigationManager UriHelper
+
 <h3>Coverages Component</h3>
 <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Coverage,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
     <ToolBarContent>
@@ -15,19 +17,28 @@
         <MudTh>Specialists Visits</MudTh>
         <MudTh>Coverage User</MudTh>
 
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Nr">@context.coverageID</MudTd>
-        <MudTd DataLabel="Description">@context.coverageDescription</MudTd>
-        <MudTd DataLabel="General Visits">@context.numberOfGeneralVisits</MudTd>
-        <MudTd DataLabel="Specialists Visits">@context.numberOfSpecialistsVisits</MudTd>
-        <MudTd DataLabel="Coverage User">@context.totalCoverageUser</MudTd>
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager />
-    </PagerContent>
-</MudTable>
-<MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" />
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nr">@context.coverageID</MudTd>
+            <MudTd DataLabel="Description">@context.coverageDescription</MudTd>
+            <MudTd DataLabel="General Visits">@context.numberOfGeneralVisits</MudTd>
+            <MudTd DataLabel="Specialists Visits">@context.numberOfSpecialistsVisits</MudTd>
+            <MudTd DataLabel="Coverage User">@context.totalCoverageUser</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+
+<MudItem Style="margin-top:1%">
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Style="margin-top:1%;margin-top:1%" Href="/AddCoverage"/>
+    @if (selectedItem != null)
+    {
+        <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit" Style="margin-top:1%;margin-left:1%" OnClick="OnClick" />
+    }
+</MudItem>
+
+
 
 @code {
     private bool dense = false;
@@ -52,16 +63,11 @@
             return true;
         if (element.coverageID == Int32.Parse(searchString))
             return true;
-        if (element.coverageDescription.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.numberOfGeneralVisits == Int32.Parse(searchString))
-            return true;
-        if (element.numberOfSpecialistsVisits == Int32.Parse(searchString))
-            return true;
-        if (element.totalCoverageUser == Int32.Parse(searchString))
-            return true;
-        if ($"{element.coverageID} {element.coverageDescription} {element.numberOfGeneralVisits} {element.numberOfSpecialistsVisits} {element.totalCoverageUser}".Contains(searchString))
-            return true;
         return false;
     }
-}
+        private void OnClick()
+        {
+            UriHelper.NavigateTo($"/CoverageDV/{selectedItem.CoverageID}");
+        }
+    }
+

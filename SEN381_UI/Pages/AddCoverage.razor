@@ -1,0 +1,44 @@
+﻿@page "/AddCoverage"
+<h3>Coverage Details</h3>
+<MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Coverages">Back</MudIconButton>
+<MudGrid>
+    <MudItem xs="6" sm="6">
+        <MudAutocomplete T="string" Label="Description" @bind-Value="coverageDescription" SearchFunc="@TypeOfDescription" Variant="Variant.Outlined" Clearable="true"/>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudNumericField @bind-Value="coverageVisit" Label="General Visits" Variant="Variant.Outlined" />
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudNumericField @bind-Value="coverageSVisit" Label="Specialists Visits" Variant="Variant.Outlined" />
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudNumericField @bind-Value="coverageUVisit" Label="Coverage User" Variant="Variant.Outlined" />
+    </MudItem>
+</MudGrid>
+
+<MudGrid Style="margin-top:auto">
+    <MudItem xs="12" sm="6">
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Add</MudButton>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save</MudButton>
+    </MudItem>
+</MudGrid>
+@code {
+    private string coverageDescription;
+    private int coverageVisit { get; set; }
+    private int coverageSVisit { get; set; }
+    private int coverageUVisit { get; set; }
+
+    private string[] description = { "Gold", "Silwer", "Platinum" };
+    private async Task<IEnumerable<string>> TypeOfDescription(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return description;
+        return description.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+}
