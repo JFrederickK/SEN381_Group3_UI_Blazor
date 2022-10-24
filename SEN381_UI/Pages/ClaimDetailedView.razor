@@ -1,0 +1,41 @@
+﻿@page "/DetailView/{id}"
+@using SEN381_UI.Data
+<h3>Claim Detailed View</h3>
+<MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Claim">Back</MudIconButton>
+<MudGrid>
+    <MudItem xs="6" sm="6">
+        <MudTextField T="string" Label="Claim ID" ReadOnly="true" Text="@id" Variant="Variant.Outlined"></MudTextField>
+    </MudItem>
+    <MudItem xs="6" sm="6">
+        <MudTextField T="string" Label="Client" ReadOnly="true" Text="Client name"></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudTextField T="string" Label="Medical condition" Text=""></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudTextField T="string" Label="Place Of Treatment" Text=""></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudTextField T="string" Label="Call Details" Text=""></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudTextField T="string" Label="Claime Status" Text=""></MudTextField>
+    </MudItem>
+</MudGrid>
+
+<MudGrid Style="margin-top:auto">
+    <MudItem xs="12" sm="6">
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Changes</MudButton>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save Changes</MudButton>
+    </MudItem>
+</MudGrid>
+@code {
+    [Parameter]
+    public string? id { get; set; }
+
+
+
+    }
+

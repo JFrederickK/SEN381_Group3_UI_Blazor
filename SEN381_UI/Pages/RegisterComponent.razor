@@ -39,7 +39,6 @@ align-text: center" ;>
 
 @code {
     RegisterAccountForm model = new RegisterAccountForm();
-    bool success;
 
     public class RegisterAccountForm
     {
@@ -60,7 +59,6 @@ align-text: center" ;>
 
     private void OnValidSubmit(EditContext context)
     {
-        success = true;
         StateHasChanged();
     }
 

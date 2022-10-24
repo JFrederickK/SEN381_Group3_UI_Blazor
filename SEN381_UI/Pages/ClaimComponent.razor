@@ -1,8 +1,8 @@
 ﻿@page "/Claim"
 @using SEN381_UI.Data
-
+@inject NavigationManager Urihelper
 <h3>ClaimComponent</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Claim,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Claim,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" Rowper>
     <ToolBarContent>
         <MudText Typo="Typo.h6">Claims</MudText>
         <MudSpacer />
@@ -27,10 +27,15 @@
 
     </RowTemplate>
     <PagerContent>
-        <MudTablePager />
-        <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" Href="/ClaimAddView" />
+        <MudTablePager PageSizeOptions="new int[] {5,10,20, 25, 30, 35, 40}" />
     </PagerContent >
+
 </MudTable>
+<MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" Href="/ClaimAddView" Style="margin-top:1%"/>
+@if (selectedItem != null)
+{
+    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit" Style="margin-top:1%;margin-left:1%" OnClick="OnClick"/>
+}
 
 
 @code {
@@ -41,9 +46,15 @@
     private string searchString = "";
     private Claim selectedItem = null;
     private HashSet<Claim> selectedItems = new HashSet<Claim>();
+    private string id = "1";
+
+
 
     private IEnumerable<Claim> Elements = new List<Claim>();
-
+    protected override void OnInitialized()
+    {
+        Elements = new ClaimMock().GetClaims();
+    }
 
     private bool FilterFunc(Claim element) => FilterFunc(element, searchString);
 
@@ -66,5 +77,9 @@
         if ($"{element.ClaimID} {element.Client} {element.MedicalConditions} {element.PlaceOfTreatment} {element.CallDetails} {element.ClaimeStatus}".Contains(searchString))
             return true;
         return false;
+    }
+    private void OnClick()
+    {
+        Urihelper.NavigateTo($"/DetailView/{selectedItem.ClaimID}");
     }
 }
