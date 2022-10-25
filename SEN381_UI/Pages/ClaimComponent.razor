@@ -2,7 +2,11 @@
 @using SEN381_UI.Data
 @inject NavigationManager Urihelper
 <h3>ClaimComponent</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Claim,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" Rowper>
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+    Filter="new Func<Claim,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" Rowper
+      T="Claim"  
+      OnRowClick="@navigate"
+>
     <ToolBarContent>
         <MudText Typo="Typo.h6">Claims</MudText>
         <MudSpacer />
@@ -32,10 +36,6 @@
 
 </MudTable>
 <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" Href="/ClaimAddView" Style="margin-top:1%"/>
-@if (selectedItem != null)
-{
-    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit" Style="margin-top:1%;margin-left:1%" OnClick="OnClick"/>
-}
 
 
 @code {
@@ -78,8 +78,8 @@
             return true;
         return false;
     }
-    private void OnClick()
+    private void navigate(TableRowClickEventArgs<Claim> p)
     {
-        Urihelper.NavigateTo($"/DetailView/{selectedItem.ClaimID}");
+        Urihelper.NavigateTo($"/Claim/{p.Item.ClaimID}");
     }
 }
