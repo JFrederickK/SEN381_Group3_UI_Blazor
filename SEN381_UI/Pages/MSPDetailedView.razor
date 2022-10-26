@@ -7,7 +7,7 @@
         <MudTextField T="string" Label="Provider ID" ReadOnly="true" Text="@id" Variant="Variant.Outlined"></MudTextField>
     </MudItem>
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Name" ReadOnly="true" @bind-Value="providerName"></MudTextField>
+        <MudTextField T="string" Label="Name" ReadOnly="true" @bind-Value="@providerName"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
         <MudTextField T="string" Label="Address" @bind-Value="providerAddress"></MudTextField>

@@ -5,7 +5,12 @@
 <h3>Medical Service Provider</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" >Back</MudIconButton>
 
-    <MudTable Items="@Elements" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<MedicalServiceProvider,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
+    <MudTable Items="@Elements" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+        Filter="new Func<MedicalServiceProvider,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
+            SortLabel="Sort by"
+    T="MedicalServiceProvider"
+    OnRowClick="@navigate"
+    >
         <ToolBarContent>
             <MudText Typo="Typo.h6">Medical Service Provider</MudText>
             <MudSpacer />
@@ -34,10 +39,6 @@
 
 <MudItem Style="margin-top:2%">
     <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" Href="/MSPAddView" />
-        @if (selectedItem != null)
-        {
-            <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit" Style="margin-left:1%" OnClick="OnClick" />
-        }
 </MudItem>
 
 
@@ -77,7 +78,9 @@
     }
 
 
-    public void OnClick() {
-        UriHelper.NavigateTo($"/MSPDetailedView/{selectedItem.PolicyProviderID}");
+
+    private void navigate(TableRowClickEventArgs<MedicalServiceProvider> p)
+    {
+        UriHelper.NavigateTo($"/MSPDetailedView/{p.Item.PolicyProviderID}");
     }
 }
