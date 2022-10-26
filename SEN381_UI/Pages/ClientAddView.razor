@@ -2,6 +2,7 @@
 @using System.ComponentModel.DataAnnotations 
 @using SEN381_UI.Data
 @using SEN381_UI.Shared.MockData
+@using SEN381_UI.BusinessLayer
 
 
 <h3>Client Add View</h3>
@@ -13,11 +14,26 @@
     </MudItem>
 
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Name" ReadOnly="true" @bind-Value="clientName"></MudTextField>
+        <MudTextField T="string" Label="Name"  @bind-Value="clientName"></MudTextField>
     </MudItem>
 
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Surname" ReadOnly="true" @bind-Value="clientSurname"></MudTextField>
+        <MudTextField T="string" Label="Surname"  @bind-Value="clientSurname"></MudTextField>
+    </MudItem>
+
+    <MudItem xs="12" sm="6">
+        <MudTextField T="string" Label="Address" @bind-Value="clientAddress"></MudTextField>
+    </MudItem>
+
+    <MudItem xs="12" sm="6">
+        <MudTextField T="string" Label="Email"  @bind-Value="clientEmail"></MudTextField>
+    </MudItem>
+    <MudItem xs="6" sm="6">
+        <MudTextField T="string" Label="Phone number" MaxLength="10"  @bind-Value="clientPhone"></MudTextField>
+    </MudItem>
+
+    <MudItem xs="6" sm="6">
+        <MudTextField T="string" Label="Policies"  @bind-Value="clientPolicies"></MudTextField>
     </MudItem>
 
     <MudItem xs="12" sm="6">
@@ -25,7 +41,7 @@
     </MudItem>
 
     <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value="clientPolicies"></MudTextField>
+        <MudTextField T="string" Label="Notes" @bind-Value="clientNotes"></MudTextField>
     </MudItem>
 
 </MudGrid>
@@ -72,22 +88,29 @@
         <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Changes</MudButton>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save Changes</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="saveClint">Save Changes</MudButton>
     </MudItem>
 </MudGrid>
 
 
 @code {
-    [Parameter]
     public string? clientId { get; set; }
 
     public string? clientName { get; set; }
 
     public string? clientSurname { get; set; }
 
-    public string? clientStatus { get; set; }
+    public string? clientAddress { get; set; }
+
+    public string? clientEmail { get; set; }
+
+    public string? clientPhone { get; set; }
 
     public string? clientPolicies { get; set; }
+
+    public string? clientStatus { get; set; }
+
+    public string? clientNotes{ get; set; }
 
     public bool Basic_CheckBox1 = true;
 
@@ -125,5 +148,12 @@
         Treatment selected = new Treatment(selectedTreatment.TreatmentID, selectedTreatment.TreatmentName, selectedTreatment.TreatmentDescription, selectedTreatment.MedicalServiceProviders);
         return selected;
 
+    }
+    private async Task saveClint()
+    {
+        Client person = new Client(clientId, clientName, clientSurname, clientAddress, clientEmail, clientPhone, clientPolicies, clientStatus, clientNotes);
+        ClientService cs = new ClientService();
+        await cs.postClientDetails(person);
+        Console.WriteLine(person);
     }
 }
