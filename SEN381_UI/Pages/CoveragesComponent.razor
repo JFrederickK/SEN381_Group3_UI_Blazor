@@ -4,7 +4,12 @@
 @inject NavigationManager UriHelper
 
 <h3>Coverages Component</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Coverage,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+    Filter="new Func<Coverage,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
+        SortLabel="Sort by"
+        T="Coverage"
+        OnRowClick="@navigate"
+>
     <ToolBarContent>
         <MudText Typo="Typo.h6">Coverages</MudText>
         <MudSpacer />
@@ -32,10 +37,6 @@
 
 <MudItem Style="margin-top:1%">
     <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Style="margin-top:1%;margin-top:1%" Href="/AddCoverage"/>
-    @if (selectedItem != null)
-    {
-        <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit" Style="margin-top:1%;margin-left:1%" OnClick="OnClick" />
-    }
 </MudItem>
 
 
@@ -65,9 +66,9 @@
             return true;
         return false;
     }
-        private void OnClick()
-        {
-            UriHelper.NavigateTo($"/CoverageDV/{selectedItem.CoverageID}");
-        }
+    private void navigate(TableRowClickEventArgs<Coverage> p)
+    {
+        UriHelper.NavigateTo($"/CoverageDV/{p.Item.CoverageID}");
     }
+}
 

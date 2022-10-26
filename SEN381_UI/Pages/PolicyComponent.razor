@@ -3,14 +3,14 @@
 @using SEN381_UI.Shared.MockData
 @inject NavigationManager Navigation
 
-<h3>PolicyComponent</h3>
+<h3>Policy Component</h3>
 
 <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
           Filter="new Func<Policy,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by"
           T="Policy"
           OnRowClick="@navigate">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Clients</MudText>
+        <MudText Typo="Typo.h6">Policy</MudText>
         <MudSpacer/>
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>

@@ -3,8 +3,8 @@
 @inject NavigationManager Urihelper
 <h3>ClaimComponent</h3>
 <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
-    Filter="new Func<Claim,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" Rowper
-      T="Claim"  
+    Filter="new Func<Claim,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" 
+      T="Claim"
       OnRowClick="@navigate"
 >
     <ToolBarContent>
@@ -63,16 +63,6 @@
         if (string.IsNullOrWhiteSpace(searchString))
            return true;
         if (element.ClaimID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Client.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.MedicalConditions.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.PlaceOfTreatment.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.CallDetails.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClaimeStatus.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if ($"{element.ClaimID} {element.Client} {element.MedicalConditions} {element.PlaceOfTreatment} {element.CallDetails} {element.ClaimeStatus}".Contains(searchString))
             return true;
