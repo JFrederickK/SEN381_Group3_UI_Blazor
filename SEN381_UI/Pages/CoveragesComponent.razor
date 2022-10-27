@@ -50,10 +50,20 @@
     private Coverage selectedItem = null;
     private HashSet<Coverage> selectedItems = new HashSet<Coverage>();
 
-    private IEnumerable<Coverage> Elements = new List<Coverage>();
+    private List<Coverage> Elements = new List<Coverage>();
     protected override void OnInitialized()
     {
         Elements = new CoverageMock().GetCoverages();
+        CoverageService cs = new CoverageService();
+        cs.getCoverages(5, 1).ContinueWith((x) =>
+        {
+            Console.WriteLine(x.Result[0].CoverageDescription);
+        });
+
+        cs.addCoverage(new Coverage(12, "Titanium", 12, 11, 31)).ContinueWith((x) =>
+        {
+            Console.WriteLine(x.Result.CoverageDescription);
+        });
     }
 
     private bool FilterFunc(Coverage element) => FilterFunc(element, searchString);
