@@ -7,76 +7,76 @@
 
 <h3>Client Add View</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/ClientListView">Back</MudIconButton>
-<MudGrid>
+<EditForm Model="@postdata" OnValidSubmit="OnValidSubmit">
+    <MudGrid>
 
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Client ID" ReadOnly="true" Text="@clientId" Variant="Variant.Outlined"></MudTextField>
     </MudItem>
 
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Name"  @bind-Value="clientName"></MudTextField>
+        <MudTextField T="string" Label="Name"  @bind-Value="postdata.ClientName"></MudTextField>
     </MudItem>
 
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Surname"  @bind-Value="clientSurname"></MudTextField>
+        <MudTextField T="string" Label="Surname"  @bind-Value="postdata.ClientSurname"></MudTextField>
     </MudItem>
 
     <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Address" @bind-Value="clientAddress"></MudTextField>
+        <MudTextField T="string" Label="Address" @bind-Value="postdata.ClientAddress"></MudTextField>
     </MudItem>
 
     <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Email"  @bind-Value="clientEmail"></MudTextField>
+        <MudTextField T="string" Label="Email"  @bind-Value="postdata.ClientEmail"></MudTextField>
     </MudItem>
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Phone number" MaxLength="10"  @bind-Value="clientPhone"></MudTextField>
+        <MudTextField T="string" Label="Phone number" MaxLength="10"  @bind-Value="postdata.ClientPhoneNumber"></MudTextField>
     </MudItem>
 
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Policies"  @bind-Value="clientPolicies"></MudTextField>
+        <MudTextField T="string" Label="Policies"  @bind-Value="@postdata.Policies"></MudTextField>
     </MudItem>
 
     <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Status" @bind-Value="clientStatus"></MudTextField>
+        <MudTextField T="string" Label="Status" @bind-Value="postdata.ClientStatus"></MudTextField>
     </MudItem>
 
     <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Notes" @bind-Value="clientNotes"></MudTextField>
+        <MudTextField T="string" Label="Notes" @bind-Value="postdata.ClientAdHocNotes"></MudTextField>
     </MudItem>
 
 </MudGrid>
 
 <MudGrid>
-    @*Different Packages*@
+        @*Different Packages*@
             <MudItem lg="12" sm="6">
                 <MudExpansionPanel class="h-25" Text="Policy Packages">
 
                     <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
-                        @foreach (Package package in packages)
-                        {
-                            string text = $"Package ID:{@package.PackageID}";
-                            <MudGrid>
-                                <MudItem xs="9">
-                                    <MudExpansionPanel Text="@text">
-                                        @foreach (TreatmentCoverage item in package.TreatmentCoverages)
-                                        {
+                    @foreach (Package package in packages)
+                    {
+                        string text = $"Package ID:{@package.PackageID}";
+                                <MudGrid>
+                                    <MudItem xs="9">
+                                        <MudExpansionPanel Text="@text">
+                                    @foreach (TreatmentCoverage item in package.TreatmentCoverages)
+                                    {
 
-                                            <MudCard class="mt-2 p-2">
-                                                <MudText Align="Align.Center"> Treatment: @item.Treatment.TreatmentName </MudText>
-                                                <MudText Align="Align.Center"> Coverage Level: @item.Coverage.CoverageDescription </MudText>
-                                            </MudCard>
+                                                    <MudCard class="mt-2 p-2">
+                                                        <MudText Align="Align.Center"> Treatment: @item.Treatment.TreatmentName </MudText>
+                                                        <MudText Align="Align.Center"> Coverage Level: @item.Coverage.CoverageDescription </MudText>
+                                                    </MudCard>
 
-                                        }
+                                    }
 
-                                    </MudExpansionPanel>
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudText Align="Align.Center">
-                                        <MudCheckBox @bind-Checked="@Basic_CheckBox1"></MudCheckBox>
-                                    </MudText>
-                                </MudItem>
-                            </MudGrid>
-                        }
+                                        </MudExpansionPanel>
+                                    </MudItem>
+                                    <MudItem xs="3">
+                                        <MudText Align="Align.Center">
+                                            <MudCheckBox @bind-Checked="@Basic_CheckBox1"></MudCheckBox>
+                                        </MudText>
+                                    </MudItem>
+                                </MudGrid>
+                    }
                     </MudExpansionPanels>
                 </MudExpansionPanel>
             </MudItem>
@@ -88,29 +88,15 @@
         <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Changes</MudButton>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="saveClint">Save Changes</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="saveClint" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
     </MudItem>
 </MudGrid>
+</EditForm>
 
 
 @code {
-    public string? clientId { get; set; }
+    private Client postdata = new Client();
 
-    public string? clientName { get; set; }
-
-    public string? clientSurname { get; set; }
-
-    public string? clientAddress { get; set; }
-
-    public string? clientEmail { get; set; }
-
-    public string? clientPhone { get; set; }
-
-    public string? clientPolicies { get; set; }
-
-    public string? clientStatus { get; set; }
-
-    public string? clientNotes{ get; set; }
 
     public bool Basic_CheckBox1 = true;
 
@@ -149,11 +135,16 @@
         return selected;
 
     }
-    private async Task saveClint()
+    private async void saveClint()
     {
-        Client person = new Client(clientId, clientName, clientSurname, clientAddress, clientEmail, clientPhone, clientPolicies, clientStatus, clientNotes);
+        Client person = new Client(postdata.ClientID, postdata.ClientName, postdata.ClientSurname, postdata.ClientAddress, postdata.ClientEmail, postdata.ClientPhoneNumber, postdata.Policies, postdata.ClientStatus, postdata.ClientAdHocNotes);
         ClientService cs = new ClientService();
+        Console.WriteLine(person.ClientAddress);
         await cs.postClientDetails(person);
-        Console.WriteLine(person);
+
+    }
+    private void OnValidSubmit(EditContext context)
+    {
+        StateHasChanged();
     }
 }
