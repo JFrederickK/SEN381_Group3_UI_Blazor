@@ -1,4 +1,6 @@
 ﻿@page "/AddCoverage"
+@inject IDialogService DialogService
+@inject NavigationManager navigate;
 <h3>Coverage Details</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Coverages">Back</MudIconButton>
 <MudGrid>
@@ -21,16 +23,18 @@
         <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Add</MudButton>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save</MudButton>
+        <MudButton OnClick="insertCoverage" Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save</MudButton>
     </MudItem>
 </MudGrid>
+
 @code {
-    private string coverageDescription;
+    private string coverageDescription { get; set; }
     private int coverageVisit { get; set; }
     private int coverageSVisit { get; set; }
     private int coverageUVisit { get; set; }
 
-    private string[] description = { "Gold", "Silwer", "Platinum" };
+    private string[] description = { "Gold", "Silver", "Platinum" };
+
     private async Task<IEnumerable<string>> TypeOfDescription(string value)
     {
         // In real life use an asynchronous function for fetching data from an api.
@@ -40,5 +44,30 @@
         if (string.IsNullOrEmpty(value))
             return description;
         return description.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async void insertCoverage(){
+        await new CoverageService().addCoverage(new Coverage(0,coverageDescription,coverageVisit,coverageSVisit,coverageUVisit)).ContinueWith((x) =>
+        {
+            Console.WriteLine(x.Result.CoverageDescription);
+            string message = "";
+            message = x.Result != null ? "Coverage Created successfilly" : "Coverage could not be created";
+            showDialog(message);
+        });
+    }
+
+    private async void showDialog(string message){
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText",message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+           var result = await DialogService.Show<Dialogue>("Coverage", paramaters, options).Result;
+            if (message != "Coverage could not be created")
+            {
+                navigate.NavigateTo("/Coverages");
+            } 
+        });
     }
 }

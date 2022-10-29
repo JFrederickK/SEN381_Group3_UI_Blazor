@@ -2,11 +2,11 @@
 {
     public class Coverage
     {
-        public int coverageID;
-        public string coverageDescription;
-        public int numberOfGeneralVisits;
-        public int numberOfSpecialistsVisits;
-        public int totalCoverageUser;
+        private int coverageID;
+        private string coverageDescription;
+        private int numberOfGeneralVisits;
+        private int numberOfSpecialistsVisits;
+        private int totalCoverageUser;
 
 
 
@@ -17,6 +17,9 @@
             this.numberOfGeneralVisits = numberOfGeneralVisits;
             this.numberOfSpecialistsVisits = numberOfSpecialistsVisits;
             this.totalCoverageUser = totalCoverageUser;
+        }
+        public Coverage()
+        {
         }
 
         public int CoverageID { get => coverageID; set => coverageID = value; }
