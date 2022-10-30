@@ -2,13 +2,15 @@
 @using SEN381_UI.Data
 @using SEN381_UI.Shared.MockData
 @inject NavigationManager UriHelper
+@inject IDialogService DialogService
 
 <h3>Coverages Component</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
-    Filter="new Func<Coverage,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
+<MudTable ServerData="@(new Func<TableState, Task<TableData<Coverage>>>(loadCoverages))" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
+          Filter="new Func<Coverage,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
         SortLabel="Sort by"
         T="Coverage"
         OnRowClick="@navigate"
+        @ref="table"
 >
     <ToolBarContent>
         <MudText Typo="Typo.h6">Coverages</MudText>
@@ -24,19 +26,20 @@
 
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Nr">@context.coverageID</MudTd>
-            <MudTd DataLabel="Description">@context.coverageDescription</MudTd>
-            <MudTd DataLabel="General Visits">@context.numberOfGeneralVisits</MudTd>
-            <MudTd DataLabel="Specialists Visits">@context.numberOfSpecialistsVisits</MudTd>
-            <MudTd DataLabel="Coverage User">@context.totalCoverageUser</MudTd>
+            <MudTd DataLabel="Nr">@context.CoverageID</MudTd>
+            <MudTd DataLabel="Description">@context.CoverageDescription</MudTd>
+            <MudTd DataLabel="General Visits">@context.NumberOfGeneralVisits</MudTd>
+            <MudTd DataLabel="Specialists Visits">@context.NumberOfSpecialistsVisits</MudTd>
+            <MudTd DataLabel="Coverage User">@context.TotalCoverageUser</MudTd>
+            <MudTd><MudTooltip Text="Delete Coverage"><MudIconButton OnClick="()=>deleteCoverage(context.CoverageID.ToString())" Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIconButton></MudTooltip></MudTd>
         </RowTemplate>
         <PagerContent>
-            <MudTablePager />
+            <MudTablePager Count="@totalSize" PageSizeOptions="@pageSizeOptions"/>
         </PagerContent>
     </MudTable>
 
-<MudItem Style="margin-top:1%">
-    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Style="margin-top:1%;margin-top:1%" Href="/AddCoverage"/>
+<MudItem Style="margin-top:1%; float:right;">
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Style="position:absolute; bottom:5%; right:5%" Href="/AddCoverage"/>
 </MudItem>
 
 
@@ -48,13 +51,17 @@
     private bool bordered = true;
     private string searchString = "";
     private Coverage selectedItem = null;
-    private HashSet<Coverage> selectedItems = new HashSet<Coverage>();
+    private List<Coverage> selectedItems = new List<Coverage>();
 
-    private IEnumerable<Coverage> Elements = new List<Coverage>();
-    protected override void OnInitialized()
-    {
-        Elements = new CoverageMock().GetCoverages();
-    }
+    private MudTable<Coverage>? table;
+    //Pagination
+    private int[] pageSizeOptions = new int[] { 5, 10, 15,25 };
+    private int page=1;
+    private int size=5;
+    private int totalSize=10;
+    private int totalPages= 2;
+
+    private List<Coverage> Elements = new List<Coverage>();
 
     private bool FilterFunc(Coverage element) => FilterFunc(element, searchString);
 
@@ -62,13 +69,57 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.coverageID == Int32.Parse(searchString))
+        if (element.CoverageID.ToString() == searchString)
             return true;
         return false;
     }
+
     private void navigate(TableRowClickEventArgs<Coverage> p)
     {
-        UriHelper.NavigateTo($"/CoverageDV/{p.Item.CoverageID}");
+        UriHelper.NavigateTo($"/Coverage/{p.Item.CoverageID}");
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        table.SetRowsPerPage(10);
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+
+    private async Task showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialog");
+        await InvokeAsync(async () =>
+        {
+            await DialogService.Show<Dialogue>("Update Coverage", paramaters, options).Result;
+
+        });
+    }
+
+    private async Task<TableData<Coverage>> loadCoverages(TableState state){
+        CoverageService cs = new CoverageService();
+        await cs.getCoverages(state.PageSize,state.Page+1).ContinueWith((x) =>
+        {
+            Elements = x.Result;
+        });
+        return new TableData<Coverage>() { Items = Elements, TotalItems = Elements.Count };
+    }
+
+    private async void deleteCoverage(string id)
+    {
+        await new CoverageService().deleteCoverage(id).ContinueWith(async (x) =>
+        {
+            string message = x.Result != null ? "Coverage Deleted Succesfully" : "Something went wrong!";
+            await showDialog(message);
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+            UriHelper.NavigateTo($"/Coverages",true);
+        });
     }
 }
 

@@ -64,13 +64,17 @@
     private List<Client> Elements = new List<Client>();
     protected override async Task OnInitializedAsync()
     {
-        Elements = await LoadClients();
-        load = true;
+        LoadClients();
     }
-    private async Task<List<Client>> LoadClients()
-    {
+
+
+    private async void LoadClients(){
         ClientService cs = new ClientService();
-        return await cs.LoadClient();
+        await cs.LoadClient().ContinueWith((x)=> {
+            Elements = x.Result;
+        });
+        load = true;
+
     }
 
     private bool FilterFunc(Client element) => FilterFunc(element, searchString);
