@@ -59,6 +59,13 @@
     protected override void OnInitialized()
     {
         Elements = new ClientMock().GetClients();
+        loadClients();
+    }
+
+    private void loadClients(){
+        ClientService cs = new ClientService();
+        cs.getClientList();
+        //List<Client> lclient = cs.getClientList();
     }
 
     private bool FilterFunc(Client element) => FilterFunc(element, searchString);
