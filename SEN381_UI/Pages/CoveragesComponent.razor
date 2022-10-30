@@ -63,10 +63,6 @@
         await cs.getCoverages(5, 1).ContinueWith((x) =>
         {
             Elements = x.Result;
-            foreach (Coverage item in Elements)
-            {
-                Console.WriteLine(item.CoverageDescription);
-            }
         });
 
     }
@@ -77,14 +73,14 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.CoverageID == Int32.Parse(searchString))
+        if (element.CoverageID.ToString() == searchString)
             return true;
         return false;
     }
 
     private void navigate(TableRowClickEventArgs<Coverage> p)
     {
-        UriHelper.NavigateTo($"/CoverageDV/{p.Item.CoverageID}");
+        UriHelper.NavigateTo($"/Coverage/{p.Item.CoverageID}");
     }
 
     private void PageChanged(int i)

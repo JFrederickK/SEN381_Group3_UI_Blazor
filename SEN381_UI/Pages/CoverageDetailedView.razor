@@ -1,4 +1,5 @@
-﻿@page "/CoverageDV/{id}"
+﻿@page "/Coverage/{id}"
+@inject IDialogService DialogService
 <h3>Coverage Detailed View</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Coverages">Back</MudIconButton>
 <MudGrid>
@@ -6,29 +7,96 @@
         <MudTextField T="string" Label="Coverage ID" ReadOnly="true" Text="@id" Variant="Variant.Outlined"></MudTextField>
     </MudItem>
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Description" ReadOnly="true" HelperText="Gold, Silwer, Platinum" HelperTextOnFocus="true" Text="Coverage name"></MudTextField>
+        <MudTextField T="string" Label="Description" ReadOnly="true" HelperText="Gold, Silwer, Platinum" HelperTextOnFocus="true" Text="@description" @bind-description="description"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudTextField T="int" Label="General Visits" Text=""></MudTextField>
+        <MudNumericField Label="General Visits" @bind-Value="generalVisits" Variant="Variant.Outlined"></MudNumericField>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudTextField T="int" Label="Specialists Visits" Text=""></MudTextField>
+        <MudNumericField Label="Specialists Visits" @bind-Value="specialistVisits" Variant="Variant.Outlined"></MudNumericField>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudTextField T="int" Label="Coverage User" Text=""></MudTextField>
+        <MudNumericField Label="Coverage Users" @bind-Value="coverageUsers" Variant="Variant.Outlined"></MudNumericField>
     </MudItem>
 </MudGrid>
 
 <MudGrid Style="margin-top:auto">
     <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Changes</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" OnClick="cancelChanges">Cancel Changes</MudButton>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save Changes</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="editCoverage">Save Changes</MudButton>
     </MudItem>
 </MudGrid>
 
 @code {
     [Parameter]
     public string? id { get; set; }
+    private string description = "";
+    private int generalVisits = 0;
+    private int specialistVisits = 0;
+    private int coverageUsers = 0;
+    //For comparing changes
+    private Coverage originalCoverage = new Coverage();
+    private Coverage newCoverage = new Coverage();
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (id!=null)
+        {
+            await loadCoverage();
+        }
+    }
+
+    private async void editCoverage()
+    {
+        Console.WriteLine(specialistVisits);
+        newCoverage = new Coverage(int.Parse(id), description, generalVisits, specialistVisits, coverageUsers);
+        Console.WriteLine(  newCoverage.NumberOfSpecialistsVisits);
+        Console.WriteLine(originalCoverage.NumberOfSpecialistsVisits);
+        if (newCoverage.CoverageDescription != originalCoverage.CoverageDescription || newCoverage.NumberOfGeneralVisits != originalCoverage.NumberOfGeneralVisits
+            || newCoverage.NumberOfSpecialistsVisits != originalCoverage.NumberOfSpecialistsVisits || newCoverage.TotalCoverageUser != originalCoverage.TotalCoverageUser)
+        {
+            await new CoverageService().updateCoverage(new Coverage(int.Parse(id), description, generalVisits, specialistVisits, coverageUsers)).ContinueWith(async (x) =>
+            {
+                string message = x.Result != null ? "Updates applied succesfully" : "Something went wrong!";
+                showDialog(message);
+
+                await loadCoverage();
+            });
+        }
+        else showDialog("No changes to apply.");
+    }
+
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialog");
+        await InvokeAsync(async () =>
+        {
+            await DialogService.Show<Dialogue>("Update Coverage", paramaters, options).Result;
+
+        });
+    }
+
+    private void cancelChanges(){
+        description = originalCoverage.CoverageDescription;
+        generalVisits = originalCoverage.NumberOfGeneralVisits;
+        specialistVisits = originalCoverage.NumberOfSpecialistsVisits;
+        coverageUsers = originalCoverage.TotalCoverageUser;
+    }
+
+    private async Task loadCoverage(){
+        await new CoverageService().getCoverageDetails(id).ContinueWith((x) =>
+        {
+            description = x.Result.CoverageDescription;
+            generalVisits = x.Result.NumberOfGeneralVisits;
+            specialistVisits = x.Result.NumberOfSpecialistsVisits;
+            coverageUsers = x.Result.TotalCoverageUser;
+
+            originalCoverage = new Coverage(int.Parse(id), description, generalVisits, specialistVisits, coverageUsers);
+        });
+    }
 }
