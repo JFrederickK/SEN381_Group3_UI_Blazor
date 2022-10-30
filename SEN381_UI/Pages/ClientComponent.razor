@@ -64,16 +64,17 @@
     private List<Client> Elements = new List<Client>();
     protected override async Task OnInitializedAsync()
     {
-        LoadClients();
+       await LoadClients();
+        load = true;
     }
 
 
-    private async void LoadClients(){
+    private async Task LoadClients(){
         ClientService cs = new ClientService();
         await cs.LoadClient().ContinueWith((x)=> {
             Elements = x.Result;
         });
-        load = true;
+ 
 
     }
 

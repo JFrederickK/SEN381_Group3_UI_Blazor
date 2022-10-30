@@ -2,6 +2,8 @@
 @using SEN381_UI.BusinessLayer
 @using SEN381_UI.Data
 @using SEN381_UI.Shared.MockData
+@inject IDialogService DialogService
+@inject NavigationManager UriHelper
 
 <MudCard style="max-height:1000px; overflow: auto;">
     <MudCardHeader>
@@ -21,33 +23,33 @@
             </MudItem>
 
             <MudItem xs="6" sm="6">
-                <MudTextField T="string" Label="Client Name" @bind-status=@name Text="@name"></MudTextField>
+                <MudTextField T="string" Label="Client Name" @bind-Value=@name Text="@name"></MudTextField>
             </MudItem>
 
             <MudItem xs="6" sm="6">
-                <MudTextField T="string" Label="Client Surname" @bind-status=@surname Text="@surname"></MudTextField>
+                <MudTextField T="string" Label="Client Surname" @bind-Value=@surname Text="@surname"></MudTextField>
             </MudItem>
             <MudItem xs="6" sm="6">
-                <MudTextField T="string" Label="Client Address" @bind-status=@address Text="@address"></MudTextField>
-            </MudItem>
-
-            <MudItem xs="6" sm="6">
-                <MudTextField T="string" Label="Client Email" @bind-status=@email Text="@email"></MudTextField>
+                <MudTextField T="string" Label="Client Address" @bind-Value=@address Text="@address"></MudTextField>
             </MudItem>
 
             <MudItem xs="6" sm="6">
-                <MudTextField T="string" Label="Client Phone number" @bind-status=@phonenumber Text="@phonenumber"></MudTextField>
-            </MudItem>
-            <MudItem xs="6" sm="6">
-                <MudTextField T="string" Label="Client Polisies" @bind-status=@policies Text="policies"></MudTextField>
+                <MudTextField T="string" Label="Client Email" @bind-Value=@email Text="@email"></MudTextField>
             </MudItem>
 
             <MudItem xs="6" sm="6">
-                <MudTextField T="string" Label="Client status" @bind-status=@status Text="@status"></MudTextField>
+                <MudTextField T="string" Label="Client Phone number" @bind-Value=@phonenumber Text="@phonenumber"></MudTextField>
+            </MudItem>
+            <MudItem xs="6" sm="6">
+                <MudTextField T="string" Label="Client Polisies" @bind-Value=@clientpolicies Text="@clientpolicies"></MudTextField>
             </MudItem>
 
             <MudItem xs="6" sm="6">
-                <MudTextField T="string" Label="Client Notes" @bind-status=@notes Text="@notes"></MudTextField>
+                <MudTextField T="string" Label="Client status" @bind-Value=@status Text="@status"></MudTextField>
+            </MudItem>
+
+            <MudItem xs="6" sm="6">
+                <MudTextField T="string" Label="Client Notes" @bind-Value=@notes Text="@notes"></MudTextField>
             </MudItem>
 
             @*Treatment Details *@
@@ -67,13 +69,17 @@
                     </MudExpansionPanels>
                 </MudExpansionPanel>
             </MudItem>
-
-            <MudItem xs="6" sm="6">
-                <MudButton>Cancel Changes</MudButton>
-            </MudItem>
-            <MudItem xs="6" sm="6">
-                <MudButton >Save Changes</MudButton>
-            </MudItem>
+            <MudGrid>
+                <MudItem xs="6" sm="4">
+                    <MudButton Color="Color.Info">Cancel Changes <MudIcon Icon="@Icons.Filled.Cancel" Color="Color.Info"></MudIcon></MudButton>
+                </MudItem>
+                <MudItem xs="6" sm="4">
+                    <MudButton Color="Color.Success" OnClick="updateClient">Save Changes  <MudIcon Icon="@Icons.Filled.PublishedWithChanges" Color="Color.Success"></MudIcon></MudButton>
+                </MudItem>
+                <MudItem xs="6" sm="4">
+                    <MudButton Color="Color.Error" OnClick="deleteClient">Delete Client <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
+                </MudItem>
+            </MudGrid>
 
         </MudGrid>
     </MudForm>
@@ -82,22 +88,67 @@
 
 
 @code {
+    private Client clientDetails = new Client();
 
     [Parameter]
     public string? id { get; set; }
 
-    private string name = "Jandre";
-    private string surname = "Kruger";
-    private string address = "27 Sonneveld street Brakpan";
 
-    private string email = "JandreKruger@gmail.com";
-    private string phonenumber = "0123456789";
-    private string polocies = "1"; 
-    private string status = "Approved";
-    private string notes = "notes";
+
+    private string name { get; set; }
+    private string surname { get; set; }
+    private string address { get; set; }
+
+    private string email { get; set; }
+    private string phonenumber { get; set; }
+    private string clientpolicies { get; set; }
+    private string status { get; set; }
+    private string notes { get; set; }
 
 
     List<Policy> policies = new PolicyMock().getMockPolicies();
+
+
+    private async void  deleteClient() {
+        await new ClientService().deleteClient(id).ContinueWith((x)=> {
+
+            string message = "";
+            message = x.Result != null ? "Client successfully deleted" : "Client could not be deleted";
+            showDialog(message);
+        }
+        );
+
+    }
+
+    private async void updateClient()
+    {
+        Client newClient = new Client(id, name, surname, address, email, phonenumber, clientpolicies, status, notes);
+        await new ClientService().updateClient(newClient).ContinueWith((x) =>
+        {
+            Console.WriteLine();
+            string message = "";
+            message = x.Result != null ? "Client successfully updated" : "Client could not be updated";
+            showDialog(message);
+        }
+        );
+
+    }
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+            var result = await DialogService.Show<Dialogue>("Client", paramaters, options).Result;
+            if (message != "Coverage could not be created")
+            {
+                UriHelper.NavigateTo("/ClientListView");
+            }
+        });
+    }
+
 
 }
 

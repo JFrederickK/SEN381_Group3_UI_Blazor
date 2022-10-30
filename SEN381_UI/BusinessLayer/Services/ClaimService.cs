@@ -3,7 +3,7 @@ using SEN381_UI.Data;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 
-namespace SEN381_UI.BusinessLayer
+namespace SEN381_UI.BusinessLayer.Services
 {
     public class ClaimService
     {
@@ -17,6 +17,15 @@ namespace SEN381_UI.BusinessLayer
             List<Claim> contributors = JsonConvert.DeserializeObject<List<Claim>>(resp);
             Console.WriteLine(contributors);
             return contributors;
+
+        }
+        public async Task<Claim> postClaimDetails(Client person)
+        {
+            var client = new HttpClient();
+            string url = $"https://localhost:7116/api/Client";
+            HttpResponseMessage response = await client.PostAsJsonAsync(url, person);
+            Claim postclient = JsonConvert.DeserializeObject<Claim>(await response.Content.ReadAsStringAsync());
+            return postclient;
 
         }
 
