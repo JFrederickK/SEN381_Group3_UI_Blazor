@@ -145,5 +145,9 @@
         });
     }
 
+    public Treatment displayDetails()
+    {
+        Treatment selected = new Treatment(selectedTreatment.TreatmentID, selectedTreatment.TreatmentName, selectedTreatment.TreatmentDescription, selectedTreatment.MedicalServiceProviders);
+        return selected;
 
 }

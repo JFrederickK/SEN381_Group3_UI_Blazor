@@ -50,7 +50,7 @@
         @if (selectedTreatment != null)
         {
             <MudTextField @bind-Value="displayDetails().TreatmentDescription" Label="Privder name" ReadOnly="true" Variant="Variant.Outlined" Style="margin-bottom:1%" />
-            <MudTextField @bind-Value="displayDetails().MedicalServiceProviders" Label="Privder Adress" ReadOnly="true" Variant="Variant.Outlined" Style="margin-bottom:1%" />
+            <MudTextField @bind-Value="displayDetails().MedicalServiceProviderTreatments" Label="Privder Adress" ReadOnly="true" Variant="Variant.Outlined" Style="margin-bottom:1%" />
         }
     </MudItem>
 </MudGrid>
@@ -102,7 +102,7 @@
 
     public Treatment displayDetails()
     {
-        Treatment selected = new Treatment(selectedTreatment.TreatmentID, selectedTreatment.TreatmentName, selectedTreatment.TreatmentDescription, selectedTreatment.MedicalServiceProviders);
+        Treatment selected = new Treatment(selectedTreatment.TreatmentID, selectedTreatment.TreatmentName, selectedTreatment.TreatmentDescription, selectedTreatment.MedicalServiceProviderTreatments);
         return selected;
 
     }
