@@ -140,16 +140,7 @@
     }
 
 
-    private async void  deleteClient() {
-        await new ClientService().deleteClient(id).ContinueWith((x)=> {
 
-            string message = "";
-            message = x.Result != null ? "Client successfully deleted" : "Client could not be deleted";
-            showDialog(message);
-        }
-        );
-
-    }
 
     private async void updateClient()
     {
@@ -172,6 +163,18 @@
     {
         UriHelper.NavigateTo("/ClientListView");
     }
+    private async void deleteClient()
+    {
+        await new ClientService().deleteClient(id).ContinueWith((x) =>
+        {
+
+            string message = "";
+            message = x.Result != null ? "Client successfully deleted" : "Client could not be deleted";
+            showDialog(message);
+        }
+        );
+
+    }
     private async void showDialog(string message)
     {
         DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
@@ -181,7 +184,7 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Client", paramaters, options).Result;
-            if (message != "Client could not be created")
+            if (message != "Client could not be created" && message != "Client could not be deleted" && message != "Client could not be updated")
             {
                 UriHelper.NavigateTo("/ClientListView");
             }

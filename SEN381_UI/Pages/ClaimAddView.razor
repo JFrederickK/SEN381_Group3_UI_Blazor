@@ -1,5 +1,7 @@
 ﻿@page "/ClaimAddView"
 @using SEN381_UI.Data
+@using System.Diagnostics
+@using System.Threading
 @inject NavigationManager UriHelper
 @inject IDialogService DialogService
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Claim">Back</MudIconButton>
@@ -34,6 +36,7 @@
         <MudTablePager />
     </PagerContent>
 </MudTable>
+                <MudText Inline="true">Selected items: @(selectedItem == null ? "" : string.Join(", ", selectedItem.ClientName))</MudText>
     </MudPaper>
         <MudItem xs="12" sm="12" Style="margin-bottom:3%; margin-top:1%">
             <MudAutocomplete T="string" Label="Place of treatment" @bind-Value="value" SearchFunc="@PlaceOfTreatment" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined" Style="margin-bottom:3%; margin-top:1%" />
@@ -41,20 +44,21 @@
         <MudItem xs="12" sm="12" Style="margin-bottom:3%">
             <MudGrid>
         <MudItem xs="12" sm="6" >
-                    <MudButton Variant="Variant.Outlined" Color="Color.Success" FullWidth="true">Start Call <MudIcon Icon="@Icons.Outlined.AddIcCall"Color="Color.Success"></MudIcon></MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Success" FullWidth="true" OnClick="@(async() => {StopWatch(); })">Start Call <MudIcon Icon="@Icons.Outlined.AddIcCall"Color="Color.Success"></MudIcon></MudButton>
         </MudItem>
         <MudItem xs="12" sm="6">
-                    <MudButton Variant="Variant.Outlined" Color="Color.Error" FullWidth="true">End Call <MudIcon Icon="@Icons.Outlined.CallEnd" Color="Color.Error"></MudIcon></MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" FullWidth="true" OnClick="@(()=> {is_stopwatchrunning = false; stopwatchvalue = new TimeSpan();})">End Call <MudIcon Icon="@Icons.Outlined.CallEnd" Color="Color.Error"></MudIcon></MudButton>
         </MudItem>
             </MudGrid>
         </MudItem>
-        <MudTextField @bind-Value="ReadOnly" Label="Call Duration" ReadOnly="true" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="ReadOnly" Label="Call time" ReadOnly="true" Variant="Variant.Outlined" Text="@stopwatchvalue.ToString()" />
+            <MudTextField @bind-Value="ReadOnly" Label="Call Duration" ReadOnly="true" Variant="Variant.Outlined" Text="@totaltime" />
     </MudItem>
  <MudItem xs="12" sm="6">
         <MudPaper Elevation="3" Outlined="true">
     <MudGrid>
                 <MudItem xs="12" sm="6">
-                    <MudTable Items="@MedicalElements" MultiSelection="true" @bind-SelectedItems="selectedMedicals" Hover="true">
+                    <MudTable Items="@MedicalElements" @bind-SelectedItem="selectedMedical" Hover="true">
                             <ToolBarContent>
         <MudText Typo="Typo.h6">Medical conditions</MudText>
         <MudSpacer />
@@ -74,10 +78,10 @@
         <MudTd colspan="5">Select All</MudTd>
     </FooterContent>
 </MudTable>
-                    <MudText Inline="true">Selected items: @(selectedMedicals == null ? "" : string.Join(", ", selectedMedicals.OrderBy(x => x.MedicalConditionName).Select(x => x.MedicalConditionName)))</MudText>
+                    <MudText Inline="true">Selected items: @(selectedMedical == null ? "" : string.Join(", ", selectedMedical.MedicalConditionName))</MudText>
                 </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudTable Items="@TreatmentsElements" MultiSelection="true" @bind-SelectedItems="selectedTreatments" Hover="true">
+                        <MudTable Items="@TreatmentsElements" @bind-SelectedItems="selectedTreatments" Hover="true">
                             <ToolBarContent>
                                 <MudText Typo="Typo.h6">Treatment list</MudText>
                                 <MudSpacer />
@@ -97,17 +101,43 @@
                                 <MudTd colspan="5">Select All</MudTd>
                             </FooterContent>
                         </MudTable>
-                        <MudText Inline="true">Selected items: @(selectedTreatments == null ? "" : string.Join(", ", selectedTreatments.OrderBy(x => x.TreatmentName).Select(x => x.TreatmentName)))</MudText>
+                        <MudText Inline="true">Selected items: @(selectedTreatment == null ? "" : string.Join(", ", selectedTreatment.TreatmentName))</MudText>
                     </MudItem>
 
     </MudGrid>
+
         </MudPaper>
+                <MudGrid Style="margin-top:auto">
+                    <MudItem xs="12" sm="6">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Add</MudButton>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@saveClaim">Save</MudButton>
+                    </MudItem>
+                </MudGrid>
  </MudItem>
 
 </MudGrid> 
 }
 
 @code {
+    TimeSpan stopwatchvalue = new TimeSpan();
+    bool is_stopwatchrunning = false;
+    private string totaltime;
+
+    async Task StopWatch() { 
+        is_stopwatchrunning = true;
+        while (is_stopwatchrunning)
+        {
+            await Task.Delay(1000);
+            if (is_stopwatchrunning)
+            {
+                stopwatchvalue = stopwatchvalue.Add(new TimeSpan(0, 0, 1));
+                StateHasChanged();
+                totaltime = stopwatchvalue.ToString();
+            }
+        }
+    }
     private bool load = false;
     private bool striped = true;
     private bool bordered = true;
@@ -244,9 +274,9 @@
             return true;
         return false;
     }
-    private async void saveClint()
+    private async void saveClaim()
     {
-        Claim newClaim = new Claim(1, selectedItem.ClientID, 1, "Brakpan", 1, "Approved");
+        Claim newClaim = new Claim(1, selectedItem.ClientID, int.Parse(selectedMedical.MedicalConditionID), value,1 , "Approved");
         await new ClaimService().postClaimDetails(newClaim).ContinueWith((x) =>
         {
             string message = "";
@@ -265,9 +295,11 @@
             var result = await DialogService.Show<Dialogue>("Client", paramaters, options).Result;
             if (message != "Coverage could not be created")
             {
-                UriHelper.NavigateTo("/ClientListView");
+                UriHelper.NavigateTo("/Claim");
             }
         });
     }
+
+
 
 }
