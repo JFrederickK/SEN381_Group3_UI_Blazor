@@ -84,7 +84,9 @@
     protected async override Task OnInitializedAsync()
     {
         //get list of providers
-        MedicalProviderElements = new ProviderMock().GetMedicalServiceProviders();
+        await new MedicalServiceProviderService().getProviders(1000, 1).ContinueWith((x)=>{
+            MedicalProviderElements = x.Result;
+        });
     }
 
     private IEnumerable<string> MaxCharacters(string ch)

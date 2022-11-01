@@ -1,71 +1,31 @@
 ﻿@page "/MSPAddView"
-@using System.ComponentModel.DataAnnotations 
-@using SEN381_UI.Data
-@using SEN381_UI.Shared.MockData
-<h3>Medical service Provider Add View</h3>
+@using System.ComponentModel.DataAnnotations
+@inject IDialogService DialogService
+@inject NavigationManager navigate;
+
+<h3>Create Medical service Provider</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/MedicalServiceProvider">Back</MudIconButton>
 <MudGrid>
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Provider ID" ReadOnly="true" Text="@id" Variant="Variant.Outlined"></MudTextField>
-    </MudItem>
-    <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Name" ReadOnly="true" @bind-Value="providerName"></MudTextField>
+        <MudTextField T="string" Label="Name" @bind-Value="providerName"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
         <MudTextField T="string" Label="Address" @bind-Value="providerAddress"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Email" Text="" @bind-Value="Email"></MudTextField>
+        <MudTextField T="string" Label="Email" @bind-Value="Email"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
         <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value="providerPhone"></MudTextField>
     </MudItem>
 </MudGrid>
 
-<MudGrid>
-    <MudItem xs="12" sm="6" Style="margin-top:1%">
-    <MudTable Items="@TreatmentsElements" @bind-SelectedItem="selectedTreatment" Hover="true">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6">Treatment list</MudText>
-            <MudSpacer />
-            <MudTextField @bind-Value="searchTreatment" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh>Nr</MudTh>
-            <MudTh>Sign</MudTh>
-
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Nr">@context.TreatmentID</MudTd>
-            <MudTd DataLabel="Sign">@context.TreatmentName</MudTd>
-
-        </RowTemplate>
-        <FooterContent>
-            <MudTd colspan="5">Select All</MudTd>
-        </FooterContent>
-    </MudTable>
-    <MudText Inline="true">Selected items: @(selectedTreatments == null ? "" : string.Join(", ", selectedTreatments.OrderBy(x => x.TreatmentName).Select(x => x.TreatmentName)))</MudText>
-        </MudItem>
-        <MudItem xs="12" sm="6">
-        @if (selectedTreatment != null)
-        {
-            <MudTextField @bind-Value="displayDetails().TreatmentDescription" Label="Privder name" ReadOnly="true" Variant="Variant.Outlined" Style="margin-bottom:1%" />
-            <MudTextField @bind-Value="displayDetails().MedicalServiceProviderTreatments" Label="Privder Adress" ReadOnly="true" Variant="Variant.Outlined" Style="margin-bottom:1%" />
-        }
-    </MudItem>
-</MudGrid>
 <MudGrid Style="margin-top:auto">
     <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Changes</MudButton>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save Changes</MudButton>
+        <MudButton OnClick="@insertProvider" Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Create Provider</MudButton>
     </MudItem>
 </MudGrid>
 @code {
-    [Parameter]
-    public string? id { get; set; }
-
     public string providerName { get; set; }
 
     public string providerAddress { get; set; }
@@ -76,34 +36,29 @@
     public string providerPhone { get; set; }
     protected override void OnInitialized()
     {
-        TreatmentsElements = new TreatmentMock().GetTreatments();
-
-    }
-    private string searchTreatment = "";
-    private Treatment selectedTreatment = null;
-    private HashSet<Treatment> selectedTreatments = new HashSet<Treatment>();
-
-    private IEnumerable<Treatment> TreatmentsElements = new List<Treatment>();
-    private bool FilterTreatment(Treatment element) => FilterTreatment(element, searchTreatment);
-
-    private bool FilterTreatment(Treatment element, string searchMedical)
-    {
-
-        if (string.IsNullOrWhiteSpace(searchMedical))
-            return true;
-        if (element.TreatmentID.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.TreatmentName.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{element.TreatmentID} {element.TreatmentName}".Contains(searchTreatment))
-            return true;
-        return false;
     }
 
-    public Treatment displayDetails()
-    {
-        Treatment selected = new Treatment(selectedTreatment.TreatmentID, selectedTreatment.TreatmentName, selectedTreatment.TreatmentDescription, selectedTreatment.MedicalServiceProviderTreatments);
-        return selected;
+    private async void insertProvider(){
+        await new MedicalServiceProviderService().addProvider(new MedicalServiceProvider("temp",providerName,providerAddress,Email,providerPhone)).ContinueWith((x)=>{
+            string message = x.Result!=null ?"Provider created sucessfully":"Provider could not be created";
+            showDialog(message);
+        });
+    }
 
+
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+            var result = await DialogService.Show<Dialogue>("Medical Service Provider", paramaters, options).Result;
+            if (message != "Provider could not be created")
+            {
+                navigate.NavigateTo("/MedicalServiceProvider");
+            }
+        });
     }
 }

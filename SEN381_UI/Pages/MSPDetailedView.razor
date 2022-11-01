@@ -1,5 +1,9 @@
-﻿@page "/MSPDetailedView/{id}"
+﻿@page "/MedicalServiceProvider/{id}"
 @using System.ComponentModel.DataAnnotations
+
+@inject NavigationManager navigation
+@inject IDialogService DialogService
+
 <h3>MSP Detailed View</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/MedicalServiceProvider">Back</MudIconButton>
 <MudGrid>
@@ -7,13 +11,13 @@
         <MudTextField T="string" Label="Provider ID" ReadOnly="true" Text="@id" Variant="Variant.Outlined"></MudTextField>
     </MudItem>
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Name" ReadOnly="true" @bind-Value="@providerName"></MudTextField>
+        <MudTextField T="string" Label="Name" @bind-Value="@providerName"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
         <MudTextField T="string" Label="Address" @bind-Value="providerAddress"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Email" Text="" @bind-Value="Email"></MudTextField>
+        <MudTextField T="string" Label="Email" @bind-Value="Email"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
         <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value="providerPhone"></MudTextField>
@@ -22,10 +26,10 @@
 
 <MudGrid Style="margin-top:auto">
     <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Changes</MudButton>
+        <MudButton OnClick="@resetProvider" Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Changes</MudButton>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save Changes</MudButton>
+        <MudButton OnClick="@updateProvider" Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save Changes</MudButton>
     </MudItem>
 </MudGrid>
 @code {
@@ -33,11 +37,59 @@
     public string? id { get; set; }
 
     public string providerName { get; set; }
-
     public string providerAddress { get; set; }
-
+    
     [EmailAddress]
     public string Email { get; set; }
-
     public string providerPhone { get; set; }
+
+    private MedicalServiceProvider originalProvider = new MedicalServiceProvider();
+    private MedicalServiceProvider newProvider = new MedicalServiceProvider();
+
+    protected async override Task OnInitializedAsync(){
+        await new MedicalServiceProviderService().getProviderDetails(id).ContinueWith((x)=>{
+            originalProvider = new MedicalServiceProvider(x.Result.PolicyProviderID, x.Result.PolicyProviderName, x.Result.PolicyProviderAddresses, x.Result.PolicyProviderEmail, x.Result.PolicProviderPhone);
+            providerName= x.Result.PolicyProviderName;
+            providerAddress = x.Result.PolicyProviderAddresses;
+            Email = x.Result.PolicyProviderEmail;
+            providerPhone = x.Result.PolicProviderPhone;
+        });
+    }
+
+    private void updateProvider()
+    {
+        newProvider = new MedicalServiceProvider(id, providerName, providerAddress, Email, providerPhone);
+        new MedicalServiceProviderService().updateProvider(newProvider).ContinueWith((x) =>
+        {
+            string message = "";
+            message = x.Result != null ? "Provider Updated successfully" : "Provider could not be updated";
+            showDialog(message);
+        });
+    }
+
+    private void resetProvider()
+    {
+        newProvider = new MedicalServiceProvider(id, originalProvider.PolicyProviderName, originalProvider.PolicyProviderAddresses, originalProvider.PolicyProviderEmail, originalProvider.PolicProviderPhone);
+        providerName = originalProvider.PolicyProviderName;
+        providerAddress = originalProvider.PolicyProviderAddresses;
+        Email = originalProvider.PolicyProviderEmail;
+        providerPhone = originalProvider.PolicProviderPhone;
+    }
+
+    private void navigateBack()
+    {
+        navigation.NavigateTo("/MedicalServiceProvider");
+    }
+
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+            var result = await DialogService.Show<Dialogue>("Medical Service Provider", paramaters, options).Result;
+        });
+    }
 }
