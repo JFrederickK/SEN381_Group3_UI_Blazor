@@ -23,14 +23,7 @@
         <MudTd DataLabel="ID">@context.MedicalConditionID</MudTd>
         <MudTd DataLabel="NAME">@context.MedicalConditionName</MudTd>
         <MudTd DataLabel="DESCRIPTION">@context.MedicalConditionDescription</MudTd>
-        <MudTd DataLabel="TREATMENTS">
-            <MudChipSet>
-                @foreach (string item in getTreatments(context.Treatments))
-                {
-                    <MudChip>@item</MudChip>
-                }
-            </MudChipSet>
-        </MudTd>
+        <MudTd DataLabel="TREATMENTS">@context.Treatments</MudTd>
 
     </RowTemplate>
     <PagerContent>
@@ -62,24 +55,12 @@
 
     private bool FilterFunc(MedicalCondition element, string searchString)
     {
-        //if (string.IsNullOrWhiteSpace(searchString))
-        //    return true;
-        //if (element.ClaimID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-        //    return true;
-        //if (element.Client.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-        //    return true;
-        //if (element.MedicalConditions.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-        //    return true;
-        //if (element.PlaceOfTreatment.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-        //    return true;
-        //if (element.CallDetails.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-        //    return true;
-        //if (element.ClaimeStatus.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-        //    return true;
-        //if ($"{element.ClaimID} {element.Client} {element.MedicalConditions} {element.PlaceOfTreatment} {element.CallDetails} {element.ClaimeStatus}".Contains(searchString))
-        //    return true;
-        //return false;
-        return true;
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.MedicalConditionID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+
     }
 
     private void OnClick()
