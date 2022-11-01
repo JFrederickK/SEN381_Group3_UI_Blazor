@@ -1,20 +1,19 @@
 ﻿@page "/Treatment"
 @using SEN381_UI.Data
-@using SEN381_UI.Shared.MockData
+@inject NavigationManager UriHelper
+@inject IDialogService DialogService
+
 <h3>Treatment Component</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Treatment,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by" LoadingProgressColor="Color.Primary" FixedHeader="@Theader">
+<MudTable ServerData="@(new Func<TableState, Task<TableData<Treatment>>>(loadTreatments))" 
+    Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Treatment,bool>(FilterFunc)" 
+    @bind-SelectedItem="selectedItem" SortLabel="Sort by" LoadingProgressColor="Color.Primary" FixedHeader="@Theader"
+    T="Treatment"
+    OnRowClick="@navigate">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Treatment</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
-    <ColGroup>
-        @*<col style="background-color:aqua"/>
-        <col style="background-color:aquamarine"/>
-        <col style="background-color:aqua"/>
-        <col style="background-color:aquamarine" />*@
-
-    </ColGroup>
     <HeaderContent>
         <MudTh>Nr</MudTh>
         <MudTh>Name</MudTh>
@@ -25,20 +24,34 @@
         <MudTd DataLabel="Nr">@context.TreatmentID</MudTd>
         <MudTd DataLabel="Name">@context.TreatmentName</MudTd>
         <MudTd DataLabel="Description">@context.TreatmentDescription</MudTd>
-        <MudTd DataLabel="Medica lService Providers">
+        <MudTd DataLabel="Medical Service Providers">
             <MudChipSet>
-                @foreach (string item in getProviderNames(context.MedicalServiceProviders))
+                @foreach (string item in getProviderNames(context.MedicalServiceProviderTreatments))
                 {
                     <MudChip>@item</MudChip>
                 }
             </MudChipSet>
-            @context.MedicalServiceProviders
         </MudTd>
+        <MudTd><MudTooltip Text="Delete Treatment"><MudIconButton OnClick="()=>deleteTreatment(context.TreatmentID.ToString())" Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIconButton></MudTooltip></MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
     </PagerContent>
 </MudTable>
+
+<MudTreeView T="string" ExpandOnClick="true">
+    @foreach (string item in location)
+    {
+        <MudTreeViewItem Value="item">
+            @foreach (string treat in treatmentTree)
+            {
+                <MudTreeViewItem Value="treat">
+                </MudTreeViewItem>
+            }
+        </MudTreeViewItem>
+    }
+</MudTreeView>
+
 <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" Href="/TreatmentAdd" Style="margin-top:1%" />
 
 @code {
@@ -51,11 +64,12 @@
     private Treatment selectedItem = null;
     private HashSet<Treatment> selectedItems = new HashSet<Treatment>();
 
-    private IEnumerable<Treatment> Elements = new List<Treatment>();
-    protected override void OnInitialized()
-    {
-        Elements = new Treatment_Mock().GetTreatments();
-    }
+    Dictionary<string, List<string>> lTreeView = new Dictionary<string, List<string>>();//Remove
+
+    List<string> treatmentTree = new List<string>() { "sdad","dasda"};
+    List<string> location = new List<string>() { "sdad", "dasda","hong kong" };
+
+    private List<Treatment> Elements = new List<Treatment>();
 
     private bool FilterFunc(Treatment element) => FilterFunc(element, searchString);
 
@@ -76,14 +90,60 @@
         return false;
     }
 
-    private List<string> getProviderNames(List<MedicalServiceProvider> providers){
+
+    private List<string> getProviderNames(List<MedicalServiceProviderTreatment> providers){
         List<string> name = new List<string>();
 
-        foreach (MedicalServiceProvider item in providers)
+        foreach (MedicalServiceProviderTreatment item in providers)
         {
-            name.Add(item.PolicyProviderName);
+            name.Add(item.MedicalServiceProvidor.PolicyProviderName);
         }
 
         return name;
+    }
+    private async Task showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialog");
+        await InvokeAsync(async () =>
+        {
+            await DialogService.Show<Dialogue>("Delete Treatment", paramaters, options).Result;
+
+        });
+    }
+
+    private async Task<TableData<Treatment>> loadTreatments(TableState state)
+    {
+        foreach (string item in location)
+        {
+            lTreeView.Add(item, treatmentTree);
+        }//Fix
+
+        TreatmentService ts = new TreatmentService();
+        await ts.getTreatments(state.PageSize, state.Page + 1).ContinueWith((x) =>
+        {
+            Elements = x.Result;
+        });
+        return new TableData<Treatment>() { Items = Elements, TotalItems = Elements.Count };
+    }
+
+    private async void deleteTreatment(string id)
+    {
+        await new TreatmentService().deleteTreatment(id).ContinueWith(async (x) =>
+        {
+            string message = x.Result != null ? "Treatment Deleted Succesfully" : "Something went wrong!";
+            await showDialog(message);
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+            UriHelper.NavigateTo($"/Treatment", true);
+        });
+    }
+    private void navigate(TableRowClickEventArgs<Treatment> p)
+    {
+        UriHelper.NavigateTo($"/Treatment/{p.Item.TreatmentID}");
     }
 }
