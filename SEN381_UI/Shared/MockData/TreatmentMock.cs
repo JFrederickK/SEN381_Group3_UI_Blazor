@@ -7,7 +7,7 @@ namespace SEN381_UI.Shared.MockData
         public List<Treatment> GetTreatments()
         {
             List<Treatment> treatments = new List<Treatment>();
-            treatments.Add(new Treatment("1", "Covid", "Help kill covid", new MedicalProviderMock().GetMedicalServiceProviders()));
+            treatments.Add(new Treatment("1", "Covid", "Help kill covid", new List<MedicalServiceProviderTreatment>()));
             return treatments;
         }
     }
