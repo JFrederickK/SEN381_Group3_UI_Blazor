@@ -35,10 +35,11 @@
                 <MudExpansionPanel class="h-25" Text="Medical Service Providers">
 
                     <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
-                            @foreach (MedicalServiceProviderTreatment provider in newTreatment.MedicalServiceProviderTreatments)
+                            @foreach (MedicalServiceProviderTreatment provider in MedicalProviderElements)
                         {
                             string text = $"Provider ID: {@provider.MedicalServiceProvidor.PolicyProviderID}";
-                            <MudExpansionPanel Text="@text">
+                                provider.ProviderStatus = selectedProvidersTreatment.Where(x => x.MedicalServiceProvidor.PolicyProviderID.Equals(provider.MedicalServiceProvidor.PolicyProviderID)).ToList().Count == 0 ? provider.ProviderStatus : selectedProvidersTreatment.Where(x => x.MedicalServiceProvidor.PolicyProviderID.Equals(provider.MedicalServiceProvidor.PolicyProviderID)).ToList()[0].ProviderStatus;
+                                <MudExpansionPanel Text="@text">
                                 <MudText> Provider Name: @provider.MedicalServiceProvidor.PolicyProviderName </MudText>
                                 <MudText> Provider Address: @provider.MedicalServiceProvidor.PolicyProviderAddresses </MudText>
                                 <MudText> Provider Phone: @provider.MedicalServiceProvidor.PolicProviderPhone </MudText>
@@ -52,8 +53,8 @@
                                 </MudText>
                             </MudExpansionPanel>
                             <MudText Align="Align.Center">
-                                @if (selectedProvidersTreatment.Contains(provider))
-                                {
+                                    @if (selectedProvidersTreatment.Where(x=> x.MedicalServiceProvidor.PolicyProviderID.Equals(provider.MedicalServiceProvidor.PolicyProviderID)).ToList().Count!=0)
+                                    {
                                     <MudButton OnClick="()=>removeProvider(provider)" Color="Color.Error">Remove</MudButton>
                                 }
                                 else
@@ -90,7 +91,7 @@
     public string treatmentID { get; set; }
     public string treatmentDescription { get; set; }
 
-    private List<MedicalServiceProvider> MedicalProviderElements = new List<MedicalServiceProvider>();
+    private List<MedicalServiceProviderTreatment> MedicalProviderElements = new List<MedicalServiceProviderTreatment>();
     private List<MedicalServiceProviderTreatment> selectedProvidersTreatment = new List<MedicalServiceProviderTreatment>();
     private List<string> statusses = new List<string>() { "Standard", "Prefered", "BlackListed" };
 
@@ -106,6 +107,14 @@
             treatmentDescription = x.Result.TreatmentDescription;
             selectedProvidersTreatment = new List<MedicalServiceProviderTreatment>(x.Result.MedicalServiceProviderTreatments);
         });
+
+        await new MedicalServiceProviderService().getProviders(1000, 1).ContinueWith((x) =>
+        {
+            foreach (MedicalServiceProvider prov in x.Result)
+            {
+                MedicalProviderElements.Add(new MedicalServiceProviderTreatment(0,"Standard",prov));
+            }
+        });
     }
 
     private void navigateBack(){
@@ -117,7 +126,7 @@
     }
     private void removeProvider(MedicalServiceProviderTreatment mspt)
     {
-        selectedProvidersTreatment.Remove(mspt);
+        selectedProvidersTreatment=selectedProvidersTreatment.Where(x=> !x.MedicalServiceProvidor.PolicyProviderID.Equals(mspt.MedicalServiceProvidor.PolicyProviderID)).ToList();
     }
 
     private async void showDialog(string message)
@@ -146,7 +155,6 @@
         treatmentDescription=originalTreatment.TreatmentDescription;
         treatmentName = originalTreatment.TreatmentName;
         selectedProvidersTreatment = new List<MedicalServiceProviderTreatment>(originalTreatment.MedicalServiceProviderTreatments);
-        Console.WriteLine(selectedProvidersTreatment.Count);
     }
 }
 

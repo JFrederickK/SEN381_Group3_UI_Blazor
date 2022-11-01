@@ -1,14 +1,13 @@
 ﻿@page "/MedicalServiceProvider"
-@using SEN381_UI.Data
-@using SEN381_UI.Shared.MockData
 @inject NavigationManager UriHelper
+@inject IDialogService DialogService
 <h3>Medical Service Provider</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" >Back</MudIconButton>
 
-    <MudTable Items="@Elements" Hover="@hover" Bordered="@bordered" Striped="@striped" 
-        Filter="new Func<MedicalServiceProvider,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
-            SortLabel="Sort by"
-    T="MedicalServiceProvider"
+<MudTable ServerData="@(new Func<TableState, Task<TableData<MedicalServiceProvider>>>(loadProviders))" Hover="@hover" Bordered="@bordered" Striped="@striped"
+          Filter="new Func<MedicalServiceProvider,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
+          SortLabel="Sort by"
+          T="MedicalServiceProvider"
     OnRowClick="@navigate"
     >
         <ToolBarContent>
@@ -30,6 +29,7 @@
             <MudTd DataLabel="Adress">@context.PolicyProviderAddresses</MudTd>
             <MudTd DataLabel="Email">@context.PolicyProviderEmail</MudTd>
             <MudTd DataLabel="Phone">@context.PolicProviderPhone</MudTd>
+            <MudTd><MudTooltip Text="Delete Treatment"><MudIconButton OnClick="()=>deleteProvider(context.PolicyProviderID)" Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIconButton></MudTooltip></MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager />
@@ -50,12 +50,17 @@
     private MedicalServiceProvider selectedItem = null;
     private HashSet<MedicalServiceProvider> selectedItems = new HashSet<MedicalServiceProvider>();
 
-    private IEnumerable<MedicalServiceProvider> Elements = new List<MedicalServiceProvider>();
+    private List<MedicalServiceProvider> Elements = new List<MedicalServiceProvider>();
 
-    protected override void OnInitialized()
+    private async Task<TableData<MedicalServiceProvider>> loadProviders(TableState state)
     {
-        Elements = new ProviderMock().GetMedicalServiceProviders();
+        await new MedicalServiceProviderService().getProviders(state.PageSize, state.Page + 1).ContinueWith((x) =>
+        {
+            Elements = x.Result;
+        });
+        return new TableData<MedicalServiceProvider>() { Items = Elements, TotalItems = Elements.Count };
     }
+
     private bool FilterFunc(MedicalServiceProvider element) => FilterFunc(element, searchString);
 
     private bool FilterFunc(MedicalServiceProvider element, string searchString)
@@ -81,6 +86,33 @@
 
     private void navigate(TableRowClickEventArgs<MedicalServiceProvider> p)
     {
-        UriHelper.NavigateTo($"/MSPDetailedView/{p.Item.PolicyProviderID}");
+        UriHelper.NavigateTo($"/MedicalServiceProvider/{p.Item.PolicyProviderID}");
+    }
+
+    private async Task showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialog");
+        await InvokeAsync(async () =>
+        {
+            await DialogService.Show<Dialogue>("Delete Provider", paramaters, options).Result;
+
+        });
+    }
+
+    private async void deleteProvider(string id)
+    {
+        await new MedicalServiceProviderService().deleteProvider(id).ContinueWith(async (x) =>
+        {
+            string message = x.Result != null ? "Provider Deleted Succesfully" : "Something went wrong!";
+            await showDialog(message);
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+            UriHelper.NavigateTo($"/MedicalServiceProvider", true);
+        });
     }
 }
