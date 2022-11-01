@@ -2,7 +2,11 @@
 @using SEN381_UI.Shared.MockData
 @page "/Treatment/{id}"
 @inject NavigationManager navigation
+@inject IDialogService DialogService
 
+@if (newTreatment != null && newTreatment.MedicalServiceProviderTreatments != null)
+{
+    
 <MudCard style="max-height:1000px; overflow: auto;">
     <MudCardHeader>
         <CardHeaderContent>
@@ -15,23 +19,23 @@
     <MudForm Class="p-5">
         <MudGrid>
 
-            @*Medical Condition Basic Details*@
-            <MudItem xs="4" sm="6">
-                <MudTextField T="string" Label="Treatment ID" ReadOnly="true" @bind-Value="tempTreatment.TreatmentID"></MudTextField>
+            @*Treatment Basic Details*@
+            <MudItem xs="3">
+                <MudTextField T="string" Label="Treatment ID" ReadOnly="true" @bind-Value="newTreatment.TreatmentID"></MudTextField>
             </MudItem>
-            <MudItem xs="4" sm="6">
-                <MudTextField T="string" Label="Treatment Name" @bind-Value="tempTreatment.TreatmentName"></MudTextField>
+            <MudItem xs="3">
+                <MudTextField T="string" Label="Treatment Name" @bind-Value="treatmentName"></MudTextField>
             </MudItem>
-            <MudItem xs="4" sm="6">
-                <MudTextField T="string" Label="Treatment Description" ReadOnly="true" @bind-Value="tempTreatment.TreatmentDescription"></MudTextField>
+            <MudItem xs="3">
+                <MudTextField T="string" Label="Treatment Description" @bind-Value="treatmentDescription"></MudTextField>
             </MudItem>
 
             @*Provider Details *@
-            <MudItem lg="12" sm="6">
+            <MudItem lg="12">
                 <MudExpansionPanel class="h-25" Text="Medical Service Providers">
 
                     <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
-                        @foreach (MedicalServiceProviderTreatment provider in tempTreatment.MedicalServiceProviderTreatments)
+                            @foreach (MedicalServiceProviderTreatment provider in newTreatment.MedicalServiceProviderTreatments)
                         {
                             string text = $"Provider ID: {@provider.MedicalServiceProvidor.PolicyProviderID}";
                             <MudExpansionPanel Text="@text">
@@ -39,64 +43,68 @@
                                 <MudText> Provider Address: @provider.MedicalServiceProvidor.PolicyProviderAddresses </MudText>
                                 <MudText> Provider Phone: @provider.MedicalServiceProvidor.PolicProviderPhone </MudText>
                                 <MudText Align="Align.Center">
-                                    @if (selectedProviders.Contains(provider.MedicalServiceProvidor))
-                                    {
-                                        <MudButton OnClick="()=>removeProvider(provider)" Color="Color.Error">Remove</MudButton>
-                                    }
-                                    else
-                                    {
-                                        <MudButton OnClick="()=>addProvider(provider)" Color="Color.Success">Add</MudButton>
-                                    }
+                                    <MudSelect @bind-Value="provider.ProviderStatus" T="string" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                        @foreach (string status in @statusses)
+                                        {
+                                            <MudSelectItem T="string" Value="status"></MudSelectItem>
+                                        }
+                                    </MudSelect>
                                 </MudText>
                             </MudExpansionPanel>
-
+                            <MudText Align="Align.Center">
+                                @if (selectedProvidersTreatment.Contains(provider))
+                                {
+                                    <MudButton OnClick="()=>removeProvider(provider)" Color="Color.Error">Remove</MudButton>
+                                }
+                                else
+                                {
+                                    <MudButton OnClick="()=>addProvider(provider)" Color="Color.Success">Add</MudButton>
+                                }
+                            </MudText>
                         }
                     </MudExpansionPanels>
                 </MudExpansionPanel>
             </MudItem>
 
             <MudItem xs="6" sm="6">
-                <MudButton>Cancel Changes</MudButton>
+                <MudButton OnClick="@resetTreatment">Cancel Changes</MudButton>
             </MudItem>
             <MudItem xs="6" sm="6">
-                <MudButton>Save Changes</MudButton>
+                <MudButton OnClick="@updateTreatment">Save Changes</MudButton>
             </MudItem>
 
         </MudGrid>
     </MudForm>
 
 </MudCard>
+}
 
 
 @code {
 
     [Parameter]
     public string? id { get; set; }
-    string name = "dasd";//Get from service
+    private Treatment originalTreatment = new Treatment();
+    private Treatment newTreatment = new Treatment();
     public string treatmentName { get; set; }
     public string treatmentID { get; set; }
     public string treatmentDescription { get; set; }
-    private string searchMedicalServiceProvider = "";
-    private MedicalServiceProviderTreatment selectedMedical = null;
-    private Treatment originalTreatment = new Treatment();
-    private Treatment tempTreatment = new Treatment();
-    private Treatment newTreatment = new Treatment();
 
     private List<MedicalServiceProvider> MedicalProviderElements = new List<MedicalServiceProvider>();
     private List<MedicalServiceProviderTreatment> selectedProvidersTreatment = new List<MedicalServiceProviderTreatment>();
-    private List<MedicalServiceProvider> selectedProviders = new List<MedicalServiceProvider>();
     private List<string> statusses = new List<string>() { "Standard", "Prefered", "BlackListed" };
 
-    List<MedicalServiceProvider> providers = new MedicalProviderMock().GetMedicalServiceProviders();//Replace with service
-
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
         //get list of providerstreatments
-        new TreatmentService().getTreatmentDetails(id).ContinueWith((x) =>
+        await new TreatmentService().getTreatmentDetails(id).ContinueWith((x) =>
         {
-            originalTreatment = x.Result;
-            tempTreatment = x.Result;
-            selectedProvidersTreatment=tempTreatment.MedicalServiceProviderTreatments;
+            originalTreatment = new Treatment(x.Result.TreatmentID, x.Result.TreatmentName, x.Result.TreatmentDescription, new List<MedicalServiceProviderTreatment>(x.Result.MedicalServiceProviderTreatments));
+            newTreatment = new Treatment(x.Result.TreatmentID, x.Result.TreatmentName, x.Result.TreatmentDescription, new List<MedicalServiceProviderTreatment>(x.Result.MedicalServiceProviderTreatments));
+            treatmentName = x.Result.TreatmentName;
+            treatmentID = x.Result.TreatmentID;
+            treatmentDescription = x.Result.TreatmentDescription;
+            selectedProvidersTreatment = new List<MedicalServiceProviderTreatment>(x.Result.MedicalServiceProviderTreatments);
         });
     }
 
@@ -110,6 +118,35 @@
     private void removeProvider(MedicalServiceProviderTreatment mspt)
     {
         selectedProvidersTreatment.Remove(mspt);
+    }
+
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+            var result = await DialogService.Show<Dialogue>("Treatment", paramaters, options).Result;
+        });
+    }
+
+    private void updateTreatment(){
+        newTreatment = new Treatment(treatmentID,treatmentName,treatmentDescription,selectedProvidersTreatment);
+        new TreatmentService().updateTreatment(newTreatment).ContinueWith((x)=>{
+            string message = "";
+            message = x.Result != null ? "Treatment Updated successfully" : "Treatment could not be updated";
+            showDialog(message);
+        });
+    }
+
+    private void resetTreatment(){
+        newTreatment = new Treatment(id, originalTreatment.TreatmentName, originalTreatment.TreatmentDescription,new List<MedicalServiceProviderTreatment>(originalTreatment.MedicalServiceProviderTreatments));
+        treatmentDescription=originalTreatment.TreatmentDescription;
+        treatmentName = originalTreatment.TreatmentName;
+        selectedProvidersTreatment = new List<MedicalServiceProviderTreatment>(originalTreatment.MedicalServiceProviderTreatments);
+        Console.WriteLine(selectedProvidersTreatment.Count);
     }
 }
 

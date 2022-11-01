@@ -34,7 +34,7 @@ namespace SEN381_UI.BusinessLayer.Services
             HttpClient client = new HttpClient();
             string url = $"https://localhost:7116/api/Treatment/{id}";
             HttpResponseMessage response = await client.GetAsync(url);
-            Treatment? treatment = JsonConvert.DeserializeObject<Treatment>(await response.Content.ReadAsStringAsync());
+            Treatment treatment = JsonConvert.DeserializeObject<Treatment>(await response.Content.ReadAsStringAsync());
             if (treatment != null)
             {
                 return treatment;
@@ -53,7 +53,7 @@ namespace SEN381_UI.BusinessLayer.Services
 
         }
 
-        public async Task<Treatment> updateCoverage(Treatment treatment)
+        public async Task<Treatment> updateTreatment(Treatment treatment)
         {
             HttpClient client = new HttpClient();
             string url = $"https://localhost:7116/api/Treatment/{treatment.TreatmentID}";
