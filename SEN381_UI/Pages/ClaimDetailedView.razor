@@ -1,41 +1,122 @@
 ﻿@page "/ClaimDetaildView/{id}"
 @using SEN381_UI.Data
+@inject IDialogService DialogService
+@inject NavigationManager UriHelper
 <h3>Claim Detailed View</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Claim">Back</MudIconButton>
-<MudGrid>
-    <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Claim ID" ReadOnly="true" Text="@id" Variant="Variant.Outlined"></MudTextField>
-    </MudItem>
-    <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Client" ReadOnly="true" Text="Client name"></MudTextField>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Medical condition" Text=""></MudTextField>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Place Of Treatment" Text=""></MudTextField>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Call Details" Text=""></MudTextField>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Claime Status" Text=""></MudTextField>
-    </MudItem>
-</MudGrid>
+@if (load)
+{
+    <MudGrid>
+        <MudItem xs="6" sm="6">
+            <MudTextField T="string" Label="Claim ID" ReadOnly="true" Text="@id" Variant="Variant.Outlined"></MudTextField>
+        </MudItem>
+        <MudItem xs="6" sm="6">
+            <MudTextField T="string" Label="Client" ReadOnly="true" Text="@clientName"></MudTextField>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField T="string" Label="Medical condition" @bind-Value=@medicalCondition Text="@medicalCondition"></MudTextField>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField T="string" Label="Place Of Treatment" @bind-Value=@placeOfTreatment Text="@placeOfTreatment"></MudTextField>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField T="string" Label="Call Details" @bind-Value=@callDetails Text="@callDetails"></MudTextField>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField T="string" Label="Claime Status" @bind-Value=@claimeStatus Text="@claimeStatus"></MudTextField>
+        </MudItem>
+    </MudGrid>
 
-<MudGrid Style="margin-top:auto">
-    <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Cancel Changes</MudButton>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Save Changes</MudButton>
-    </MudItem>
-</MudGrid>
+                <MudGrid>
+                    <MudItem xs="6" sm="4">
+                        <MudButton Color="Color.Info" OnClick="@cancel">Cancel Changes <MudIcon Icon="@Icons.Filled.Cancel" Color="Color.Info"></MudIcon></MudButton>
+                    </MudItem>
+                    <MudItem xs="6" sm="4">
+                        <MudButton Color="Color.Success" OnClick="@updateClaims">Save Changes  <MudIcon Icon="@Icons.Filled.PublishedWithChanges" Color="Color.Success"></MudIcon></MudButton>
+                    </MudItem>
+                    <MudItem xs="6" sm="4">
+                        <MudButton Color="Color.Error" OnClick="@deleteClient">Delete Client <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
+                    </MudItem>
+                </MudGrid>
+}
 @code {
     [Parameter]
-    public string? id { get; set; }
+    public string id { get; set; }
 
+    private bool load = false;
 
+    private string clientName { get; set; }
+
+    private string medicalCondition { get; set; }
+    private string placeOfTreatment { get; set; }
+    private string callDetails { get; set; }
+    private string claimeStatus { get; set; }
+
+    private Claim originalClaim = new Claim();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadClaim();
+        load = true;
+    }
+    private async Task LoadClaim() {
+        ClaimService cs = new ClaimService();
+        await cs.getClientDetails(int.Parse(id)).ContinueWith((x) => {
+            clientName = x.Result.Client;
+            medicalCondition = x.Result.MedicalConditions.ToString();
+            placeOfTreatment = x.Result.PlaceOfTreatment;
+            callDetails = x.Result.CallDetails.ToString();
+            claimeStatus = x.Result.ClaimeStatus;
+
+            originalClaim = new Claim(int.Parse(id), clientName, int.Parse(medicalCondition), placeOfTreatment, int.Parse(callDetails), claimeStatus);
+
+        }
+        );
+    }
+    private async void deleteClient()
+    {
+        await new ClaimService().deleteClaim(int.Parse(id)).ContinueWith((x) =>
+        {
+            string message = "";
+            message = x.Result != null ? "Claim could not be deleted" : "Claim successfully deleted";
+            showDialog(message);
+        }
+        );
 
     }
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+            var result = await DialogService.Show<Dialogue>("Claim", paramaters, options).Result;
+            if (message != "Claim could not be created")
+            {
+                UriHelper.NavigateTo("/Claim");
+            }
+        });
+    }
+    private void cancel()
+    {
+        UriHelper.NavigateTo("/Claim");
+    }
+    private async void updateClaims()
+    {
+        Claim newClaim = new Claim(int.Parse(id), clientName, int.Parse(medicalCondition), placeOfTreatment, int.Parse(callDetails), claimeStatus);
+        await new ClaimService().updateClaim(newClaim).ContinueWith((x)=> { 
+
+            string message = "";
+            message = x.Result != null ? "Client could not be updated" : "Client successfully updated";
+            showDialog(message);
+        }
+
+
+
+        );
+    }
+
+}
 

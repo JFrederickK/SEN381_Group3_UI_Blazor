@@ -1,11 +1,15 @@
 ﻿@page "/ClaimAddView"
 @using SEN381_UI.Data
+@inject NavigationManager UriHelper
+@inject IDialogService DialogService
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Claim">Back</MudIconButton>
 
-<MudGrid >
+@if (true)
+{
+   <MudGrid >
 <MudItem xs="12" sm="6">
     <MudPaper Elevation="3" Outlined="true">
-<MudTable Items="@Elements" Hover="true" Bordered="@bordered" Striped="@striped" Filter="new Func<Client,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by">
+                <MudTable Items="@Elements" Hover="true" Bordered="@bordered" Striped="@striped" Filter="new Func<Client,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" MultiSelection="false">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Clients Details</MudText>
         <MudSpacer />
@@ -15,21 +19,16 @@
         <MudTh>Nr</MudTh>
         <MudTh>Name</MudTh>
         <MudTh>Surname</MudTh>
-        <MudTh>Address</MudTh>
         <MudTh>Email</MudTh>
         <MudTh>Phone</MudTh>
-        <MudTh>Policies</MudTh>
-        <MudTh>Status</MudTh>
+
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Nr">@context.ClientID</MudTd>
         <MudTd DataLabel="Name">@context.ClientName</MudTd>
         <MudTd DataLabel="Surname">@context.ClientSurname</MudTd>
-        <MudTd DataLabel="Adress">@context.ClientAddress</MudTd>
         <MudTd DataLabel="Email">@context.ClientEmail</MudTd>
         <MudTd DataLabel="Phone">@context.ClientPhoneNumber</MudTd>
-        <MudTd DataLabel="Policies">@context.Policies</MudTd>
-        <MudTd DataLabel="Status">@context.ClientStatus</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
@@ -105,9 +104,11 @@
         </MudPaper>
  </MudItem>
 
-</MudGrid>
+</MudGrid> 
+}
 
-    @code {
+@code {
+    private bool load = false;
     private bool striped = true;
     private bool bordered = true;
     private string searchString = "";
@@ -116,13 +117,33 @@
 
     private IEnumerable<Client> Elements = new List<Client>();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Elements = new ClientMock().GetClients();
-        MedicalElements = new MedicalConditionMock().GetMedicals();
-        TreatmentsElements = new Treatment_Mock().GetTreatments();
+        await LoadClients();
+        await LoadMedicalConditions();
+        load = true;
+    }
+    private async Task LoadClients()
+    {
+        ClientService cs = new ClientService();
+        await cs.LoadClient().ContinueWith((x) =>
+        {
+            Elements = x.Result;
+        });
+
 
     }
+    private async Task LoadMedicalConditions()
+    {
+        ClaimService cs = new ClaimService();
+        await cs.LoadMedicalCondition().ContinueWith((x) =>
+        {
+            MedicalElements = x.Result;
+        });
+
+
+    }
+
     private bool FilterFunc(Client element) => FilterFunc(element, searchString);
 
     private bool FilterFunc(Client element, string searchString)
@@ -195,7 +216,7 @@
         if (string.IsNullOrWhiteSpace(searchMedical))
             return true;
         if (element.MedicalConditionID.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
-        return true;
+            return true;
         if (element.MedicalConditionName.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
             return true;
         if ($"{element.MedicalConditionID} {element.MedicalConditionName}".Contains(searchMedical))
@@ -223,6 +244,30 @@
             return true;
         return false;
     }
-
+    private async void saveClint()
+    {
+        Claim newClaim = new Claim(1, selectedItem.ClientID, 1, "Brakpan", 1, "Approved");
+        await new ClaimService().postClaimDetails(newClaim).ContinueWith((x) =>
+        {
+            string message = "";
+            message = x.Result != null ? "Client is successfully created" : "Client could not be created";
+            showDialog(message);
+        });
+    }
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+            var result = await DialogService.Show<Dialogue>("Client", paramaters, options).Result;
+            if (message != "Coverage could not be created")
+            {
+                UriHelper.NavigateTo("/ClientListView");
+            }
+        });
+    }
 
 }

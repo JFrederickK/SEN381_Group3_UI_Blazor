@@ -3,8 +3,9 @@
     "",
     "\\SEN381_UI",
     "\\SEN381_UI\\BusinessLayer",
+    "\\SEN381_UI\\Data",
     "\\SEN381_UI\\Pages"
   ],
-  "SelectedNode": "\\SEN381_UI\\Pages\\ClientDetailed.razor",
+  "SelectedNode": "\\SEN381_UI\\Data\\Client.cs",
   "PreviewInSolutionExplorer": false
 }
