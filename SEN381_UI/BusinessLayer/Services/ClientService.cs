@@ -19,6 +19,15 @@ namespace SEN381_UI.BusinessLayer.Services
             return contributors;
 
         }
+        public async Task<Client> getClientDetails(string id)
+        {
+            Console.WriteLine("Start Request");
+            HttpClient client = new HttpClient();
+            string url = $"https://localhost:7116/api/Client/{id}";
+            HttpResponseMessage response = await client.GetAsync(url);
+            Client newclient = JsonConvert.DeserializeObject<Client>(await response.Content.ReadAsStringAsync());
+            return newclient;
+        }
 
         public async Task<Client> postClientDetails(Client person)
         {

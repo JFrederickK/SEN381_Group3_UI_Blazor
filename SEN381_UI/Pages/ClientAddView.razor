@@ -11,25 +11,19 @@
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/ClientListView">Back</MudIconButton>
 <EditForm Model="@postdata" OnValidSubmit="OnValidSubmit">
     <MudGrid>
-
-    <MudItem xs="6" sm="6">
-
-    </MudItem>
-
     <MudItem xs="6" sm="6">
             <MudTextField T="string" Label="Name" @bind-Value=@name></MudTextField>
     </MudItem>
-
     <MudItem xs="6" sm="6">
             <MudTextField T="string" Label="Surname" @bind-Value=@surname></MudTextField>
-    </MudItem>
+    </MudItem> 
 
     <MudItem xs="12" sm="6">
             <MudTextField T="string" Label="Address" @bind-Value=@address></MudTextField>
     </MudItem>
 
     <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Email" @bind-Value=@email></MudTextField>
+            <MudTextField T="string" Label="Email" @bind-Value=@email Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})"></MudTextField>
     </MudItem>
     <MudItem xs="6" sm="6">
             <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value=@phonenumber></MudTextField>
@@ -91,7 +85,7 @@
             <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" OnClick="@cancel">Cancel Changes</MudButton>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="saveClint" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@saveClint" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
     </MudItem>
 </MudGrid>
 </EditForm>
@@ -114,6 +108,7 @@
     public bool Basic_CheckBox1 = true;
 
     public List<Package> packages = new PackageMock().getPackages();
+
     private async void saveClint()
     {
         Client newClient = new Client(id, name, surname, address, email, phonenumber, clientpolicies, status, notes);
@@ -124,9 +119,6 @@
             message = x.Result != null ? "Client is successfully created" : "Client could not be created";
             showDialog(message);
         });
-
-
-
     }
 
     private void OnValidSubmit(EditContext context)
@@ -152,4 +144,6 @@
             }
         });
     }
+
+
 }

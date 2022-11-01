@@ -84,21 +84,7 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.ClientName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientSurname.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientAddress.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientEmail.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientPhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Policies.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientStatus.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientAdHocNotes.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.ClientID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if ($"{element.ClientName} {element.ClientSurname} {element.ClientAddress} {element.ClientEmail} {element.ClientPhoneNumber} {element.Policies} {element.ClientStatus} {element.ClientAdHocNotes}".Contains(searchString))
             return true;

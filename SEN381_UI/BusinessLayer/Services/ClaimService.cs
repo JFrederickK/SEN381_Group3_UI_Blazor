@@ -28,6 +28,15 @@ namespace SEN381_UI.BusinessLayer.Services
             return postclient;
 
         }
+        public async Task<Claim> getClientDetails(string id)
+        {
+            Console.WriteLine("Start Request");
+            HttpClient claim = new HttpClient();
+            string url = $"https://localhost:7116/api/Client/{id}";
+            HttpResponseMessage response = await claim.GetAsync(url);
+            Claim newclient = JsonConvert.DeserializeObject<Claim>(await response.Content.ReadAsStringAsync());
+            return newclient;
+        }
 
     }
 }

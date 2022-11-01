@@ -1,5 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace SEN381_UI.Data {
-    public class Client
+    public class Client : IEqualityComparer<Client> 
     {
         public string clientID;
         public string clientName;
@@ -38,10 +40,29 @@ namespace SEN381_UI.Data {
         public string ClientStatus { get => clientStatus; set => clientStatus = value; }
         public string ClientAdHocNotes { get => clientAdHocNotes; set => clientAdHocNotes = value; }
 
+        public   bool Equals(Client? x, Client? y)
+        {
+            if (x == null || y == null)
+                return false;
+            else if (x.ClientName == y.ClientName || x.ClientSurname == y.ClientSurname || x.ClientAddress == y.ClientAddress || x.ClientEmail == y.ClientEmail || x.ClientPhoneNumber == y.ClientPhoneNumber || x.Policies == y.Policies || x.ClientStatus == y.ClientStatus || x.ClientAdHocNotes == y.ClientAdHocNotes)
+                return true;
+            else
+                return false;
+
+        }
+
+
+        public int GetHashCode([DisallowNull] Client obj)
+        {
+            return obj.GetHashCode();
+        }
+
         public void makeClaim()
         {
             //Implement Logic
         }
+
+
     }
 }
 

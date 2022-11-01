@@ -52,7 +52,7 @@
     {
         Console.WriteLine(specialistVisits);
         newCoverage = new Coverage(int.Parse(id), description, generalVisits, specialistVisits, coverageUsers);
-        Console.WriteLine(  newCoverage.NumberOfSpecialistsVisits);
+        Console.WriteLine( newCoverage.NumberOfSpecialistsVisits);
         Console.WriteLine(originalCoverage.NumberOfSpecialistsVisits);
         if (newCoverage.CoverageDescription != originalCoverage.CoverageDescription || newCoverage.NumberOfGeneralVisits != originalCoverage.NumberOfGeneralVisits
             || newCoverage.NumberOfSpecialistsVisits != originalCoverage.NumberOfSpecialistsVisits || newCoverage.TotalCoverageUser != originalCoverage.TotalCoverageUser)
