@@ -3,7 +3,9 @@
 @inject NavigationManager Urihelper
 
 <h3>Medical Conditions</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<MedicalCondition,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" 
+@if (load)
+{
+    <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<MedicalCondition,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" 
           SortLabel="Sort by" Rowper
           T="MedicalCondition"
           OnRowClick="@navigateToDetails" >
@@ -31,10 +33,12 @@
     </PagerContent>
 
 </MudTable>
+}
 <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" OnClick="navigateToAdd" Style="margin-top:1%" />
 
 
 @code {
+    private bool load = false;
     private bool dense = false;
     private bool hover = true;
     private bool striped = true;
@@ -46,10 +50,19 @@
 
 
 
-    private IEnumerable<MedicalCondition> Elements = new List<MedicalCondition>();
-    protected override void OnInitialized()
+    private List<MedicalCondition> Elements = new List<MedicalCondition>();
+    protected override async Task OnInitializedAsync()
     {
-        Elements = new MedicalConditionMock().GetMedicals();
+        await LoadMedicalConditions();
+        load = true;
+    }
+
+    private async Task LoadMedicalConditions() {
+        MedicalConditionService cs = new MedicalConditionService();
+        await cs.LoadMedicalCondition().ContinueWith((x) =>
+        {
+            Elements = x.Result;
+        });
     }
     private bool FilterFunc(MedicalCondition element) => FilterFunc(element, searchString);
 
@@ -57,7 +70,7 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.MedicalConditionID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.MedicalConditionName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
 
