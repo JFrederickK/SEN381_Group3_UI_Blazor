@@ -18,22 +18,52 @@
         </MudCardHeader>
         <MudForm Class="p-5">
             <MudGrid>
+                <MudGrid>
+                    <MudItem xs="6" sm="6">
+                        <MudTextField T="string" Label="Medical Condition ID" ReadOnly="true" Text="@id"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="6" sm="6">
+                        <MudTextField T="string" Label="Medical Condition name" @bind-Value=@name Text="@name"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="6" sm="6">
 
+                        <MudTextField T="string" Label="Medical Condition Description" @bind-Value=@description Text="@description"></MudTextField>
+
+                    </MudItem>
+                </MudGrid>
                 @*Medical Condition Basic Details*@
-                <MudItem xs="6" sm="6">
-                    <MudTextField T="string" Label="Medical Condition ID" ReadOnly="true" Text="@id"></MudTextField>
-                </MudItem>
-                <MudItem xs="6" sm="6">
-                    <MudTextField T="string" Label="Medical Condition name" @bind-Value=@name Text="@name"></MudTextField>
-                </MudItem>
-                <MudItem xs="6" sm="6">
 
-                    <MudTextField T="string" Label="Medical Condition name" @bind-Value=@description Text="@description"></MudTextField>
-
-                </MudItem>
 
                 @*Treatment Details *@
-                <MudItem lg="12" sm="6">
+                <MudGrid >
+                    <MudItem xs="12" sm="6">
+                        <MudTable Style="border-radius:2%;margin-top:1%" Items="@medicalConditionT" Hover="true" Bordered="true" Striped="true" Filter="new Func<MedicalConditionTreatment,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
+                              MultiSelection="false">
+                            <ToolBarContent>
+                                <MudText Typo="Typo.h6">Treatments</MudText>
+                                <MudSpacer />
+                                <MudTextField @bind-Value="searchString" Placeholder="Search for treatment" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            </ToolBarContent>
+                            <HeaderContent>
+                                <MudTh >Condition Name</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd Style="border:solid red" DataLabel="Condition Name">@context.TreatmentName</MudTd>
+                            </RowTemplate>
+                            <PagerContent>
+                                <MudTablePager PageSizeOptions="pageSizeOptions"  />
+                            </PagerContent>
+
+                        </MudTable>
+                    </MudItem>
+                        <MudItem xs="12" sm="6">
+                          <MudTextField Style="margin-bottom:2%" T="string" Text="@(selectedItem == null ? "" : selectedItem.TreatmentID)" Label="Treatment ID" Variant="Variant.Outlined" Margin="Margin.Dense"> </MudTextField>
+                        <MudTextField  T="string" Text="@(selectedItem == null ? "" : selectedItem.TreatmentDescription)" Label="Treatment Description" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+                        <MudButton Style="margin-top:1%" Variant="Variant.Outlined" Color="Color.Error" OnClick="@deleteMedicatTreatment" FullWidth="true">Delete Medical  <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
+                    </MudItem>
+                </MudGrid>
+
+@*                <MudItem lg="12" sm="6">
                     <MudExpansionPanel class="h-25" Text="Potential Treatment Details">
 
                         <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
@@ -51,7 +81,7 @@
                             }
                         </MudExpansionPanels>
                     </MudExpansionPanel>
-                </MudItem>
+                </MudItem>*@
 
                 <MudGrid Style="margin-top:auto">
                     <MudItem xs="6" sm="4">
@@ -73,8 +103,9 @@
 
 
 @code {
-
-
+    private int[] pageSizeOptions = new int[] { 5, 10, 15 };
+    private string searchString = "";
+    private MedicalConditionTreatment selectedItem = null;
     private MedicalCondition medicalDetails = new MedicalCondition();
     private MedicalCondition newMedical = new MedicalCondition();
     public List<MedicalConditionTreatment> medicalConditionT = new List<MedicalConditionTreatment>();
@@ -94,6 +125,7 @@
         await LoadMedicalCondition();
         await LoadTreatments();
         load = true;
+
     }
 
     private async Task LoadMedicalCondition() {
@@ -150,7 +182,13 @@
     }
     private async void deleteMedicatTreatment()
     {
-        Console.WriteLine(TreatmentID);
+        await new MedicalConditionService().deleteMedicalConditionTreatment(selectedItem.TreatmentID).ContinueWith((x) =>
+        {
+            string message = "";
+            message = x.Result != null ? "Medical Condition could not be deleted" : "Medical Condition successfully deleted";
+            showDialog(message);
+        }
+        );
     }
 
     private async void showDialog(string message)
@@ -167,6 +205,17 @@
                 UriHelper.NavigateTo("/MedicalConditions");
             }
         });
+    }
+    private bool FilterFunc(MedicalConditionTreatment element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(MedicalConditionTreatment element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.TreatmentID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+
     }
 
 }
