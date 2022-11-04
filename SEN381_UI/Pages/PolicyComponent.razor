@@ -1,14 +1,20 @@
 ﻿@page "/Policy"
+@using SEN381_UI.BusinessLayer.Services
 @using SEN381_UI.Data
 @using SEN381_UI.Shared.MockData
+
 @inject NavigationManager Navigation
+@inject NavigationManager UriHelper
+@inject IDialogService DialogService
 
 <h3>Policy Component</h3>
 
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+<MudTable ServerData="@(new Func<TableState, Task<TableData<Policy>>>(loadPolicies))" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
           Filter="new Func<Policy,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by"
           T="Policy"
-          OnRowClick="@navigate">
+          OnRowClick="@navigate"
+          @ref="table">
+          
     <ToolBarContent>
         <MudText Typo="Typo.h6">Policy</MudText>
         <MudSpacer/>
@@ -34,7 +40,7 @@
 
     </RowTemplate>
     <PagerContent>
-        <MudTablePager />
+        <MudTablePager Count="@totalSize" PageSizeOptions="@pageSizeOptions"/>
     </PagerContent>
 </MudTable>
 <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Href="/PolicyAdd" />
@@ -48,16 +54,57 @@
     private Policy selectedItem = null;
     private HashSet<Policy> selectedItems = new HashSet<Policy>();
 
-    private IEnumerable<Policy> Elements = new List<Policy>();
 
-    protected override void OnInitialized()
+    //Pagination
+    private int[] pageSizeOptions = new int[] { 5, 10, 15,25 };
+    private int page=1;
+    private int size=5;
+    private int totalSize=10;
+    private int totalPages= 2;
+    private MudTable<Policy>? table;
+
+
+    private List<Policy> Elements = new List<Policy>();
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
     {
+        table.SetRowsPerPage(10);
+        return base.OnAfterRenderAsync(firstRender);
+    }
 
-        Elements = new PolicyMock().getMockPolicies();
+
+    // Get all policies
+    private async Task<TableData<Policy>> loadPolicies(TableState state)
+    {
+        PolicyService ps = new PolicyService();
+        await ps.getPolicies(state.PageSize, state.Page + 1).ContinueWith((x) =>
+           {
+               Elements = x.Result;
+           });
+        return new TableData<Policy>() { Items = Elements, TotalItems = Elements.Count };
+    }
+
+
+    // Delete Policy
+    private async void deletePolicy(string id)
+    {
+        await new PolicyService().deletePolicy(id).ContinueWith(async (x) =>
+        {
+            string message = x.Result != null ? "Policy Deleted Succesfully" : "Something went wrong!";
+            await showDialog(message);
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+            UriHelper.NavigateTo($"/Policy",true);
+        });
     }
 
     private bool FilterFunc(Policy element) => FilterFunc(element, searchString);
 
+
+    // Policy Filter functions
     private bool FilterFunc(Policy element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
@@ -71,6 +118,8 @@
         return false;
     }
 
+
+    // Get Packages
     private List<string> PackageTreatments(List<Package> pack){
         List<string> treatments = new List<string>();
 
@@ -84,8 +133,25 @@
         return treatments;
     }
 
+
+    // Navigate to Policy Details Page
     private void navigate(TableRowClickEventArgs<Policy> p)
     {
         Navigation.NavigateTo($"Policy/{p.Item.PolicyId}");
+    }
+
+
+    // Show Dialog
+    private async Task showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialog");
+        await InvokeAsync(async () =>
+        {
+            await DialogService.Show<Dialogue>("Update Policy", paramaters, options).Result;
+
+        });
     }
 }
