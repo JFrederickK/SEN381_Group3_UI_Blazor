@@ -40,9 +40,12 @@
                             @foreach (MedicalConditionTreatment treatments in medicalConditionT)
                             {
                                 string text = $"Treatment ID: {@treatments.TreatmentID}";
+
                                 <MudExpansionPanel Text="@text">
+                                    TreatmentID = @treatments.TreatmentID.ToString();
                                     <MudText> Treatment Name: @treatments.TreatmentName </MudText>
                                     <MudText> Treatment Description: @treatments.TreatmentDescription </MudText>
+                                    <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@deleteMedicatTreatment" FullWidth="true">Delete Client  <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
                                 </MudExpansionPanel>
 
                             }
@@ -58,7 +61,7 @@
                         <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@saveMedicalCondtion" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
                     </MudItem>
                     <MudItem xs="6" sm="4">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@deleteMedical" FullWidth="true">Delete Client  <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@deleteMedical" FullWidth="true">Delete Medical  <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
                     </MudItem>
                 </MudGrid>
 
@@ -70,16 +73,20 @@
 
 
 @code {
+
+
     private MedicalCondition medicalDetails = new MedicalCondition();
     private MedicalCondition newMedical = new MedicalCondition();
     public List<MedicalConditionTreatment> medicalConditionT = new List<MedicalConditionTreatment>();
+
+    public bool Selected_Treatment { get; set; } = false;
 
     [Parameter]
     public string? id { get; set; }
 
     private string name { get; set; }
     private string description { get; set; }
-    private string treatment { get; set; }
+    private string TreatmentID { get; set; }
     private bool load = false;
 
 
@@ -94,9 +101,8 @@
         await cs.getMCDetails(id).ContinueWith((x)=> {
             name = x.Result.MedicalConditionName;
             description = x.Result.MedicalConditionDescription;
-            treatment = x.Result.Treatments;
 
-            medicalDetails = new MedicalCondition(id, name, description, treatment);
+            medicalDetails = new MedicalCondition(int.Parse(id), name, description);
         });
     }
     private async Task LoadTreatments()
@@ -115,14 +121,14 @@
 
 
     private async void saveMedicalCondtion() {
-        MedicalCondition newMC = new MedicalCondition(id, name, description, treatment);
+        MedicalCondition newMC = new MedicalCondition(int.Parse(id), name, description);
         if (!newMC.GetHashCode().Equals(medicalDetails.GetHashCode()))
         {
             await new MedicalConditionService().updateMedical(newMC).ContinueWith((x)=> { 
                 string message = "";
                 message = x.Result != null ? "Medical Condition successfully updated" : "Medical Condition could not be updated";
                 showDialog(message);
-            
+
             });
         }
         else
@@ -136,11 +142,15 @@
         await new MedicalConditionService().deleteMedicalCondition(id).ContinueWith((x) =>
         {
             string message = "";
-            message = x.Result != null ? "Medical Condition could not be deleted" : "Claim successfully deleted";
+            message = x.Result != null ? "Medical Condition could not be deleted" : "Medical Condition successfully deleted";
             showDialog(message);
         }
         );
 
+    }
+    private async void deleteMedicatTreatment()
+    {
+        Console.WriteLine(TreatmentID);
     }
 
     private async void showDialog(string message)
@@ -152,14 +162,12 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Medical Condition", paramaters, options).Result;
-            if (message != "Medical Condition could not be created")
+            if (message != "Medical Condition could not be created" && message != "Medical Condition could not be deleted")
             {
                 UriHelper.NavigateTo("/MedicalConditions");
             }
         });
     }
-
-
 
 }
 

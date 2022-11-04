@@ -18,14 +18,13 @@
         <MudTh>ID</MudTh>
         <MudTh>Condition Name</MudTh>
         <MudTh>Description</MudTh>
-        <MudTh>Treatments</MudTh>
 
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="ID">@context.MedicalConditionID</MudTd>
         <MudTd DataLabel="NAME">@context.MedicalConditionName</MudTd>
         <MudTd DataLabel="DESCRIPTION">@context.MedicalConditionDescription</MudTd>
-        <MudTd DataLabel="TREATMENTS">@context.Treatments</MudTd>
+
 
     </RowTemplate>
     <PagerContent>
@@ -70,7 +69,7 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.MedicalConditionName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.MedicalConditionID == int.Parse(searchString))
             return true;
         return false;
 
