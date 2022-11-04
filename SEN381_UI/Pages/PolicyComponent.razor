@@ -76,7 +76,7 @@
 
         foreach (Package item in pack)
         {
-            foreach (TreatmentCoverage tc in item.TreatmentCoverages)
+            foreach (PackageTreatmentCoverage tc in item.TreatmentCoverages)
             {
                 treatments.Add(tc.Treatment.TreatmentName);
             }

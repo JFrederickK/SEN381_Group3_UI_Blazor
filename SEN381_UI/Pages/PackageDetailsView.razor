@@ -77,7 +77,7 @@
     string status = "Active";
     string providerID = "12";
     bool Basic_CheckBox1 = true;
-    List<Package> packages = new PackageMock().getPackages();//Replace with service
+    List<Package> packages = new List<Package>();
     List<TreatmentCoverage> tc = new TreatmentCoverageMock().getTreatmentCoverage();
 
     private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);//Used for date picker
