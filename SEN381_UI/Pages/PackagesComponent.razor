@@ -1,9 +1,10 @@
 ﻿@page "/Packages"
 @using SEN381_UI.Data
-@inject NavigationManager Urihelper
+@inject NavigationManager UriHelper
+@inject IDialogService DialogService
 
 <h3>Policy Packages</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Package,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
+<MudTable ServerData="@(new Func<TableState, Task<TableData<Package>>>(loadPackages))" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Package,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
           SortLabel="Sort by" Rowper
           T="Package"
           OnRowClick="@navigateToDetails">
@@ -29,6 +30,7 @@
             </MudChipSet>
         </MudTd>
         <MudTd DataLabel="PackageStatus">@status</MudTd>
+        <MudTd><MudTooltip Text="Delete Package"><MudIconButton OnClick="()=>deletePackage(context.PackageID)" Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIconButton></MudTooltip></MudTd>
 
     </RowTemplate>
     <PagerContent>
@@ -52,17 +54,14 @@
 
 
 
-    private IEnumerable<Package> Elements = new List<Package>();
-    protected override void OnInitialized()
-    {
-        Elements = new PackageMock().getPackages();
-    }
+    private List<Package> Elements = new List<Package>();
+
     private bool FilterFunc(Package element) => FilterFunc(element, searchString);
 
     private bool FilterFunc(Package element, string searchString)
     {
-        //if (string.IsNullOrWhiteSpace(searchString))
-        //    return true;
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
         //if (element.ClaimID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
         //    return true;
         //if (element.Client.Contains(searchString, StringComparison.OrdinalIgnoreCase))
@@ -83,22 +82,59 @@
 
     private void navigateToAdd()
     {
-        Urihelper.NavigateTo($"/PackagesAdd");
+        UriHelper.NavigateTo($"/PackagesAdd");
     }
 
     private void navigateToDetails(TableRowClickEventArgs<Package> mc)
     {
-        Urihelper.NavigateTo($"/Packages/{mc.Item.PackageID}");
+        UriHelper.NavigateTo($"/Packages/{mc.Item.PackageID}");
     }
 
-    private List<string> getCoverages(List<TreatmentCoverage> tcs)
+    private List<string> getCoverages(List<PackageTreatmentCoverage> tcs)
     {
         List<string> text = new List<string>();
-        foreach (TreatmentCoverage treat in tcs)
+        foreach (PackageTreatmentCoverage treat in tcs)
         {
             text.Add($"{treat.Treatment.TreatmentName}\n{treat.Coverage.CoverageDescription}");
         }
         return text;
+    }
+
+
+    private async Task showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialog");
+        await InvokeAsync(async () =>
+        {
+            await DialogService.Show<Dialogue>("Delete Package", paramaters, options).Result;
+
+        });
+    }
+
+    private async Task<TableData<Package>> loadPackages(TableState state)
+    {
+        await new PackageService().getPackages(state.PageSize, state.Page + 1).ContinueWith((x) =>
+        {
+            Elements = x.Result;
+        });
+        return new TableData<Package>() { Items = Elements, TotalItems = Elements.Count };
+    }
+
+    private async void deletePackage(string id)
+    {
+        await new PackageService().deletePackage(id).ContinueWith(async (x) =>
+        {
+            string message = x.Result != null ? "Package Deleted Succesfully" : "Something went wrong!";
+            await showDialog(message);
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+            UriHelper.NavigateTo($"/Packages", true);
+        });
     }
 }
 
