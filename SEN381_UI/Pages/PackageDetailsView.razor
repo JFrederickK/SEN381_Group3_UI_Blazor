@@ -70,7 +70,7 @@
             </MudItem>
 
                 <MudItem xs="6" sm="6">
-                    <MudButton>Cancel Changes</MudButton>
+                    <MudButton OnClick="resetPackage">Cancel Changes</MudButton>
                 </MudItem>
                 <MudItem xs="6" sm="6">
                 <MudButton OnClick="updatePackage">Save Changes</MudButton>
@@ -117,6 +117,15 @@
         await new PackageService().getPacakgeDetails(id).ContinueWith((x)=>{
             originalPackage = x.Result;
             selectedPTC = new List<PackageTreatmentCoverage>(x.Result.TreatmentCoverages);
+
+            foreach (PackageTreatmentCoverage item in selectedPTC)
+            {
+                if(dicTreatCov.Keys.ToList().Exists((x)=>x.TreatmentID==item.Treatment.TreatmentID)){
+                    dicTreatCov[dicTreatCov.Keys.ToList().Find((x) => x.TreatmentID == item.Treatment.TreatmentID)]=item.Coverage;
+                }
+                else dicTreatCov[item.Treatment] = item.Coverage;
+
+            }
         });
 
     }
@@ -139,7 +148,7 @@
 
     public void updatePackage()
     {
-        new PackageService().updatePackage(new Package("0", _dateRange.Start, _dateRange.End, selectedPTC.Count != 0 ? selectedPTC : new List<PackageTreatmentCoverage>())).ContinueWith((x) =>
+        new PackageService().updatePackage(new Package(id, _dateRange.Start, _dateRange.End, selectedPTC.Count != 0 ? selectedPTC : new List<PackageTreatmentCoverage>())).ContinueWith((x) =>
         {
             string message = "";
             message = x.Result != null ? "Package Created successfilly" : "Package could not be created";
@@ -147,7 +156,7 @@
         });
     }
 
-    private void resetPackage()
+    public void resetPackage()
     {
         _dateRange.Start = originalPackage.PackageStartDate;
         _dateRange.End = originalPackage.PackageEndDate;
@@ -162,7 +171,7 @@
 
     private void removePCT(Treatment treat)
     {
-        selectedPTC = selectedPTC.Where((x) => !x.Treatment.Equals(treat)).ToList();
+        selectedPTC = selectedPTC.Where((x) => !x.Treatment.TreatmentID.Equals(treat.TreatmentID)).ToList();
     }
 
     public void navigateBack(){
