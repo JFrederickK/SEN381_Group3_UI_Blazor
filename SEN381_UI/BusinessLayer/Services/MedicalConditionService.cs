@@ -36,12 +36,12 @@ namespace SEN381_UI.BusinessLayer.Services
             return coverage;
 
         }
-        public async Task<MedicalCondition> postMedicalConditionDetails(MedicalCondition person)
+        public async Task<bool> postMedicalConditionDetails(InsertMedicalConditionRequest person)
         {
             var medical = new HttpClient();
             string url = $"https://localhost:7116/api/MedicalCondition";
             HttpResponseMessage response = await medical.PostAsJsonAsync(url, person);
-            MedicalCondition postclient = JsonConvert.DeserializeObject<MedicalCondition>(await response.Content.ReadAsStringAsync());
+            bool postclient = JsonConvert.DeserializeObject<bool>(await response.Content.ReadAsStringAsync());
             return postclient;
 
         }
@@ -61,10 +61,10 @@ namespace SEN381_UI.BusinessLayer.Services
             List<MedicalConditionTreatment> newmedical = JsonConvert.DeserializeObject<List<MedicalConditionTreatment>>(await response.Content.ReadAsStringAsync());
             return newmedical;
         }
-        public async Task<MedicalCondition> deleteMedicalConditionTreatment(string id)
+        public async Task<MedicalCondition> deleteMedicalConditionTreatment(int id, string Tid)
         {
             var medical = new HttpClient();
-            string url = $"https://localhost:7116/api/MedicalConditionByTreatment/{id}";
+            string url = $"https://localhost:7116/api/MedicalConditionByTreatment/{id}?Tid={Tid}";
             HttpResponseMessage response = await medical.DeleteAsync(url);
             MedicalCondition coverage = JsonConvert.DeserializeObject<MedicalCondition>(await response.Content.ReadAsStringAsync());
             return coverage;

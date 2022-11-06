@@ -7,6 +7,7 @@
 
 @if (load)
 {
+    @*Medical Condition Basic Details*@
     <MudCard style="max-height:1000px; overflow: auto;">
         <MudCardHeader>
             <CardHeaderContent>
@@ -31,9 +32,6 @@
 
                     </MudItem>
                 </MudGrid>
-                @*Medical Condition Basic Details*@
-
-
                 @*Treatment Details *@
                 <MudGrid >
                     <MudItem xs="12" sm="6">
@@ -48,7 +46,7 @@
                                 <MudTh >Condition Name</MudTh>
                             </HeaderContent>
                             <RowTemplate>
-                                <MudTd Style="border:solid red" DataLabel="Condition Name">@context.TreatmentName</MudTd>
+                                <MudTd DataLabel="Condition Name">@context.TreatmentName</MudTd>
                             </RowTemplate>
                             <PagerContent>
                                 <MudTablePager PageSizeOptions="pageSizeOptions"  />
@@ -58,31 +56,14 @@
                     </MudItem>
                         <MudItem xs="12" sm="6">
                           <MudTextField Style="margin-bottom:2%" T="string" Text="@(selectedItem == null ? "" : selectedItem.TreatmentID)" Label="Treatment ID" Variant="Variant.Outlined" Margin="Margin.Dense"> </MudTextField>
-                        <MudTextField  T="string" Text="@(selectedItem == null ? "" : selectedItem.TreatmentDescription)" Label="Treatment Description" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
-                        <MudButton Style="margin-top:1%" Variant="Variant.Outlined" Color="Color.Error" OnClick="@deleteMedicatTreatment" FullWidth="true">Delete Medical  <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
+                        <MudTextField T="string" Text="@(selectedItem == null ? "" : selectedItem.TreatmentDescription)" Label="Treatment Description" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+                        @if (selectedItem != null)
+                        {
+                            <MudButton Style="margin-top:1%" Variant="Variant.Outlined" Color="Color.Error" OnClick="@deleteMedicatTreatment" FullWidth="true">Delete Medical  <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
+
+                        }
                     </MudItem>
                 </MudGrid>
-
-@*                <MudItem lg="12" sm="6">
-                    <MudExpansionPanel class="h-25" Text="Potential Treatment Details">
-
-                        <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
-                            @foreach (MedicalConditionTreatment treatments in medicalConditionT)
-                            {
-                                string text = $"Treatment ID: {@treatments.TreatmentID}";
-
-                                <MudExpansionPanel Text="@text">
-                                    TreatmentID = @treatments.TreatmentID.ToString();
-                                    <MudText> Treatment Name: @treatments.TreatmentName </MudText>
-                                    <MudText> Treatment Description: @treatments.TreatmentDescription </MudText>
-                                    <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@deleteMedicatTreatment" FullWidth="true">Delete Client  <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
-                                </MudExpansionPanel>
-
-                            }
-                        </MudExpansionPanels>
-                    </MudExpansionPanel>
-                </MudItem>*@
-
                 <MudGrid Style="margin-top:auto">
                     <MudItem xs="6" sm="4">
                         <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" OnClick="@cancel">Cancel Changes</MudButton>
@@ -182,13 +163,16 @@
     }
     private async void deleteMedicatTreatment()
     {
-        await new MedicalConditionService().deleteMedicalConditionTreatment(selectedItem.TreatmentID).ContinueWith((x) =>
-        {
-            string message = "";
-            message = x.Result != null ? "Medical Condition could not be deleted" : "Medical Condition successfully deleted";
-            showDialog(message);
-        }
-        );
+
+            await new MedicalConditionService().deleteMedicalConditionTreatment(int.Parse(id), selectedItem.TreatmentID).ContinueWith((x) =>
+     {
+         string message = "";
+         message = x.Result != null ? "Medical Condition could not be deleted" : "Medical Condition successfully deleted";
+         showDialog(message);
+     }
+     );
+        
+
     }
 
     private async void showDialog(string message)
@@ -200,10 +184,6 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Medical Condition", paramaters, options).Result;
-            if (message != "Medical Condition could not be created" && message != "Medical Condition could not be deleted")
-            {
-                UriHelper.NavigateTo("/MedicalConditions");
-            }
         });
     }
     private bool FilterFunc(MedicalConditionTreatment element) => FilterFunc(element, searchString);

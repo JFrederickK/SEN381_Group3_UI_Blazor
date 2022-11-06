@@ -25,40 +25,58 @@
                 </MudItem>
 
                 @*Different Treatments*@
-                <MudItem lg="12" sm="6">
-                    <MudExpansionPanel class="h-25" Text="Policy Packages">
+                <MudItem xs="12" sm="12">
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudTable Style="border-radius:2%;margin-top:1%" Items="@medicalConditionT" Hover="true" Bordered="true" Striped="true" Filter="new Func<MedicalConditionTreatment,bool>(FilterFunc)" @bind-SelectedItems="selectedItems"
+                                  MultiSelection="true">
+                                <ToolBarContent>
+                                    <MudText Typo="Typo.h6">Treatments</MudText>
+                                    <MudSpacer />
+                                    <MudTextField @bind-Value="searchString" Placeholder="Search for treatment" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                                </ToolBarContent>
+                                <HeaderContent>
+                                    <MudTh>Condition Name</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="Condition Name">@context.TreatmentName</MudTd>
+                                </RowTemplate>
+                                <PagerContent>
+                                    <MudTablePager PageSizeOptions="pageSizeOptions" />
+                                </PagerContent>
 
-                        <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
-                            @foreach (MedicalConditionTreatment treatment in treatments)
-                            {
-                                string text = $"Treatment ID:{@treatment.TreatmentID}";
-                                <MudGrid>
-                                    <MudItem xs="9">
-                                        <MudExpansionPanel Text="@text">
-                                            <MudCard>
-                                                <MudText>Name: @treatment.TreatmentName</MudText>
-                                                <MudText>Description: @treatment.TreatmentDescription</MudText>
-                                            </MudCard>
+                            </MudTable>
+                        </MudItem>
+                            <MudItem xs="6">
+                            <u><h4 style="text-align:center;">Items selected</h4></u>
+                            <MudExpansionPanels>
+                                    @foreach (MedicalConditionTreatment treatment in selectedItems)
+                                    {
+                                        string text = $"Treatment ID:{@treatment.TreatmentID}";
+                                        <MudGrid>
+                                            <MudItem xs="12">
+                                                <MudExpansionPanel Text="@text">
+                                                    <MudCard>
+                                                        <MudText>Name: @treatment.TreatmentName</MudText>
+                                                        <MudText>Description: @treatment.TreatmentDescription</MudText>
+                                                    </MudCard>
 
-                                        </MudExpansionPanel>
-                                    </MudItem>
-                                    <MudItem xs="3">
-                                        <MudText Align="Align.Center">
-                                            <MudCheckBox @bind-Checked="@Basic_CheckBox1"></MudCheckBox>
-                                        </MudText>
-                                    </MudItem>
-                                </MudGrid>
-                            }
-                        </MudExpansionPanels>
-                    </MudExpansionPanel>
+                                                </MudExpansionPanel>
+                                            </MudItem>
+                                        </MudGrid>
+                                    }
+                                </MudExpansionPanels>
+
+                            </MudItem>
+                    </MudGrid>
                 </MudItem>
                 </MudGrid>
                 <MudGrid Style="margin-top:auto">
                     <MudItem xs="12" sm="6">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" OnClick="@cancel">Cancel Changes</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" FullWidth="true" OnClick="@cancel">Cancel Changes</MudButton>
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@saveMedical" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Success" FullWidth="true" OnClick="@saveMedical" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
                     </MudItem>
             </MudGrid>
         </MudForm>
@@ -68,15 +86,15 @@
 
 
 @code {
-
-
+    private HashSet<MedicalConditionTreatment> selectedItems = new HashSet<MedicalConditionTreatment>();
+    private List<string> selectedItemIDs = new List<string>();
+    public List<MedicalConditionTreatment> medicalConditionT = new List<MedicalConditionTreatment>();
     private string mcName { get; set; }
     private string mcDescription { get; set; }
-
+    private string searchString = "";
     private bool load = false;
-
-    List<MedicalConditionTreatment> treatments = new List<MedicalConditionTreatment>();//Replace with service
-    public bool Basic_CheckBox1 { get; set; } = false;
+    private int[] pageSizeOptions = new int[] { 5, 10, 15 };
+    private MedicalConditionTreatment selectedItem = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,17 +107,20 @@
         await cs.LoadMedicalConditionTreatment().ContinueWith((x) =>
         {
 
-            treatments = x.Result;
+            medicalConditionT = x.Result;
         });
     }
     private async void saveMedical()
     {
-        MedicalCondition newMedicalCondition = new MedicalCondition(0, mcName, mcDescription);
+        foreach (MedicalConditionTreatment item in selectedItems)
+        {
+            selectedItemIDs.Add(item.TreatmentID);
+        }
+        InsertMedicalConditionRequest newMedicalCondition = new InsertMedicalConditionRequest(mcName, mcDescription, selectedItemIDs, selectedItemIDs.Count);
         await new MedicalConditionService().postMedicalConditionDetails(newMedicalCondition).ContinueWith((x) =>
         {
-            Console.WriteLine(newMedicalCondition.MedicalConditionName);
             string message = "";
-            message = x.Result != null ? "Medical Condition is successfully created" : "Medical Condition could not be created";
+            message = x.Result != false ? "Medical Condition is successfully created" : "Medical Condition could not be created";
             showDialog(message);
         });
     }
@@ -126,5 +147,16 @@
                 UriHelper.NavigateTo("/MedicalConditions");
             }
         });
+    }
+    private bool FilterFunc(MedicalConditionTreatment element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(MedicalConditionTreatment element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.TreatmentID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+
     }
 }
