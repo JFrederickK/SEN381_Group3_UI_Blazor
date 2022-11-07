@@ -1,4 +1,5 @@
 ﻿@page "/ClaimAddView"
+@using SEN381_API_GROUP3.shared.models
 @using SEN381_UI.Data
 @using System.Diagnostics
 @using System.Threading
@@ -21,89 +22,82 @@
         <MudTh>Nr</MudTh>
         <MudTh>Name</MudTh>
         <MudTh>Surname</MudTh>
-        <MudTh>Email</MudTh>
-        <MudTh>Phone</MudTh>
 
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Nr">@context.ClientID</MudTd>
         <MudTd DataLabel="Name">@context.ClientName</MudTd>
         <MudTd DataLabel="Surname">@context.ClientSurname</MudTd>
-        <MudTd DataLabel="Email">@context.ClientEmail</MudTd>
-        <MudTd DataLabel="Phone">@context.ClientPhoneNumber</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
     </PagerContent>
 </MudTable>
-                <MudText Inline="true">Selected items: @(selectedItem == null ? "" : string.Join(", ", selectedItem.ClientName))</MudText>
+                <MudTextField T="string" Text="@(selectedItem == null ? "" : selectedItem.ClientID)" Variant="Variant.Outlined" Placeholder="Please select a Client" @bind-Value="clientsID" ReadOnly="true"></MudTextField>
     </MudPaper>
         <MudItem xs="12" sm="12" Style="margin-bottom:3%; margin-top:1%">
-            <MudAutocomplete T="string" Label="Place of treatment" @bind-Value="value" SearchFunc="@PlaceOfTreatment" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined" Style="margin-bottom:3%; margin-top:1%" />
+            <MudAutocomplete T="string" Label="Place of treatment" @bind-Value="value" SearchFunc="@PlaceOfTreatment" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined" Style="margin-bottom:3%; margin-top:1%"/>
         </MudItem>
         <MudItem xs="12" sm="12" Style="margin-bottom:3%">
             <MudGrid>
         <MudItem xs="12" sm="6" >
-                    <MudButton Variant="Variant.Outlined" Color="Color.Success" FullWidth="true" OnClick="@(async() => {StopWatch(); })">Start Call <MudIcon Icon="@Icons.Outlined.AddIcCall"Color="Color.Success"></MudIcon></MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Success" FullWidth="true" OnClick="@(async() => {StopWatch(); TimerStart = DateTime.Now.ToString();})">Start Call <MudIcon Icon="@Icons.Outlined.AddIcCall" Color="Color.Success"></MudIcon></MudButton>
         </MudItem>
         <MudItem xs="12" sm="6">
                         <MudButton Variant="Variant.Outlined" Color="Color.Error" FullWidth="true" OnClick="@(()=> {is_stopwatchrunning = false; stopwatchvalue = new TimeSpan();})">End Call <MudIcon Icon="@Icons.Outlined.CallEnd" Color="Color.Error"></MudIcon></MudButton>
         </MudItem>
             </MudGrid>
         </MudItem>
-            <MudTextField @bind-Value="ReadOnly" Label="Call time" ReadOnly="true" Variant="Variant.Outlined" Text="@stopwatchvalue.ToString()" />
+@*            <MudTextField @bind-Value="ReadOnly" Label="Call time" ReadOnly="true" Variant="Variant.Outlined" Text="@stopwatchvalue.ToString()" />*@
             <MudTextField @bind-Value="ReadOnly" Label="Call Duration" ReadOnly="true" Variant="Variant.Outlined" Text="@totaltime" />
     </MudItem>
  <MudItem xs="12" sm="6">
         <MudPaper Elevation="3" Outlined="true">
     <MudGrid>
                 <MudItem xs="12" sm="6">
-                    <MudTable Items="@MedicalElements" @bind-SelectedItem="selectedMedical" Hover="true">
+                            <MudTable Items="@MedicalElements" @bind-SelectedItems="selectedMedicals" Hover="true" MultiSelection="true">
                             <ToolBarContent>
         <MudText Typo="Typo.h6">Medical conditions</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchMedical" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Nr</MudTh>
-        <MudTh>Sign</MudTh>
+        <MudTh>Name</MudTh>
+
+
 
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Nr">@context.MedicalConditionID</MudTd>
-        <MudTd DataLabel="Sign">@context.MedicalConditionName</MudTd>
+        <MudTd DataLabel="Name">@context.MedicalConditionName</MudTd>
+
 
     </RowTemplate>
     <FooterContent>
         <MudTd colspan="5">Select All</MudTd>
     </FooterContent>
 </MudTable>
-                    <MudText Inline="true">Selected items: @(selectedMedical == null ? "" : string.Join(", ", selectedMedical.MedicalConditionName))</MudText>
                 </MudItem>
-                    <MudItem xs="12" sm="6">
-                        <MudTable Items="@TreatmentsElements" @bind-SelectedItems="selectedTreatments" Hover="true">
-                            <ToolBarContent>
-                                <MudText Typo="Typo.h6">Treatment list</MudText>
-                                <MudSpacer />
-                                <MudTextField @bind-Value="searchTreatment" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                            </ToolBarContent>
-                            <HeaderContent>
-                                <MudTh>Nr</MudTh>
-                                <MudTh>Sign</MudTh>
+                        <MudItem xs="6">
+                            <u><h4 style="text-align:center;">Items selected</h4></u>
+                            <MudExpansionPanels>
+                            @foreach (MedicalCondition treatment in selectedMedicals)
+                            {
+                                string text = $"Treatment ID:{@treatment.MedicalConditionID}";
+                                <MudGrid>
+                                    <MudItem xs="12">
+                                        <MudExpansionPanel Text="@text">
+                                            <MudCard>
+                                                <MudText>Name: @treatment.MedicalConditionName</MudText>
+                                                <MudText>Description: @treatment.MedicalConditionDescription</MudText>
+                                            </MudCard>
 
-                            </HeaderContent>
-                            <RowTemplate>
-                                <MudTd DataLabel="Nr">@context.TreatmentID</MudTd>
-                                <MudTd DataLabel="Sign">@context.TreatmentName</MudTd>
+                                        </MudExpansionPanel>
+                                    </MudItem>
+                                </MudGrid>
+                            }
+                        </MudExpansionPanels>
 
-                            </RowTemplate>
-                            <FooterContent>
-                                <MudTd colspan="5">Select All</MudTd>
-                            </FooterContent>
-                        </MudTable>
-                        <MudText Inline="true">Selected items: @(selectedTreatment == null ? "" : string.Join(", ", selectedTreatment.TreatmentName))</MudText>
                     </MudItem>
-
     </MudGrid>
 
         </MudPaper>
@@ -124,6 +118,8 @@
     TimeSpan stopwatchvalue = new TimeSpan();
     bool is_stopwatchrunning = false;
     private string totaltime;
+    private string TimerStart { get; set; }
+    private string TimerStoped { get; set; }
 
     async Task StopWatch() { 
         is_stopwatchrunning = true;
@@ -133,19 +129,22 @@
             if (is_stopwatchrunning)
             {
                 stopwatchvalue = stopwatchvalue.Add(new TimeSpan(0, 0, 1));
-                StateHasChanged();
                 totaltime = stopwatchvalue.ToString();
+                StateHasChanged();
+
             }
         }
     }
+    private int[] pageSizeOptions = new int[] { 5, 10, 15 };
     private bool load = false;
     private bool striped = true;
     private bool bordered = true;
     private string searchString = "";
     private Client selectedItem = null;
-    private HashSet<Client> selectedItems = new HashSet<Client>();
+    public string clientsID { get; set; }
 
-    private IEnumerable<Client> Elements = new List<Client>();
+    private List<int> selectedItemIDs = new List<int>();
+    private List<Client> Elements = new List<Client>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -170,8 +169,6 @@
         {
             MedicalElements = x.Result;
         });
-
-
     }
 
     private bool FilterFunc(Client element) => FilterFunc(element, searchString);
@@ -182,24 +179,6 @@
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
         if (element.ClientID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientSurname.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientAddress.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientEmail.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientPhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        //if (element.Policies.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-        //    return true;
-        if (element.ClientStatus.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.ClientAdHocNotes.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{element.ClientName} {element.ClientSurname} {element.ClientAddress} {element.ClientEmail} {element.ClientPhoneNumber} {element.Policy} {element.ClientStatus} {element.ClientAdHocNotes}".Contains(searchString))
             return true;
         return false;
     }
@@ -253,30 +232,19 @@
             return true;
         return false;
     }
-    //Treatment dummy
-    private string searchTreatment = "";
-    private Treatment selectedTreatment = null;
-    private HashSet<Treatment> selectedTreatments = new HashSet<Treatment>();
-
-    private IEnumerable<Treatment> TreatmentsElements = new List<Treatment>();
-    private bool FilterTreatment(Treatment element) => FilterTreatment(element, searchTreatment);
-
-    private bool FilterTreatment(Treatment element, string searchMedical)
-    {
-
-        if (string.IsNullOrWhiteSpace(searchMedical))
-            return true;
-        if (element.TreatmentID.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.TreatmentName.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{element.TreatmentID} {element.TreatmentName}".Contains(searchTreatment))
-            return true;
-        return false;
-    }
     private async void saveClaim()
     {
-        Claim newClaim = new Claim(1, selectedItem.ClientID, selectedMedical.MedicalConditionID, value,1 , "Approved");
+        TimerStoped = DateTime.Now.ToString();
+        foreach (MedicalCondition item in selectedMedicals)
+        {
+            selectedItemIDs.Add(item.MedicalConditionID);
+        }
+        Console.WriteLine(selectedItem.ClientID);
+
+        Console.WriteLine(TimerStart);
+        Console.WriteLine(TimerStoped);
+        
+        AddClaim newClaim = new AddClaim(1, selectedItem.ClientID, selectedItemIDs, value, 1, "Approved",TimerStart, TimerStoped );
         await new ClaimService().postClaimDetails(newClaim).ContinueWith((x) =>
         {
             string message = "";

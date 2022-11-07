@@ -17,7 +17,6 @@
         <HeaderContent>
             <MudTh>Nr</MudTh>
             <MudTh>Client</MudTh>
-            <MudTh>Medical Conditions</MudTh>
             <MudTh>Place Of Treatment</MudTh>
             <MudTh>Call Details</MudTh>
             <MudTh>Claime Status</MudTh>
@@ -26,7 +25,6 @@
         <RowTemplate>
             <MudTd DataLabel="Nr">@context.ClaimID</MudTd>
             <MudTd DataLabel="Client">@context.Client</MudTd>
-            <MudTd DataLabel="Medical Conditions">@context.MedicalConditions</MudTd>
             <MudTd DataLabel="Place Of Treatment">@context.PlaceOfTreatment</MudTd>
             <MudTd DataLabel="Call Details">@context.CallDetails</MudTd>
             <MudTd DataLabel="Claime Status">@context.ClaimeStatus</MudTd>
@@ -74,7 +72,7 @@
             return true;
         if (element.Client.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if ($"{element.ClaimID} {element.Client} {element.MedicalConditions} {element.PlaceOfTreatment} {element.CallDetails} {element.ClaimeStatus}".Contains(searchString))
+        if ($"{element.ClaimID} {element.Client} {element.PlaceOfTreatment} {element.CallDetails} {element.ClaimeStatus}".Contains(searchString))
             return true;
         return false;
     }
