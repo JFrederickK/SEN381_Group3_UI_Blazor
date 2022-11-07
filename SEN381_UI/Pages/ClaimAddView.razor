@@ -245,7 +245,7 @@
 
         if (string.IsNullOrWhiteSpace(searchMedical))
             return true;
-        if (element.MedicalConditionID.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
+        if (element.MedicalConditionID == int.Parse(searchMedical))
             return true;
         if (element.MedicalConditionName.Contains(searchMedical, StringComparison.OrdinalIgnoreCase))
             return true;
@@ -276,7 +276,7 @@
     }
     private async void saveClaim()
     {
-        Claim newClaim = new Claim(1, selectedItem.ClientID, int.Parse(selectedMedical.MedicalConditionID), value,1 , "Approved");
+        Claim newClaim = new Claim(1, selectedItem.ClientID, selectedMedical.MedicalConditionID, value,1 , "Approved");
         await new ClaimService().postClaimDetails(newClaim).ContinueWith((x) =>
         {
             string message = "";
