@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SEN381_API_GROUP3.shared.models;
 using SEN381_UI.Data;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
@@ -19,12 +20,12 @@ namespace SEN381_UI.BusinessLayer.Services
             return contributors;
 
         }
-        public async Task<Claim> postClaimDetails(Claim person)
+        public async Task<AddClaim> postClaimDetails(AddClaim person)
         {
             var client = new HttpClient();
             string url = $"https://localhost:7116/api/Claims";
             HttpResponseMessage response = await client.PostAsJsonAsync(url, person);
-            Claim postclient = JsonConvert.DeserializeObject<Claim>(await response.Content.ReadAsStringAsync());
+            AddClaim postclient = JsonConvert.DeserializeObject<AddClaim>(await response.Content.ReadAsStringAsync());
             return postclient;
 
         }
