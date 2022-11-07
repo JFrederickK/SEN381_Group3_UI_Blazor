@@ -1,0 +1,146 @@
+﻿@page "/FamilyMember/{clientID}/{memberID}"
+@inject IDialogService DialogService
+@inject NavigationManager UriHelper
+
+@if (load)
+{
+        <MudCard style="max-height:1000px; overflow: auto;">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h5" Align="Align.Center">Family Member Detailed View</MudText>
+                </CardHeaderContent>
+                <CardHeaderAvatar>
+                    <MudIconButton OnClick="navigateToFamilyMembers" Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%">Back</MudIconButton>
+                </CardHeaderAvatar>
+            </MudCardHeader>
+            <MudForm Class="p-5">
+                <MudGrid>
+
+                @*Medical Condition Basic Details*@
+                    <MudItem xs="6" sm="6">
+                        <MudTextField T="string" Label="Family Member ID" ReadOnly="true" Text="@memberID"></MudTextField>
+                    </MudItem>
+
+                    <MudItem xs="6" sm="6">
+                        <MudTextField T="string" Label="Family Member Name" @bind-Value=@name Text="@name"></MudTextField>
+                    </MudItem>
+
+                    <MudItem xs="6" sm="6">
+                        <MudTextField T="string" Label="Family Member Surname" @bind-Value=@surname Text="@surname"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="6" sm="6">
+                        <MudTextField T="string" Label="Family Member Address" @bind-Value=@address Text="@address"></MudTextField>
+                    </MudItem>
+
+                    <MudItem xs="6" sm="6">
+                        <MudTextField T="string" Label="Family Member Email" @bind-Value=@email Text="@email"></MudTextField>
+                    </MudItem>
+
+                    <MudItem xs="6" sm="6">
+                        <MudTextField T="string" Label="Family Member Phone Number" @bind-Value=@phonenumber Text="@phonenumber"></MudTextField>
+                    </MudItem>
+
+                    <MudItem xs="6" sm="6">
+                        <MudTextField T="string" Label="Family Member Role" @bind-Value=@role Text="@role"></MudTextField>
+                    </MudItem>
+
+                    <MudGrid>
+                        <MudItem xs="6" sm="4">
+                            <MudButton Color="Color.Info" OnClick="@cancel">Cancel Changes <MudIcon Icon="@Icons.Filled.Cancel" Color="Color.Info"></MudIcon></MudButton>
+                        </MudItem>
+                        <MudItem xs="6" sm="4">
+                            <MudButton Color="Color.Success" OnClick="@updateClient">Save Changes  <MudIcon Icon="@Icons.Filled.PublishedWithChanges" Color="Color.Success"></MudIcon></MudButton>
+                        </MudItem>
+                    </MudGrid>
+
+                </MudGrid>
+            </MudForm>
+
+        </MudCard>
+}
+
+
+
+@code {
+    private FamilyMember memberDetails = new FamilyMember();
+    private FamilyMember newDetails = new FamilyMember();
+
+    [Parameter]
+    public string? clientID { get; set; }
+    [Parameter]
+    public string? memberID { get; set; }
+
+
+    private bool load = false;
+    private string name { get; set; }
+    private string surname { get; set; }
+    private string address { get; set; }
+    private string email { get; set; }
+    private string phonenumber { get; set; }
+    private string role { get; set; }
+
+    private FamilyMember originalMember = new FamilyMember();
+    private FamilyMember newMember = new FamilyMember();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadFamilyMember();
+        load = true;
+    }
+    private async Task LoadFamilyMember()
+    {
+        await new FamilyMemberService().getFamilyMemberDetails(memberID).ContinueWith((x) =>
+        {
+            name = x.Result.MemberName;
+            surname = x.Result.MemberSurname;
+            address = x.Result.Address;
+            email = x.Result.Email;
+            phonenumber = x.Result.PhoneNumber;
+            role = x.Result.Role;
+
+            originalMember = new FamilyMember(memberID, name, surname, phonenumber, email, address, role,clientID);
+        });
+    }
+
+
+
+
+    private async void updateClient()
+    {
+        FamilyMember newMember = new FamilyMember(memberID, name, surname, phonenumber, email, address, role, clientID);
+        if (!newMember.Equals(originalMember))
+        {
+            await new FamilyMemberService().updateFamilyMember(newMember).ContinueWith((x) =>
+            {
+                string message = "";
+                message = x.Result != null ? "Family Member successfully updated" : "Family Member could not be updated";
+                showDialog(message);
+            });
+        }
+        else showDialog("No changes to apply.");
+
+
+    }
+    private void cancel()
+    {
+        UriHelper.NavigateTo("/Client");
+    }
+
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+            var result = await DialogService.Show<Dialogue>("Family Member", paramaters, options).Result;
+        });
+    }
+
+    private void navigateToFamilyMembers()
+    {
+        UriHelper.NavigateTo($"/FamilyMembers/{clientID}");
+    }
+
+}

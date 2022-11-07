@@ -1,0 +1,96 @@
+﻿@page "/FamilyMemberAddView/{clientID}"
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager UriHelper
+@inject IDialogService DialogService
+
+
+<h3>Create Family Member</h3>
+<MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" OnClick="cancel">Back</MudIconButton>
+<EditForm Model="@postdata" OnValidSubmit="OnValidSubmit">
+    <MudGrid>
+        <MudItem xs="6" sm="6">
+            <MudTextField T="string" Label="Name" @bind-Value=@name></MudTextField>
+        </MudItem>
+        <MudItem xs="6" sm="6">
+            <MudTextField T="string" Label="Surname" @bind-Value=@surname></MudTextField>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField T="string" Label="Address" @bind-Value=@address></MudTextField>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField T="string" Label="Email" @bind-Value=@email Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})"></MudTextField>
+        </MudItem>
+        <MudItem xs="6" sm="6">
+            <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value=@phonenumber></MudTextField>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudTextField T="string" Label="Role" @bind-Value=@role></MudTextField>
+        </MudItem>
+
+    </MudGrid>
+
+
+    <MudGrid Style="margin-top:auto">
+        <MudItem xs="12" sm="6">
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" OnClick="@cancel">Cancel Changes</MudButton>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@saveFamilyMember" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public string? clientID { get; set; }
+
+    private FamilyMember postdata = new FamilyMember();
+    private string id = "";
+    private string name { get; set; }
+    private string surname { get; set; }
+    private string address { get; set; }
+
+    private string email { get; set; }
+    private string phonenumber { get; set; }
+    private string role { get; set; }
+
+    private async void saveFamilyMember()
+    {
+
+        FamilyMember newFam = new FamilyMember(id, name, surname, phonenumber, email, address,role,clientID);
+        await new FamilyMemberService().postFamilyMember(newFam).ContinueWith((x) =>
+        {
+            string message = "";
+            message = x.Result != null ? "Family Member was successfully created" : "Family Member could not be created";
+            showDialog(message);
+        });
+    }
+
+    private void OnValidSubmit(EditContext context)
+    {
+        StateHasChanged();
+    }
+    private void cancel()
+    {
+        UriHelper.NavigateTo($"/FamilyMembers/{clientID}");
+    }
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+        var result = await DialogService.Show<Dialogue>("Family Member", paramaters, options).Result;
+        if (message != "Family Member could not be created")
+        {
+            UriHelper.NavigateTo($"/FamilyMembers/{clientID}");
+        }
+        });
+    }
+}
