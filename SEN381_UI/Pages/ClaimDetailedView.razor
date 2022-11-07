@@ -17,8 +17,8 @@
             <MudTextField T="string" Label="Medical condition" @bind-Value=@medicalCondition Text="@medicalCondition"></MudTextField>
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Place Of Treatment" @bind-Value=@placeOfTreatment Text="@placeOfTreatment"></MudTextField>
-        </MudItem>
+            <MudAutocomplete T="string" Label="Place of treatment" @bind-Value=@placeOfTreatment Text="@placeOfTreatment" SearchFunc="@PlaceOfTreatment" Margin="Margin.Dense" Dense="true" />
+        </MudItem> 
         <MudItem xs="12" sm="6">
             <MudTextField T="string" Label="Call Details" @bind-Value=@callDetails Text="@callDetails"></MudTextField>
         </MudItem>
@@ -27,15 +27,15 @@
         </MudItem>
     </MudGrid>
 
-                <MudGrid>
+                <MudGrid Style="margin-top:auto">
                     <MudItem xs="6" sm="4">
-                        <MudButton Color="Color.Info" OnClick="@cancel">Cancel Changes <MudIcon Icon="@Icons.Filled.Cancel" Color="Color.Info"></MudIcon></MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" OnClick="@cancel">Cancel Changes</MudButton>
                     </MudItem>
                     <MudItem xs="6" sm="4">
-                        <MudButton Color="Color.Success" OnClick="@updateClaims">Save Changes  <MudIcon Icon="@Icons.Filled.PublishedWithChanges" Color="Color.Success"></MudIcon></MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@updateClaims" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
                     </MudItem>
                     <MudItem xs="6" sm="4">
-                        <MudButton Color="Color.Error" OnClick="@deleteClient">Delete Client <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@deleteClaim" FullWidth="true">Delete Medical  <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
                     </MudItem>
                 </MudGrid>
 }
@@ -61,19 +61,46 @@
     }
     private async Task LoadClaim() {
         ClaimService cs = new ClaimService();
-        await cs.getClientDetails(int.Parse(id)).ContinueWith((x) => {
+        await cs.getClientDetails(int.Parse(id)).ContinueWith((x) =>
+        {
             clientName = x.Result.Client;
-            medicalCondition = x.Result.MedicalConditions.ToString();
             placeOfTreatment = x.Result.PlaceOfTreatment;
             callDetails = x.Result.CallDetails.ToString();
             claimeStatus = x.Result.ClaimeStatus;
 
-            originalClaim = new Claim(int.Parse(id), clientName, int.Parse(medicalCondition), placeOfTreatment, int.Parse(callDetails), claimeStatus);
+            originalClaim = new Claim(int.Parse(id), clientName, placeOfTreatment,int.Parse(callDetails), claimeStatus);
 
         }
         );
     }
-    private async void deleteClient()
+    private string[] placesOfTreatment =
+    {
+        "Alabama", "Alaska", "American Samoa", "Arizona",
+        "Arkansas", "California", "Colorado", "Connecticut",
+        "Delaware", "District of Columbia", "Federated States of Micronesia",
+        "Florida", "Georgia", "Guam", "Hawaii", "Idaho",
+        "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
+        "Louisiana", "Maine", "Marshall Islands", "Maryland",
+        "Massachusetts", "Michigan", "Minnesota", "Mississippi",
+        "Missouri", "Montana", "Nebraska", "Nevada",
+        "New Hampshire", "New Jersey", "New Mexico", "New York",
+        "North Carolina", "North Dakota", "Northern Mariana Islands", "Ohio",
+        "Oklahoma", "Oregon", "Palau", "Pennsylvania", "Puerto Rico",
+        "Rhode Island", "South Carolina", "South Dakota", "Tennessee",
+        "Texas", "Utah", "Vermont", "Virgin Island", "Virginia",
+        "Washington", "West Virginia", "Wisconsin", "Wyoming",
+    };
+    private async Task<IEnumerable<string>> PlaceOfTreatment(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return placesOfTreatment;
+        return placesOfTreatment.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    private async void deleteClaim()
     {
         await new ClaimService().deleteClaim(int.Parse(id)).ContinueWith((x) =>
         {
@@ -105,13 +132,23 @@
     }
     private async void updateClaims()
     {
-        Claim newClaim = new Claim(int.Parse(id), clientName, int.Parse(medicalCondition), placeOfTreatment, int.Parse(callDetails), claimeStatus);
-        await new ClaimService().updateClaim(newClaim).ContinueWith((x)=> { 
+        Claim newClaim = new Claim(int.Parse(id), clientName, placeOfTreatment, int.Parse(callDetails), claimeStatus);
+        if (!originalClaim.Equals(newClaim))
+        {
+            await new ClaimService().updateClaim(newClaim).ContinueWith((x) =>
+            {
 
-            string message = "";
-            message = x.Result != null ? "Client could not be updated" : "Client successfully updated";
-            showDialog(message);
-        });
+                string message = "";
+                message = x.Result != null ? "Client could not be updated" : "Client successfully updated";
+                showDialog(message);
+            });
+        }
+        else
+        {
+            showDialog("No changes to apply.");
+        }
+
+
     }
 
 }
