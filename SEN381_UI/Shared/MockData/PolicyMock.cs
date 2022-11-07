@@ -9,7 +9,7 @@ namespace SEN381_UI.Shared.MockData
         {
             List<Policy> lpol = new List<Policy>();
 
-            lpol.Add(new Policy("1","Temp1","Limited",new PackageMock().getPackages()));
+            lpol.Add(new Policy("1","Temp1","Limited",, new PackageMock().getPackages()));
             lpol.Add(new Policy("2", "Temp2", "Limited", new PackageMock().getPackages()));
             lpol.Add(new Policy("3", "Temp3", "ACTIVE", new PackageMock().getPackages()));
 

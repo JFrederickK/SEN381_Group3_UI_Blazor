@@ -1,7 +1,8 @@
 ﻿@page "/PolicyAdd"
 @using SEN381_UI.Data
 @using SEN381_UI.Shared.MockData
-@inject NavigationManager Navigation
+@inject NavigationManager UriHelper
+@inject IDialogService DialogService
 
 <MudCard style="max-height:1000px; overflow: auto;">
 
@@ -11,7 +12,7 @@
             <MudText Typo="Typo.h5" Align="Align.Center">Create Policy</MudText>
         </CardHeaderContent>
         <CardHeaderAvatar>
-            <MudIconButton OnClick="@navigateBack" Icon="@Icons.Filled.KeyboardBackspace"></MudIconButton>
+            <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Policy">Back</MudIconButton>
         </CardHeaderAvatar>
     </MudCardHeader>
 
@@ -65,10 +66,15 @@
                     </MudExpansionPanels>
                 </MudExpansionPanel>
             </MudItem>
-           
-            <MudItem lg="12" sm="6">
-                <MudButton class="m-auto">Create Policy</MudButton>
-            </MudItem>
+
+            <MudGrid Style="margin-top:auto">
+                <MudItem xs="12" sm="6">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" FullWidth="true" OnClick="@cancel">Cancel Changes</MudButton>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Success" FullWidth="true" OnClick="@addPolicy" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
+                </MudItem>
+            </MudGrid>
         </MudGrid>
     </MudForm>
 
@@ -81,7 +87,7 @@
     string policyStatus { get; set; }
 
     List<Package> packages = new PackageMock().getPackages();//Replace with service
-    //List<Client> clients = new ClientMock().GetClients();//Replace with service
+                                                             //List<Client> clients = new ClientMock().GetClients();//Replace with service
 
 
     public bool Basic_CheckBox1 { get; set; } = true;
@@ -89,19 +95,41 @@
     private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);//Used for date picker
 
     private void navigateBack(){
-        Navigation.NavigateTo("Policy");
+        UriHelper.NavigateTo("Policy");
     }
 
-    //ek add nou hierdie comment
 
-    private void add()
+    private async void addPolicy()
     {
-        Policy policy = new Policy(policyId, policyName, policyStatus, packages);
+        Policy newpolicy = new Policy(policyId, policyName, policyStatus, _dateRange, packages);
 
         PolicyService policyService = new PolicyService();
 
-        policyService.addPolicy(policy);
+        await policyService.addPolicy(newpolicy).ContinueWith((x)=> {
 
+            string message = "";
+            message = x.Result != null ? "Policy is successfully created" : "Policy could not be created";
+            showDialog(message);
+        });
+    }
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+            var result = await DialogService.Show<Dialogue>("Client", paramaters, options).Result;
+            if (message != "Policy could not be created")
+            {
+                UriHelper.NavigateTo("/Policy");
+            }
+        });
+    }
+    private void cancel()
+    {
+        UriHelper.NavigateTo("/Policy");
     }
 }
 
