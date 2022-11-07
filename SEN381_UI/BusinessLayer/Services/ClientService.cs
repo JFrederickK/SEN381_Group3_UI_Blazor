@@ -12,8 +12,9 @@ namespace SEN381_UI.BusinessLayer.Services
         public async Task<List<Client>> LoadClient(int size, int page)
         {
             using var client = new HttpClient();
-
-            var result = await client.GetAsync("https://localhost:7116/api/Client?page=1&size=22");
+            Console.WriteLine(page);
+            Console.WriteLine(size);
+            var result = await client.GetAsync($"https://localhost:7116/api/Client?page={page+1}&size={size}");
             var resp = await result.Content.ReadAsStringAsync();
             List<Client> clients = JsonConvert.DeserializeObject<List<Client>>(resp);
             return clients;

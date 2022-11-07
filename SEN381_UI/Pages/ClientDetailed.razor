@@ -97,13 +97,16 @@
                     </MudExpansionPanel>
                 </MudItem>
                 <MudGrid>
-                    <MudItem xs="6" sm="4">
+                    <MudItem class="align-content-center" lg="12" sm="4">
+                        <MudButton class="align-content-center"  OnClick="@navigateToFamilyMembers">View Client Family Members </MudButton>
+                    </MudItem>
+                    <MudItem xs="4" sm="4">
                         <MudButton Color="Color.Info" OnClick="@cancel">Cancel Changes <MudIcon Icon="@Icons.Filled.Cancel" Color="Color.Info"></MudIcon></MudButton>
                     </MudItem>
-                    <MudItem xs="6" sm="4">
+                    <MudItem xs="4" sm="4">
                         <MudButton Color="Color.Success" OnClick="@updateClient">Save Changes  <MudIcon Icon="@Icons.Filled.PublishedWithChanges" Color="Color.Success"></MudIcon></MudButton>
                     </MudItem>
-                    <MudItem xs="6" sm="4">
+                    <MudItem xs="4" sm="4">
                         <MudButton Color="Color.Error" OnClick="@deleteClient">Delete Client <MudIcon Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIcon></MudButton>
                     </MudItem>
                 </MudGrid>
@@ -228,6 +231,10 @@
         if (selectedPolicy != null) policies.Add(selectedPolicy);
         policies.Remove(pol);
         selectedPolicy = pol;
+    }
+
+    private void navigateToFamilyMembers(){
+        UriHelper.NavigateTo($"/FamilyMembers/{id}");
     }
 
 }
