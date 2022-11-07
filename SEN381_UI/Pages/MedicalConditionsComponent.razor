@@ -3,27 +3,28 @@
 @inject NavigationManager Urihelper
 
 <h3>Medical Conditions</h3>
-<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<MedicalCondition,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" 
+@if (load)
+{
+    <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<MedicalCondition,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" 
           SortLabel="Sort by" Rowper
           T="MedicalCondition"
           OnRowClick="@navigateToDetails" >
     <ToolBarContent>
         <MudText Typo="Typo.h6">Medical Conditions</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="searchString" Placeholder="Search for condition " Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>ID</MudTh>
         <MudTh>Condition Name</MudTh>
         <MudTh>Description</MudTh>
-        <MudTh>Treatments</MudTh>
 
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="ID">@context.MedicalConditionID</MudTd>
         <MudTd DataLabel="NAME">@context.MedicalConditionName</MudTd>
         <MudTd DataLabel="DESCRIPTION">@context.MedicalConditionDescription</MudTd>
-        <MudTd DataLabel="TREATMENTS">@context.Treatments</MudTd>
+
 
     </RowTemplate>
     <PagerContent>
@@ -31,10 +32,12 @@
     </PagerContent>
 
 </MudTable>
+}
 <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" OnClick="navigateToAdd" Style="margin-top:1%" />
 
 
 @code {
+    private bool load = false;
     private bool dense = false;
     private bool hover = true;
     private bool striped = true;
@@ -46,10 +49,19 @@
 
 
 
-    private IEnumerable<MedicalCondition> Elements = new List<MedicalCondition>();
-    protected override void OnInitialized()
+    private List<MedicalCondition> Elements = new List<MedicalCondition>();
+    protected override async Task OnInitializedAsync()
     {
-        Elements = new MedicalConditionMock().GetMedicals();
+        await LoadMedicalConditions();
+        load = true;
+    }
+
+    private async Task LoadMedicalConditions() {
+        MedicalConditionService cs = new MedicalConditionService();
+        await cs.LoadMedicalCondition().ContinueWith((x) =>
+        {
+            Elements = x.Result;
+        });
     }
     private bool FilterFunc(MedicalCondition element) => FilterFunc(element, searchString);
 
@@ -57,7 +69,7 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.MedicalConditionID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.MedicalConditionID == int.Parse(searchString))
             return true;
         return false;
 
