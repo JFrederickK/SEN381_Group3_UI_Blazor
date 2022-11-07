@@ -156,7 +156,7 @@
     private async Task LoadClients()
     {
         ClientService cs = new ClientService();
-        await cs.LoadClient().ContinueWith((x) =>
+        await cs.LoadClient(1000,1).ContinueWith((x) =>
         {
             Elements = x.Result;
         });
@@ -193,13 +193,13 @@
             return true;
         if (element.ClientPhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.Policies.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
+        //if (element.Policies.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
         if (element.ClientStatus.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if (element.ClientAdHocNotes.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if ($"{element.ClientName} {element.ClientSurname} {element.ClientAddress} {element.ClientEmail} {element.ClientPhoneNumber} {element.Policies} {element.ClientStatus} {element.ClientAdHocNotes}".Contains(searchString))
+        if ($"{element.ClientName} {element.ClientSurname} {element.ClientAddress} {element.ClientEmail} {element.ClientPhoneNumber} {element.Policy} {element.ClientStatus} {element.ClientAdHocNotes}".Contains(searchString))
             return true;
         return false;
     }

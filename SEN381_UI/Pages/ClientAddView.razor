@@ -8,7 +8,7 @@
 
 
 <h3>Client Add View</h3>
-<MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/ClientListView">Back</MudIconButton>
+<MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Client">Back</MudIconButton>
 <EditForm Model="@postdata" OnValidSubmit="OnValidSubmit">
     <MudGrid>
     <MudItem xs="6" sm="6">
@@ -29,10 +29,6 @@
             <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value=@phonenumber></MudTextField>
     </MudItem>
 
-    <MudItem xs="6" sm="6">
-            <MudTextField T="string" Label="Policies" @bind-Value=@clientpolicies></MudTextField>
-    </MudItem>
-
     <MudItem xs="12" sm="6">
             <MudTextField T="string" Label="Status" @bind-Value=@status></MudTextField>
     </MudItem>
@@ -44,39 +40,51 @@
 </MudGrid>
 
 <MudGrid>
-        @*Different Packages*@
-            <MudItem lg="12" sm="6">
-                <MudExpansionPanel class="h-25" Text="Policy Packages">
-
-                    <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
-                    @foreach (Package package in packages)
-                    {
-                        string text = $"Package ID:{@package.PackageID}";
-                                <MudGrid>
-                                    <MudItem xs="9">
-                                        <MudExpansionPanel Text="@text">
-                                    @foreach (PackageTreatmentCoverage item in package.TreatmentCoverages)
-                                    {
-
-                                                    <MudCard class="mt-2 p-2">
-                                                        <MudText Align="Align.Center"> Treatment: @item.Treatment.TreatmentName </MudText>
-                                                        <MudText Align="Align.Center"> Coverage Level: @item.Coverage.CoverageDescription </MudText>
-                                                    </MudCard>
-
-                                    }
-
-                                        </MudExpansionPanel>
-                                    </MudItem>
-                                    <MudItem xs="3">
-                                        <MudText Align="Align.Center">
-                                            <MudCheckBox @bind-Checked="@Basic_CheckBox1"></MudCheckBox>
-                                        </MudText>
-                                    </MudItem>
-                                </MudGrid>
-                    }
-                    </MudExpansionPanels>
-                </MudExpansionPanel>
-            </MudItem>
+        @*Treatment Details *@
+        <MudItem lg="12">
+            <MudExpansionPanel class="h-25" Text="List of Policies">
+                <MudGrid>
+                    @*Policy *@
+                    <MudItem xs="6">
+                        <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
+                            @foreach (Policy policy in policies)
+                            {
+                                string text = $"Policy ID: {@policy.PolicyId}";
+                                <MudExpansionPanel Text="@text">
+                                    <MudText> Policy Name: @policy.PolicyName </MudText>
+                                    <MudText> Policy Status: @policy.PolicyStatus </MudText>
+                                </MudExpansionPanel>
+                                <MudButton OnClick="()=>addPolicy(policy)" Color="Color.Success"> Make Active Policy</MudButton>
+                            }
+                        </MudExpansionPanels>
+                    </MudItem>
+                    @*Selected Policy*@
+                    <MudItem xs="6">
+                        <MudCard class="align-content-center">
+                            <MudCardHeader class="justify-content-center">
+                                Active Policy
+                            </MudCardHeader>
+                            @if (selectedPolicy != null)
+                            {
+                                <MudCardContent class="justify-content-center">
+                                    <MudText class="justify-content-center"> Policy Name: @selectedPolicy.PolicyName </MudText>
+                                    <MudText class="justify-content-center"> Policy Status: @selectedPolicy.PolicyStatus </MudText>
+                                </MudCardContent>
+                                <MudCardActions class="justify-content-center">
+                                    <MudButton OnClick="()=>removePolicy(selectedPolicy)" Color="Color.Error"> Remove Policy</MudButton>
+                                </MudCardActions>
+                            }
+                            else
+                            {
+                                <MudCardContent>
+                                    Client does not have any active policies
+                                </MudCardContent>
+                            }
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudItem>
 </MudGrid>
 
 
@@ -100,23 +108,26 @@
 
     private string email { get; set; }
     private string phonenumber { get; set; }
-    private string clientpolicies { get; set; }
+    private ClientPolicy? clientPolicy { get; set; }
+    private Policy? selectedPolicy;
     private string status { get; set; }
     private string notes { get; set; }
 
 
     public bool Basic_CheckBox1 = true;
 
-    public List<Package> packages = new PackageMock().getPackages();
+    public List<Policy> policies = new PolicyMock().getMockPolicies();
 
     private async void saveClint()
     {
-        Client newClient = new Client(id, name, surname, address, email, phonenumber, clientpolicies, status, notes);
+        if (selectedPolicy == null) clientPolicy = new ClientPolicy(null,null,null);
+        else clientPolicy = new ClientPolicy(selectedPolicy.PolicyId, selectedPolicy.PolicyName, selectedPolicy.PolicyStatus);
+
+        Client newClient = new Client(id, name, surname, address, email, phonenumber, clientPolicy, status, notes);
         await new ClientService().postClientDetails(newClient).ContinueWith((x) =>
         {
-            Console.WriteLine(  x.Result.ClientPhoneNumber);
             string message = "";
-            message = x.Result != null ? "Client is successfully created" : "Client could not be created";
+            message = x.Result != null ? "Client was successfully created" : "Client could not be created";
             showDialog(message);
         });
     }
@@ -127,7 +138,7 @@
     }
     private void cancel()
     {
-        UriHelper.NavigateTo("/ClientListView");
+        UriHelper.NavigateTo("/Client");
     }
     private async void showDialog(string message)
     {
@@ -138,17 +149,23 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Client", paramaters, options).Result;
-            if (message != "Coverage could not be created")
+            if (message != "Client could not be created")
             {
-                UriHelper.NavigateTo("/ClientListView");
+                UriHelper.NavigateTo("/Client");
             }
         });
     }
 
-//    public Treatment displayDetails()
-//    {
-//        Treatment selected = new Treatment(selectedTreatment.TreatmentID, selectedTreatment.TreatmentName, selectedTreatment.TreatmentDescription, selectedTreatment.MedicalServiceProviders);
-//        return selected;
+    private void removePolicy(Policy pol)
+    {
+        policies.Add(pol);
+        selectedPolicy = null;
+    }
 
-//}
+    private void addPolicy(Policy pol)
+    {
+        if (selectedPolicy != null) policies.Add(selectedPolicy);
+        policies.Remove(pol);
+        selectedPolicy = pol;
+    }
 }

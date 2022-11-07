@@ -9,14 +9,14 @@ namespace SEN381_UI.BusinessLayer.Services
 {
     public class ClientService
     {
-        public async Task<List<Client>> LoadClient()
+        public async Task<List<Client>> LoadClient(int size, int page)
         {
             using var client = new HttpClient();
 
             var result = await client.GetAsync("https://localhost:7116/api/Client?page=1&size=22");
             var resp = await result.Content.ReadAsStringAsync();
-            List<Client> contributors = JsonConvert.DeserializeObject<List<Client>>(resp);
-            return contributors;
+            List<Client> clients = JsonConvert.DeserializeObject<List<Client>>(resp);
+            return clients;
 
         }
         public async Task<Client> getClientDetails(string id)
@@ -35,8 +35,6 @@ namespace SEN381_UI.BusinessLayer.Services
             string url = $"https://localhost:7116/api/Client";
             HttpResponseMessage response = await client.PostAsJsonAsync(url, person);
             Client postclient = JsonConvert.DeserializeObject<Client>(await response.Content.ReadAsStringAsync());
-            Console.WriteLine("clinet info");
-            Console.WriteLine(postclient.clientAddress);
             return postclient;
 
         }

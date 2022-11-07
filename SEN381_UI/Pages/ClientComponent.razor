@@ -1,4 +1,4 @@
-﻿@page "/ClientListView"
+﻿@page "/Client"
 @using System.Net.Http.Json
 @using SEN381_UI.BusinessLayer
 @using SEN381_UI.Data
@@ -7,9 +7,8 @@
 
 <h3>Client Component</h3>
 
-@if (load == true)
-{
-    <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
+    <MudTable ServerData="@(new Func<TableState, Task<TableData<Client>>>(loadClients))" 
+          Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
           Filter="new Func<Client,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by"
           T="Client"
           OnRowClick="@GoToDetails">
@@ -25,7 +24,7 @@
             <MudTh>Address</MudTh>
             <MudTh>Email</MudTh>
             <MudTh>Phone</MudTh>
-            <MudTh>Policies</MudTh>
+            <MudTh>Active Policy</MudTh>
             <MudTh>Status</MudTh>
             <MudTh>Notes</MudTh>
         </HeaderContent>
@@ -36,7 +35,7 @@
             <MudTd DataLabel="Address">@context.clientAddress</MudTd>
             <MudTd DataLabel="Email">@context.ClientEmail</MudTd>
             <MudTd DataLabel="Phone">@context.clientPhoneNumber</MudTd>
-            <MudTd DataLabel="Polisies">@context.policies</MudTd>
+            <MudTd DataLabel="Active Policy">@getClientPolicy(context)</MudTd>
             <MudTd DataLabel="Status">@context.ClientStatus</MudTd>
             <MudTd DataLabel="Notes">@context.ClientAdHocNotes</MudTd>
         </RowTemplate>
@@ -47,11 +46,9 @@
     <MudItem Style="margin-top:2%">
         <MudFab Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" Href="/ClientAddView" />
     </MudItem>
-}
 
 
 @code {
-    private bool load = false;
     private int[] pageSizeOptions = new int[] {5, 10, 15};
     private bool dense = false;
     private bool hover = true;
@@ -62,20 +59,15 @@
     private HashSet<Client> selectedItems = new HashSet<Client>();
 
     private List<Client> Elements = new List<Client>();
-    protected override async Task OnInitializedAsync()
+
+
+    private async Task<TableData<Client>> loadClients(TableState state)
     {
-       await LoadClients();
-        load = true;
-    }
-
-
-    private async Task LoadClients(){
         ClientService cs = new ClientService();
-        await cs.LoadClient().ContinueWith((x)=> {
+        await cs.LoadClient(state.PageSize,state.Page).ContinueWith((x)=> {
             Elements = x.Result;
         });
- 
-
+        return new TableData<Client>() { Items = Elements, TotalItems = Elements.Count };
     }
 
     private bool FilterFunc(Client element) => FilterFunc(element, searchString);
@@ -86,12 +78,16 @@
             return true;
         if (element.ClientID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if ($"{element.ClientName} {element.ClientSurname} {element.ClientAddress} {element.ClientEmail} {element.ClientPhoneNumber} {element.Policies} {element.ClientStatus} {element.ClientAdHocNotes}".Contains(searchString))
+        if ($"{element.ClientName} {element.ClientSurname} {element.ClientAddress} {element.ClientEmail} {element.ClientPhoneNumber} {element.ClientStatus} {element.ClientAdHocNotes}".Contains(searchString))
             return true;
         return false;
     }
     private void GoToDetails(TableRowClickEventArgs<Client> p)
     {
-        UriHelper.NavigateTo($"/ClientDetailsView/{p.Item.ClientID}");
+        UriHelper.NavigateTo($"/Client/{p.Item.ClientID}");
+    }
+
+    private string getClientPolicy(Client client){
+        return client.Policy == null ? "None" : client.Policy.PolicyName;
     }
 }
