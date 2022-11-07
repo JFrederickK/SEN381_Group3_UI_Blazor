@@ -15,7 +15,7 @@ public class Policy
         PolicyId = policyId;
         PolicyName = policyName;
         PolicyStatus = policyStatus;
-        dateAvailable = dateAvailable;
+        DateAvailable = dateAvailable;
         Package = package;
     }
     public Policy()
