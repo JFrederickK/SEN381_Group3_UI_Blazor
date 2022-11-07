@@ -4,6 +4,8 @@
 @inject NavigationManager Navigation
 
 <MudCard style="max-height:1000px; overflow: auto;">
+
+
     <MudCardHeader>
         <CardHeaderContent>
             <MudText Typo="Typo.h5" Align="Align.Center">Create Policy</MudText>
@@ -12,11 +14,20 @@
             <MudIconButton OnClick="@navigateBack" Icon="@Icons.Filled.KeyboardBackspace"></MudIconButton>
         </CardHeaderAvatar>
     </MudCardHeader>
+
+
     <MudForm Class="p-5">
+
         <MudGrid>
+
             <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Policy Name" @bind-status=policyName Text="@policyName"></MudTextField>
+                <MudTextField T="string" Label="Policy Name" @bind-Value=@policyName Text="@policyName"></MudTextField>
             </MudItem>
+            
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string" Label="Policy Status" @bind-Value=@policyStatus Text="@policyStatus"></MudTextField>
+            </MudItem>
+
             <MudItem xs="12" sm="6">
                 <MudDateRangePicker Label="Policy Availability Dates" @bind-DateRange="_dateRange"></MudDateRangePicker>
             </MudItem>
@@ -65,17 +76,30 @@
 
 
 @code {
-
-    string policyName="";
+    string policyId { get; set; } = "";
+    string policyName { get; set; }
+    string policyStatus { get; set; }
 
     List<Package> packages = new PackageMock().getPackages();//Replace with service
-    List<Client> clients = new ClientMock().GetClients();//Replace with service
+    //List<Client> clients = new ClientMock().GetClients();//Replace with service
+
+
     public bool Basic_CheckBox1 { get; set; } = true;
 
     private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);//Used for date picker
 
     private void navigateBack(){
         Navigation.NavigateTo("Policy");
+    }
+
+    private void add()
+    {
+        Policy policy = new Policy(policyId, policyName, policyStatus, packages);
+
+        PolicyService policyService = new PolicyService();
+
+        policyService.addPolicy(policy);
+
     }
 }
 
