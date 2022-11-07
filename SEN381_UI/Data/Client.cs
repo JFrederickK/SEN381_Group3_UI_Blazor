@@ -9,7 +9,7 @@ namespace SEN381_UI.Data {
         public string clientAddress;
         public string clientEmail;
         public string clientPhoneNumber;
-        public string policies;
+        public ClientPolicy? policy;
         public string clientStatus;
         public string clientAdHocNotes;
 
@@ -17,7 +17,7 @@ namespace SEN381_UI.Data {
         {
         }
 
-        public Client(string clientID, string clientName, string clientSurname, string clientAddress, string clientEmail, string clientPhoneNumber, string policies, string clientStatus, string clientAdHocNotes)
+        public Client(string clientID, string clientName, string clientSurname, string clientAddress, string clientEmail, string clientPhoneNumber, ClientPolicy policy, string clientStatus, string clientAdHocNotes)
         {
             this.clientID = clientID;
             this.clientName = clientName;
@@ -25,7 +25,7 @@ namespace SEN381_UI.Data {
             this.clientAddress = clientAddress;
             this.clientEmail = clientEmail;
             this.clientPhoneNumber = clientPhoneNumber;
-            this.policies = policies;
+            this.policy = policy;
             this.clientStatus = clientStatus;
             this.clientAdHocNotes = clientAdHocNotes;
         }
@@ -36,7 +36,7 @@ namespace SEN381_UI.Data {
         public string ClientAddress { get => clientAddress; set => clientAddress = value; }
         public string ClientEmail { get => clientEmail; set => clientEmail = value; }
         public string ClientPhoneNumber { get => clientPhoneNumber; set => clientPhoneNumber = value; }
-        public string Policies { get => policies; set => policies = value; }
+        public ClientPolicy? Policy { get => policy; set => policy = value; }
         public string ClientStatus { get => clientStatus; set => clientStatus = value; }
         public string ClientAdHocNotes { get => clientAdHocNotes; set => clientAdHocNotes = value; }
 
@@ -44,7 +44,7 @@ namespace SEN381_UI.Data {
         {
             if (x == null || y == null)
                 return false;
-            else if (x.ClientName == y.ClientName || x.ClientSurname == y.ClientSurname || x.ClientAddress == y.ClientAddress || x.ClientEmail == y.ClientEmail || x.ClientPhoneNumber == y.ClientPhoneNumber || x.Policies == y.Policies || x.ClientStatus == y.ClientStatus || x.ClientAdHocNotes == y.ClientAdHocNotes)
+            else if (x.ClientName == y.ClientName || x.ClientSurname == y.ClientSurname || x.ClientAddress == y.ClientAddress || x.ClientEmail == y.ClientEmail || x.ClientPhoneNumber == y.ClientPhoneNumber || x.Policy == y.Policy || x.ClientStatus == y.ClientStatus || x.ClientAdHocNotes == y.ClientAdHocNotes)
                 return true;
             else
                 return false;
@@ -57,12 +57,28 @@ namespace SEN381_UI.Data {
             return obj.GetHashCode();
         }
 
-        public void makeClaim()
+    }
+
+    public class ClientPolicy
+    {
+        private string? policyID;
+        private string? policyName;
+        private string? policyStatus;
+
+        public ClientPolicy(string policyID, string policyName, string policyStatus)
         {
-            //Implement Logic
+            this.policyID = policyID;
+            this.policyName = policyName;
+            this.policyStatus = policyStatus;
         }
 
+        public ClientPolicy()
+        {
+        }
 
+        public string? PolicyID { get => policyID; set => policyID = value; }
+        public string? PolicyName { get => policyName; set => policyName = value; }
+        public string? PolicyStatus { get => policyStatus; set => policyStatus = value; }
     }
 }
 

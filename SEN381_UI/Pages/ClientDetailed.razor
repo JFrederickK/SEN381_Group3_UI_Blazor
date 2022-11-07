@@ -1,6 +1,4 @@
-﻿@page "/ClientDetailsView/{id}"
-@using SEN381_UI.BusinessLayer
-@using SEN381_UI.Data
+﻿@page "/Client/{id}"
 @using SEN381_UI.Shared.MockData
 @inject IDialogService DialogService
 @inject NavigationManager UriHelper
@@ -13,7 +11,7 @@
                 <MudText Typo="Typo.h5" Align="Align.Center">Clients Detailed view</MudText>
             </CardHeaderContent>
             <CardHeaderAvatar>
-                <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/ClientListView">Back</MudIconButton>
+                <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Client">Back</MudIconButton>
             </CardHeaderAvatar>
         </MudCardHeader>
         <MudForm Class="p-5">
@@ -42,9 +40,9 @@
                 <MudItem xs="6" sm="6">
                     <MudTextField T="string" Label="Client Phone number" @bind-Value=@phonenumber Text="@phonenumber"></MudTextField>
                 </MudItem>
-                <MudItem xs="6" sm="6">
+                @*<MudItem xs="6" sm="6">
                     <MudTextField T="string" Label="Client Polisies" @bind-Value=@clientpolicies Text="@clientpolicies"></MudTextField>
-                </MudItem>
+                </MudItem>*@
 
                 <MudItem xs="6" sm="6">
                     <MudTextField T="string" Label="Client status" @bind-Value=@status Text="@status"></MudTextField>
@@ -55,20 +53,47 @@
                 </MudItem>
 
                 @*Treatment Details *@
-                <MudItem lg="12" sm="6">
+                <MudItem lg="12">
                     <MudExpansionPanel class="h-25" Text="List of Policies">
-
-                        <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
-                            @foreach (Policy policy in policies)
-                            {
-                                string text = $"Policy ID: {@policy.PolicyId}";
-                                <MudExpansionPanel Text="@text">
-                                    <MudText> Policy Name: @policy.PolicyName </MudText>
-                                    <MudText> Policy STATUS: @policy.PolicyStatus </MudText>
-                                </MudExpansionPanel>
-
-                            }
-                        </MudExpansionPanels>
+                        <MudGrid>
+                            @*Policy *@
+                            <MudItem xs="6">
+                                <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
+                                    @foreach (Policy policy in policies)
+                                    {
+                                        string text = $"Policy ID: {@policy.PolicyId}";
+                                        <MudExpansionPanel Text="@text">
+                                            <MudText> Policy Name: @policy.PolicyName </MudText>
+                                            <MudText> Policy Status: @policy.PolicyStatus </MudText>
+                                        </MudExpansionPanel>
+                                        <MudButton OnClick="()=>addPolicy(policy)" Color="Color.Success"> Make Active Policy</MudButton>
+                                    }
+                                </MudExpansionPanels>
+                            </MudItem>
+                            @*Selected Policy*@
+                            <MudItem xs="6">
+                                <MudCard class="align-content-center">
+                                    <MudCardHeader class="justify-content-center">
+                                        Active Policy
+                                    </MudCardHeader>
+                                    @if (selectedPolicy!=null)
+                                    {
+                                        <MudCardContent class="justify-content-center">
+                                            <MudText class="justify-content-center"> Policy Name: @selectedPolicy.PolicyName </MudText>
+                                            <MudText class="justify-content-center"> Policy Status: @selectedPolicy.PolicyStatus </MudText>
+                                        </MudCardContent>
+                                        <MudCardActions class="justify-content-center">
+                                            <MudButton OnClick="()=>removePolicy(selectedPolicy)"  Color="Color.Error"> Remove Policy</MudButton>
+                                        </MudCardActions>  
+                                    }
+                                    else {
+                                        <MudCardContent>
+                                            Client does not have any active policies
+                                        </MudCardContent>
+                                    }
+                                </MudCard>
+                            </MudItem>
+                        </MudGrid>
                     </MudExpansionPanel>
                 </MudItem>
                 <MudGrid>
@@ -105,7 +130,7 @@
     private string address { get; set; }
     private string email { get; set; }
     private string phonenumber { get; set; }
-    private string clientpolicies { get; set; }
+    private ClientPolicy? clientPolicy { get; set; }
     private string status { get; set; }
     private string notes { get; set; }
 
@@ -114,6 +139,7 @@
 
 
     List<Policy> policies = new PolicyMock().getMockPolicies();
+    Policy? selectedPolicy;
 
     protected async override Task OnInitializedAsync()
     {
@@ -130,12 +156,16 @@
             address = x.Result.ClientAddress;
             email = x.Result.ClientEmail;
             phonenumber = x.Result.ClientPhoneNumber;
-            clientpolicies = x.Result.Policies;
+            clientPolicy = x.Result.Policy;
             status = x.Result.ClientStatus;
             notes = x.Result.ClientAdHocNotes;
 
-            originalClient = new Client(id, name, surname, address, email, phonenumber, clientpolicies, status, notes);
+            if (clientPolicy!=null)
+            {
+                addPolicy(policies.Find((x)=>x.PolicyId==clientPolicy.PolicyID));
+            }
 
+            originalClient = new Client(id, name, surname, address, email, phonenumber, x.Result.Policy, status, notes);
         });
     }
 
@@ -144,16 +174,17 @@
 
     private async void updateClient()
     {
-        Client newClient = new Client(id, name, surname, address, email, phonenumber, clientpolicies, status, notes);
+        if (selectedPolicy != null) clientPolicy = new ClientPolicy(selectedPolicy.PolicyId, selectedPolicy.PolicyName, selectedPolicy.PolicyStatus);
+        else clientPolicy = new ClientPolicy(null,null,null);
+        Client newClient = new Client(id, name, surname, address, email, phonenumber,clientPolicy , status, notes);
         if (!newClient.Equals(originalClient))
         {
             await new ClientService().updateClient(newClient).ContinueWith((x) =>
-    {
-    string message = "";
-    message = x.Result != null ? "Client successfully updated" : "Client could not be updated";
-    showDialog(message);
-    }
-    );
+            {
+                string message = "";
+                message = x.Result != null ? "Client successfully updated" : "Client could not be updated";
+                showDialog(message);
+            });
         }
         else showDialog("No changes to apply.");
 
@@ -161,7 +192,7 @@
     }
     private void cancel()
     {
-        UriHelper.NavigateTo("/ClientListView");
+        UriHelper.NavigateTo("/Client");
     }
     private async void deleteClient()
     {
@@ -184,11 +215,19 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Client", paramaters, options).Result;
-            if (message != "Client could not be created" && message != "Client could not be deleted" && message != "Client could not be updated")
-            {
-                UriHelper.NavigateTo("/ClientListView");
-            }
         });
+    }
+
+    private void removePolicy(Policy pol){
+        policies.Add(pol);
+        selectedPolicy = null;
+    }
+
+    private void addPolicy(Policy pol)
+    {
+        if (selectedPolicy != null) policies.Add(selectedPolicy);
+        policies.Remove(pol);
+        selectedPolicy = pol;
     }
 
 }
