@@ -136,7 +136,7 @@
         paramaters.Add("ButtonText", "Close Dialogue");
         await InvokeAsync(async () =>
         {
-            var result = await DialogService.Show<Dialogue>("Client", paramaters, options).Result;
+            var result = await DialogService.Show<Dialogue>("Policy", paramaters, options).Result;
             if (message != "Policy could not be created")
             {
                 UriHelper.NavigateTo("/Policy");
