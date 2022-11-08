@@ -71,15 +71,6 @@ namespace SEN381_UI.BusinessLayer.Services
             Console.WriteLine(policy);
             return policy;
         }
-        public async Task<Package> updatePolicy(Package pol)
-        {
-            HttpClient client = new HttpClient();
-            string url = $"https://localhost:7116/api/Package?page=1&size=12";
-            HttpResponseMessage response = await client.PutAsJsonAsync<Package>(url, pol);
-            Package policy = JsonConvert.DeserializeObject<Package>(await response.Content.ReadAsStringAsync());
-
-            Console.WriteLine(policy);
-            return policy;
-        }
+        
     }
 }
