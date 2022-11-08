@@ -108,13 +108,13 @@
     }
 
 
-    private async void addPolicy()
+    private void addPolicy()
     {
         Policy newpolicy = new Policy(policyId, policyName, "", _dateRange.Start, _dateRange.End, packages);
 
         PolicyService policyService = new PolicyService();
 
-        await policyService.addPolicy(newpolicy).ContinueWith((x)=> {
+        policyService.addPolicy(newpolicy).ContinueWith((x)=> {
 
             string message = "";
             message = x.Result != null ? "Policy is successfully created" : "Policy could not be created";
