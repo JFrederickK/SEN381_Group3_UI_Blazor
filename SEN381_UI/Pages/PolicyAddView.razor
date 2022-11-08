@@ -110,7 +110,7 @@
 
     private void addPolicy()
     {
-        Policy newpolicy = new Policy(policyId, policyName, "", _dateRange.Start, _dateRange.End, packages);
+        Policy newpolicy = new Policy(policyId, policyName, "", _dateRange.Start, _dateRange.End, selectedPackages);
 
         PolicyService policyService = new PolicyService();
 
