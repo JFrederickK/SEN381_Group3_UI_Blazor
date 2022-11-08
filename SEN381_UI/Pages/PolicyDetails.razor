@@ -26,6 +26,19 @@
                  <MudItem xs="6" sm="6">
                      <MudTextField T="string" Label="Policy Status" ReadOnly="true" @bind-status=status Text="@status"></MudTextField>
                  </MudItem>
+                 
+                <MudItem xs="12" sm="6">
+                 </MudItem>
+                <MudItem xs="12" sm="6">
+                 </MudItem>
+                <MudItem xs="12" sm="6">
+                 </MudItem>
+                <MudItem xs="12" sm="6">
+                 </MudItem>
+                <MudItem xs="12" sm="6">
+                 </MudItem>
+                <MudItem xs="12" sm="6">
+                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudDateRangePicker Label="Policy Availability Dates" @bind-DateRange="_dateRange"></MudDateRangePicker>
                 </MudItem>
@@ -95,7 +108,6 @@
 @code {
 
     string policyName { get; set; }
-
     List<Package> packages = new List<Package>();
 
     List<Package> selectedPackages = new List<Package>();
@@ -107,6 +119,7 @@
 
     private DateRange _dateRange = new DateRange();//Used for date picker
 
+    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);//Used for date picker
 
 
     protected async override Task OnInitializedAsync()
@@ -180,6 +193,7 @@
     private void addPackage(Package package){
         selectedPackages.Add(package);
     }
+
     private void removePackage(Package package)
     {
         selectedPackages.Remove(package);
