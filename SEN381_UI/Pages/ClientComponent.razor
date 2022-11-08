@@ -64,7 +64,7 @@
     private async Task<TableData<Client>> loadClients(TableState state)
     {
         ClientService cs = new ClientService();
-        await cs.LoadClient(state.PageSize,state.Page).ContinueWith((x)=> {
+        await cs.LoadClient(state.PageSize,state.Page+1).ContinueWith((x)=> {
             Elements = x.Result;
         });
         return new TableData<Client>() { Items = Elements, TotalItems = Elements.Count };

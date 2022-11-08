@@ -12,7 +12,7 @@
    <MudGrid >
 <MudItem xs="12" sm="6">
     <MudPaper Elevation="3" Outlined="true">
-                <MudTable Items="@Elements" Hover="true" Bordered="@bordered" Striped="@striped" Filter="new Func<Client,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" MultiSelection="false">
+    <MudTable Items="@Elements" Hover="true" Bordered="@bordered" Striped="@striped" Filter="new Func<Client,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" MultiSelection="false">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Clients Details</MudText>
         <MudSpacer />
@@ -157,7 +157,10 @@
         ClientService cs = new ClientService();
         await cs.LoadClient(1000,1).ContinueWith((x) =>
         {
+            
             Elements = x.Result;
+            Console.WriteLine(Elements.Count);
+            Console.WriteLine(  x.Result);
         });
 
 

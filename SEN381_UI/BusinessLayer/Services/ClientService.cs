@@ -14,7 +14,7 @@ namespace SEN381_UI.BusinessLayer.Services
             using var client = new HttpClient();
             Console.WriteLine(page);
             Console.WriteLine(size);
-            var result = await client.GetAsync($"https://localhost:7116/api/Client?page={page+1}&size={size}");
+            var result = await client.GetAsync($"https://localhost:7116/api/Client?page={page}&size={size}");
             var resp = await result.Content.ReadAsStringAsync();
             List<Client> clients = JsonConvert.DeserializeObject<List<Client>>(resp);
             return clients;
