@@ -26,9 +26,7 @@
                  <MudItem xs="6" sm="6">
                      <MudTextField T="string" Label="Policy Status" ReadOnly="true" @bind-status=status Text="@status"></MudTextField>
                  </MudItem>
-                 <MudItem xs="12" sm="6">
-                      <MudTextField T="string" Label="Place Of Treatment" @bind-status=placeOfTreatment Text="@placeOfTreatment"></MudTextField>
-                 </MudItem>
+                 
                 <MudItem xs="12" sm="6">
                     <MudDateRangePicker Label="Policy Availability Dates" @bind-DateRange="_dateRange"></MudDateRangePicker>
                 </MudItem>
@@ -107,10 +105,11 @@
     public string? id { get; set; }
 
     string status = "Active";
-    string placeOfTreatment = "St Georges";
 
 
-    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);//Used for date picker
+
+    //private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);//Used for date picker
+    private DateRange _dateRange = new DateRange();
 
 
 
