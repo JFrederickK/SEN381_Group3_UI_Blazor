@@ -33,43 +33,46 @@
                 <MudDateRangePicker Label="Policy Availability Dates" @bind-DateRange="_dateRange"></MudDateRangePicker>
             </MudItem>
 
-            @*Different Packages*@
-            <MudItem lg="12" sm="6">
-                <MudExpansionPanel class="h-25" Text="Policy Packages">
+             @*TreatmentsCoverages*@
+    <MudItem xs="6" sm="6">
+        <MudExpansionPanels class="accordion-body">
+            @foreach (Package package in packages)
+            {
+                string text = $"Package ID: {package.PackageID}";
+                
+                <MudGrid>
+                    <MudItem xs="9">
+                        <MudExpansionPanel Text="@text">
 
-                    <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
+                                    @foreach (PackageTreatmentCoverage ptc in package.TreatmentCoverages)
+                                    {
+                                        <MudCard class="mt-2 p-2">
+                                            <MudText Align="Align.Center"> Name: @ptc.Treatment.TreatmentName </MudText>
+                                            <MudText Align="Align.Center"> Description: @ptc.Coverage.CoverageDescription </MudText>
+                                        </MudCard>
+                                    }
+                                   
+                        </MudExpansionPanel>
 
-                        @*Loop through all packages*@
-                        @foreach (Package package in packages)
-                        {
-                            string text = $"Package ID:{@package.PackageID}";
-                            <MudGrid>
-                                <MudItem xs="9">
-                                    <MudExpansionPanel Text="@text">
+                    </MudItem>
 
-                                        @*loop through all PTC's in package object*@
-                                        @foreach (PackageTreatmentCoverage item in package.TreatmentCoverages)
-                                        {
+                    <MudItem xs="3">
+                        <MudText Align="Align.Center">
+                            @if (selectedPackages.Contains(package))
+                            {
+                                <MudButton OnClick="()=>removePackage(package)" Variant="Variant.Filled" Color="Color.Error">Remove</MudButton>
+                            }
+                            else
+                            {
+                                <MudButton OnClick="()=>addPackage(package)" Variant="Variant.Filled" Color="Color.Success">Add</MudButton>
+                            }
+                        </MudText>
+                    </MudItem>
+                </MudGrid>
 
-                                            <MudCard class="mt-2 p-2">
-                                                <MudText Align="Align.Center"> Treatment: @item.Treatment.TreatmentName </MudText>
-                                                <MudText Align="Align.Center"> Coverage Level: @item.Coverage.CoverageDescription </MudText>
-                                            </MudCard>
-
-                                        }
-
-                                    </MudExpansionPanel>
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudText Align="Align.Center">
-                                        <MudCheckBox @bind-Checked="@Basic_CheckBox1"></MudCheckBox>
-                                    </MudText>
-                                </MudItem>
-                            </MudGrid>
-                        }
-                    </MudExpansionPanels>
-                </MudExpansionPanel>
-            </MudItem>
+            }
+        </MudExpansionPanels>
+    </MudItem>
 
             <MudGrid Style="margin-top:auto">
                 <MudItem xs="12" sm="6">
@@ -90,13 +93,22 @@
     string policyName { get; set; }
     string policyStatus { get; set; }
 
-    List<Package> packages = new PackageMock().getPackages();//Replace with service
-                                                             //List<Client> clients = new ClientMock().GetClients();//Replace with service
+    List<Package> packages = new List<Package>();//Replace with service
+                                                 //List<Client> clients = new ClientMock().GetClients();//Replace with service
 
-
-    public bool Basic_CheckBox1 { get; set; } = true;
+    List<Package> selectedPackages = new List<Package>();
 
     private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);//Used for date picker
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        //get list of providers
+        await new PackageService().getPackages(1000, 1).ContinueWith((x)=>{
+            packages = x.Result;
+        });
+    }
+
 
     private void navigateBack(){
         UriHelper.NavigateTo("Policy");
@@ -134,6 +146,15 @@
     private void cancel()
     {
         UriHelper.NavigateTo("/Policy");
+    }
+
+
+    private void addPackage(Package package){
+        selectedPackages.Add(package);
+    }
+    private void removePackage(Package package)
+    {
+        selectedPackages.Remove(package);
     }
 }
 

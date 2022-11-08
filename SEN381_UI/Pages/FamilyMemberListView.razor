@@ -1,0 +1,125 @@
+﻿@page "/FamilyMembers/{clientID}"
+@inject NavigationManager UriHelper
+@inject IDialogService DialogService
+
+<h3>Family Members</h3>
+<MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" OnClick="backToClient">Back</MudIconButton>
+<MudTable ServerData="@(new Func<TableState, Task<TableData<FamilyMember>>>(LoadFamilyMembers))"
+          Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
+          Filter="new Func<FamilyMember,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort by"
+          T="FamilyMember"
+          OnRowClick="@GoToDetails">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Family Members</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Nr</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Surname</MudTh>
+        <MudTh>Address</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Phone</MudTh>
+        <MudTh>Role</MudTh>
+        <MudTh>Main Client ID</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.MemberId</MudTd>
+        <MudTd DataLabel="Name">@context.MemberName</MudTd>
+        <MudTd DataLabel="Surname">@context.MemberSurname</MudTd>
+        <MudTd DataLabel="Address">@context.Address</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+        <MudTd DataLabel="Phone">@context.PhoneNumber</MudTd>
+        <MudTd DataLabel="Role">@context.Role</MudTd>
+        <MudTd DataLabel="Main Client ID">@context.ClientID</MudTd>
+        <MudTd><MudTooltip Text="Delete Family Member"><MudIconButton OnClick="()=>deleteFamilyMember(context.MemberId)" Icon="@Icons.Filled.Delete" Color="Color.Error"></MudIconButton></MudTooltip></MudTd>
+
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="pageSizeOptions" />
+    </PagerContent>
+</MudTable>
+<MudItem Style="margin-top:2%">
+    <MudFab OnClick="@navigateToAdd" Color="Color.Success" StartIcon="@Icons.Material.Filled.Add"></MudFab>
+</MudItem>
+
+
+@code {
+
+    [Parameter]
+    public string? clientID { get; set; }
+
+    private int[] pageSizeOptions = new int[] { 5, 10, 15 };
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string searchString = "";
+    private FamilyMember selectedItem = null;
+    private HashSet<FamilyMember> selectedItems = new HashSet<FamilyMember>();
+
+    private List<FamilyMember> Elements = new List<FamilyMember>();
+
+    private async Task<TableData<FamilyMember>> LoadFamilyMembers(TableState state)
+    {
+        await new FamilyMemberService().LoadFamilyMembers(clientID).ContinueWith((x) =>
+        {
+            Elements = x.Result;
+        });
+        return new TableData<FamilyMember>() { Items = Elements, TotalItems = Elements.Count };
+    }
+
+    private bool FilterFunc(FamilyMember element) => FilterFunc(element, searchString);
+
+    private bool FilterFunc(FamilyMember element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.MemberId.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.MemberName} {element.MemberSurname} {element.Address} {element.Email} {element.PhoneNumber} {element.ClientID}".Contains(searchString))
+            return true;
+        return false;
+    }
+    private void GoToDetails(TableRowClickEventArgs<FamilyMember> p)
+    {
+        UriHelper.NavigateTo($"/FamilyMember/{p.Item.ClientID}/{p.Item.MemberId}");
+    }
+
+    private async Task showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialog");
+        await InvokeAsync(async () =>
+        {
+            await DialogService.Show<Dialogue>("Delete Family Member", paramaters, options).Result;
+
+        });
+    }
+
+    private async void deleteFamilyMember(string id)
+    {
+        await new FamilyMemberService().deleteFamilymember(id).ContinueWith(async (x) =>
+        {
+            string message = x.Result != null ? "Family Member Deleted Succesfully" : "Something went wrong!";
+            await showDialog(message);
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+            UriHelper.NavigateTo($"/FamilyMembers/{clientID}", true);
+        });
+    }
+
+    private void navigateToAdd(){
+        UriHelper.NavigateTo($"/FamilyMemberAddView/{clientID}");
+    }
+
+    private void backToClient()
+    {
+        UriHelper.NavigateTo($"/Client/{clientID}");
+    }
+}
