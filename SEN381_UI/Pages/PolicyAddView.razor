@@ -1,6 +1,4 @@
 ﻿@page "/PolicyAdd"
-@using SEN381_UI.Data
-@using SEN381_UI.Shared.MockData
 @inject NavigationManager UriHelper
 @inject IDialogService DialogService
 
@@ -24,10 +22,6 @@
             <MudItem xs="12" sm="6">
                 <MudTextField T="string" Label="Policy Name" @bind-Value=@policyName Text="@policyName"></MudTextField>
             </MudItem>
-            
-            <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Policy Status" @bind-Value=@policyStatus Text="@policyStatus"></MudTextField>
-            </MudItem>
 
             <MudItem xs="12" sm="6">
                 <MudDateRangePicker Label="Policy Availability Dates" @bind-DateRange="_dateRange"></MudDateRangePicker>
@@ -47,8 +41,8 @@
                                     @foreach (PackageTreatmentCoverage ptc in package.TreatmentCoverages)
                                     {
                                         <MudCard class="mt-2 p-2">
-                                            <MudText Align="Align.Center"> Name: @ptc.Treatment.TreatmentName </MudText>
-                                            <MudText Align="Align.Center"> Description: @ptc.Coverage.CoverageDescription </MudText>
+                                            <MudText Align="Align.Center"> Treatment Name: @ptc.Treatment.TreatmentName </MudText>
+                                            <MudText Align="Align.Center"> Coverage Description: @ptc.Coverage.CoverageDescription </MudText>
                                         </MudCard>
                                     }
                                    
@@ -91,7 +85,6 @@
 @code {
     string policyId { get; set; } = "";
     string policyName { get; set; }
-    string policyStatus { get; set; }
 
     List<Package> packages = new List<Package>();//Replace with service
                                                  //List<Client> clients = new ClientMock().GetClients();//Replace with service
@@ -117,7 +110,7 @@
 
     private async void addPolicy()
     {
-        Policy newpolicy = new Policy(policyId, policyName, policyStatus, _dateRange.Start, _dateRange.End, packages);
+        Policy newpolicy = new Policy(policyId, policyName, "", _dateRange.Start, _dateRange.End, packages);
 
         PolicyService policyService = new PolicyService();
 
@@ -126,14 +119,20 @@
             string message = "";
             message = x.Result != null ? "Policy is successfully created" : "Policy could not be created";
             showDialog(message);
+
         });
     }
+
+
+
     private async void showDialog(string message)
     {
         DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
         DialogParameters paramaters = new DialogParameters();
         paramaters.Add("ContentText", message);
         paramaters.Add("ButtonText", "Close Dialogue");
+
+
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Client", paramaters, options).Result;
@@ -143,6 +142,9 @@
             }
         });
     }
+
+
+
     private void cancel()
     {
         UriHelper.NavigateTo("/Policy");
