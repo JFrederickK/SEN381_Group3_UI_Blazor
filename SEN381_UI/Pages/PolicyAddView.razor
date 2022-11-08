@@ -38,12 +38,16 @@
                 <MudExpansionPanel class="h-25" Text="Policy Packages">
 
                     <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
+
+                        @*Loop through all packages*@
                         @foreach (Package package in packages)
                         {
                             string text = $"Package ID:{@package.PackageID}";
                             <MudGrid>
                                 <MudItem xs="9">
                                     <MudExpansionPanel Text="@text">
+
+                                        @*loop through all PTC's in package object*@
                                         @foreach (PackageTreatmentCoverage item in package.TreatmentCoverages)
                                         {
 
