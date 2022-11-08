@@ -145,13 +145,13 @@
     }
 
 
-    private async void updatePolicy()
+    private void updatePolicy()
     {
         Policy newpolicy = new Policy(id, policyName, status, _dateRange.Start, _dateRange.End, packages);
 
         PolicyService policyService = new PolicyService();
 
-        await policyService.updatePolicy(newpolicy).ContinueWith((x)=> {
+        policyService.updatePolicy(newpolicy).ContinueWith((x)=> {
 
             string message = "";
             message = x.Result != null ? "Policy is successfully created" : "Policy could not be created";
@@ -191,6 +191,7 @@
     private void addPackage(Package package){
         selectedPackages.Add(package);
     }
+
     private void removePackage(Package package)
     {
         selectedPackages.Remove(package);
