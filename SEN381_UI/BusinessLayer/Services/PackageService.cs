@@ -8,7 +8,7 @@ namespace SEN381_UI.BusinessLayer.Services
         public async Task<List<Package>> getPackages(int size, int page)
         {
             HttpClient client = new HttpClient();
-            string url = $"https://localhost:7116/api/Package?page={page+1}&size={size}";
+            string url = $"https://localhost:7116/api/Package?page={page}&size={size}";
             HttpResponseMessage response = await client.GetAsync(url);
             List<Package> packages = JsonConvert.DeserializeObject<List<Package>>(await response.Content.ReadAsStringAsync());
             if (packages != null)
