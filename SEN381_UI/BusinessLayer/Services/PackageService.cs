@@ -20,7 +20,10 @@ namespace SEN381_UI.BusinessLayer.Services
 
         public async Task<Package> addPackage(Package package)
         {
-            Console.WriteLine("Start Request");
+            Console.WriteLine(package.PackageID);
+            Console.WriteLine(package.PackageEndDate);
+            Console.WriteLine(package.PackageStartDate);
+            Console.WriteLine(package.TreatmentCoverages.Count);
             HttpClient client = new HttpClient();
             string url = $"https://localhost:7116/api/Package";
             HttpResponseMessage response = await client.PostAsJsonAsync<Package>(url, package);
