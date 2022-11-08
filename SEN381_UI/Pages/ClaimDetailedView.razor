@@ -14,9 +14,6 @@
             <MudTextField T="string" Label="Client" ReadOnly="true" Text="@clientName"></MudTextField>
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Medical condition" @bind-Value=@medicalCondition Text="@medicalCondition"></MudTextField>
-        </MudItem>
-        <MudItem xs="12" sm="6">
             <MudAutocomplete T="string" Label="Place of treatment" @bind-Value=@placeOfTreatment Text="@placeOfTreatment" SearchFunc="@PlaceOfTreatment" Margin="Margin.Dense" Dense="true" />
         </MudItem> 
         <MudItem xs="12" sm="6">
@@ -25,6 +22,43 @@
         <MudItem xs="12" sm="6">
             <MudTextField T="string" Label="Claime Status" @bind-Value=@claimeStatus Text="@claimeStatus"></MudTextField>
         </MudItem>
+        @*Medical Condition*@
+@*        <MudItem lg="12">
+
+            <MudExpansionPanel class="h-25" Text="Medical condition">
+
+                <MudExpansionPanels style="max-height:400px; overflow: auto;" class="accordion-body">
+                    @foreach (MedicalCondition medical in MedicalProviderElements)
+                    {
+                        string text = $"Provider ID: {@medical.MedicalServiceProvidor.PolicyProviderID}";
+                        medical.ProviderStatus = selectedProvidersTreatment.Where(x => x.MedicalServiceProvidor.PolicyProviderID.Equals(provider.MedicalServiceProvidor.PolicyProviderID)).ToList().Count == 0 ? provider.ProviderStatus : selectedProvidersTreatment.Where(x => x.MedicalServiceProvidor.PolicyProviderID.Equals(provider.MedicalServiceProvidor.PolicyProviderID)).ToList()[0].ProviderStatus;
+                        <MudExpansionPanel Text="@text">
+                            <MudText> Provider Name: @medical.MedicalServiceProvidor.PolicyProviderName </MudText>
+                            <MudText> Provider Address: @medical.MedicalServiceProvidor.PolicyProviderAddresses </MudText>
+                            <MudText> Provider Phone: @medical.MedicalServiceProvidor.PolicProviderPhone </MudText>
+                            <MudText Align="Align.Center">
+                                <MudSelect @bind-Value="medical.ProviderStatus" T="string" Label="Status" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                    @foreach (string status in @statusses)
+                                    {
+                                        <MudSelectItem T="string" Value="status"></MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudText>
+                        </MudExpansionPanel>
+                        <MudText Align="Align.Center">
+                            @if (selectedProvidersTreatment.Where(x => x.MedicalServiceProvidor.PolicyProviderID.Equals(provider.MedicalServiceProvidor.PolicyProviderID)).ToList().Count != 0)
+                            {
+                                <MudButton OnClick="()=>removeProvider(provider)" Color="Color.Error">Remove</MudButton>
+                            }
+                            else
+                            {
+                                <MudButton OnClick="()=>addProvider(provider)" Color="Color.Success">Add</MudButton>
+                            }
+                        </MudText>
+                    }
+                </MudExpansionPanels>
+            </MudExpansionPanel>
+        </MudItem>*@
     </MudGrid>
 
                 <MudGrid Style="margin-top:auto">
