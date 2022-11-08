@@ -70,9 +70,6 @@ namespace SEN381_UI.BusinessLayer.Services
 
             Console.WriteLine(policy);
             return policy;
-
         }
-
-
     }
 }
