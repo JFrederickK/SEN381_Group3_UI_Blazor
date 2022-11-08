@@ -1,8 +1,5 @@
 ﻿@page "/ClientAddView"
 @using System.ComponentModel.DataAnnotations 
-@using SEN381_UI.Data
-@using SEN381_UI.Shared.MockData
-@using SEN381_UI.BusinessLayer
 @inject NavigationManager UriHelper
 @inject IDialogService DialogService
 
@@ -113,10 +110,19 @@
     private string status { get; set; }
     private string notes { get; set; }
 
+    public List<Policy> policies = new List<Policy>();
 
-    public bool Basic_CheckBox1 = true;
+    protected async override Task OnInitializedAsync(){
+        await LoadPolicies();
+    }
 
-    public List<Policy> policies = new PolicyMock().getMockPolicies();
+    private async Task LoadPolicies()
+    {
+        await new PolicyService().getPolicies(1000, 1).ContinueWith((x) =>
+        {
+            if (x.Result != null) policies = x.Result;
+        });
+    }
 
     private async void saveClint()
     {
