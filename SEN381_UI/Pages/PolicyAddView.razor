@@ -105,7 +105,7 @@
 
     private async void addPolicy()
     {
-        Policy newpolicy = new Policy(policyId, policyName, policyStatus, _dateRange, packages);
+        Policy newpolicy = new Policy(policyId, policyName, policyStatus, _dateRange.Start, _dateRange.End, packages);
 
         PolicyService policyService = new PolicyService();
 
