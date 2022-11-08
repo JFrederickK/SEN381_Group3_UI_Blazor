@@ -3,7 +3,7 @@
 @inject NavigationManager UriHelper
 @inject IDialogService DialogService
 <h1>Login</h1>
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+<EditForm Model="@model">
     <DataAnnotationsValidator />
     <MudGrid>
         <MudItem xs="12" sm="12">
@@ -53,34 +53,19 @@
     [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
     public string Password { get; set; }
 
-    public void Validate() {
+    public async void Validate() {
         model.EmployeeName = Username;
         model.EmployeeEmail = Email;
         model.EmployeePassword = Password;
-        foreach (EmployeeDetails item in checkDetail)
-        {
-            if (item.GetHashCode().Equals(model.GetHashCode()))
-            {
-                showDialog("Welcome back");
-                break;
-            }
-            else{
-                showDialog("Sorry. The details give does not match. Please try again");
-            }
-        }
-    }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadEmployees();
-    }
-    private async Task LoadEmployees()
-    {
-        LoginService cs = new LoginService();
-        await cs.LoadLogin().ContinueWith((x) =>
-        {
-            checkDetail = x.Result;
+        await new LoginService().getLoginByEmail(model.EmployeeName, model.EmployeeEmail, model.EmployeePassword).ContinueWith((x) =>
+        { 
+            string message = "";
+            message = x.Result != false ? "Welcom back" : "Sorry the give data does not match";
+            showDialog(message);
+        
         });
+
     }
     private async void showDialog(string message)
     {
@@ -93,14 +78,9 @@
             var result = await DialogService.Show<Dialogue>("Employee", paramaters, options).Result;
             if (message != "Employee could could not be created")
             {
-                UriHelper.NavigateTo("/");
+                UriHelper.NavigateTo("/Client");
             }
         });
-    }
-
-    private void OnValidSubmit(EditContext context)
-    {
-        StateHasChanged(); 
     }
 
 

@@ -5,23 +5,23 @@ namespace SEN381_UI.BusinessLayer.Services
 {
     public class LoginService
     {
-        public async Task<List<EmployeeDetails>> LoadLogin()
+        public async Task<bool> LoadLogin()
         {
             using var medical = new HttpClient();
 
             var result = await medical.GetAsync("https://localhost:7116/api/LoginReg");
             var resp = await result.Content.ReadAsStringAsync();
-            List<EmployeeDetails> contributors = JsonConvert.DeserializeObject<List<EmployeeDetails>>(resp);
+            bool contributors = JsonConvert.DeserializeObject<bool>(resp);
             return contributors;
 
         }
-        public async Task<EmployeeDetails> getLoginByEmail(string id)
+        public async Task<bool> getLoginByEmail()
         {
             Console.WriteLine("Start Request");
             HttpClient medical = new HttpClient();
-            string url = $"https://localhost:7116/api/LoginReg/{id}";
+            string url = $"https://localhost:7116/api/LoginReg/{employee}";
             HttpResponseMessage response = await medical.GetAsync(url);
-            EmployeeDetails newmedical = JsonConvert.DeserializeObject<EmployeeDetails>(await response.Content.ReadAsStringAsync());
+            bool newmedical = JsonConvert.DeserializeObject<bool>(await response.Content.ReadAsStringAsync());
             return newmedical;
         }
        public async Task<EmployeeDetails> updateMedical(EmployeeDetails cov)
