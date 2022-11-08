@@ -146,7 +146,7 @@
 
     private void updatePolicy()
     {
-        Policy newpolicy = new Policy(id, policyName, status, _dateRange.Start, _dateRange.End, packages);
+        Policy newpolicy = new Policy(id, policyName, status, _dateRange.Start, _dateRange.End, selectedPackages);
 
         PolicyService policyService = new PolicyService();
 
