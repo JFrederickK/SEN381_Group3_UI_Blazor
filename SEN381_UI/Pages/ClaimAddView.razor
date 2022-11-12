@@ -242,10 +242,6 @@
         {
             selectedItemIDs.Add(item.MedicalConditionID);
         }
-        Console.WriteLine(selectedItem.ClientID);
-
-        Console.WriteLine(TimerStart);
-        Console.WriteLine(TimerStoped);
         
         AddClaim newClaim = new AddClaim(1, selectedItem.ClientID, selectedItemIDs, value, 1, "Approved",TimerStart, TimerStoped );
         await new ClaimService().postClaimDetails(newClaim).ContinueWith((x) =>
