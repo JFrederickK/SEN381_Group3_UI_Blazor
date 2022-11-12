@@ -1,6 +1,7 @@
 ﻿@page "/PolicyAdd"
 @inject NavigationManager UriHelper
 @inject IDialogService DialogService
+@using System.Text.RegularExpressions;
 
 <MudCard style="max-height:1000px; overflow: auto;">
 
@@ -114,7 +115,8 @@
         {
             showDialog("Please provide a name for the policy");
         }
-        else { 
+        else if (StringOnly(policyName))
+        {
             Policy newpolicy = new Policy(policyId, policyName, "", _dateRange.Start, _dateRange.End, selectedPackages);
 
             PolicyService policyService = new PolicyService();
@@ -128,6 +130,10 @@
 
             });
         }
+        else { 
+            showDialog("Please provide a name for the policy that contains only letter");
+        }
+
 
     }
 
@@ -165,6 +171,13 @@
     private void removePackage(Package package)
     {
         selectedPackages.Remove(package);
+    }
+    public bool StringOnly(string word)
+    {
+        var Inputletters = @"^[a-zA-Z]{2,}$";
+        bool val = Regex.IsMatch(word, Inputletters);
+
+        return val;
     }
 }
 
