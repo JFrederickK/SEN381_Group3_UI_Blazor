@@ -42,7 +42,7 @@
     List<EmployeeDetails> checkDetail = new List<EmployeeDetails>();
 
     [Required]
-    [StringLength(20, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
+    [StringLength(20, ErrorMessage = "Username must be at least 8 characters long.", MinimumLength = 8)]
     public string Username { get; set; }
 
     [Required]
@@ -58,12 +58,11 @@
         model.EmployeeEmail = Email;
         model.EmployeePassword = Password;
 
-        await new LoginService().getLoginByEmail(model.EmployeeName, model.EmployeeEmail, model.EmployeePassword).ContinueWith((x) =>
+        await new LoginService().getLoginByEmail(model.EmployeeEmail, model.EmployeePassword, model.EmployeeName).ContinueWith((x) =>
         { 
             string message = "";
-            message = x.Result != false ? "Welcom back" : "Sorry the give data does not match";
+            message = (x!=null && !x.IsFaulted && x.Result != null) ? "Welcome back" : "Information was incorrect";
             showDialog(message);
-        
         });
 
     }
@@ -76,9 +75,9 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Employee", paramaters, options).Result;
-            if (message != "Employee could could not be created")
+            if (message != "Information was incorrect")
             {
-                UriHelper.NavigateTo("/Client");
+                UriHelper.NavigateTo("/Client",true);
             }
         });
     }

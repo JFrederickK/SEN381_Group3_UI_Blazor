@@ -23,7 +23,7 @@ align-text: center" ;>
                                   @bind-Value="Password" For="@(() => model.EmployeePassword)" InputType="InputType.Password" />
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@saveMedical">Register</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@saveEmployee">Register</MudButton>
                     <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Secondary" Class="ml-auto" Href="/">
                         <NavLink href="/">Login</NavLink>
                     </MudButton>
@@ -57,15 +57,12 @@ align-text: center" ;>
     public string Password { get; set; }
 
 
-    private async void saveMedical()
+    private async void saveEmployee()
     {
         EmployeeDetails model = new EmployeeDetails();
         model.EmployeeName = Username;
         model.EmployeeEmail = Email;
         model.EmployeePassword = Password;
-
-        Console.WriteLine(model.EmployeePassword);
-        Console.WriteLine(model.EmployeeEmail);
 
         await new LoginService().postEmployee(model).ContinueWith((x) =>
         {
