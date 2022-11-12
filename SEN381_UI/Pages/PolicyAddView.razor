@@ -110,17 +110,25 @@
 
     private void addPolicy()
     {
-        Policy newpolicy = new Policy(policyId, policyName, "", _dateRange.Start, _dateRange.End, selectedPackages);
+        if (policyName == null)
+        {
+            showDialog("Please provide a name for the policy");
+        }
+        else { 
+            Policy newpolicy = new Policy(policyId, policyName, "", _dateRange.Start, _dateRange.End, selectedPackages);
 
-        PolicyService policyService = new PolicyService();
+            PolicyService policyService = new PolicyService();
 
-        policyService.addPolicy(newpolicy).ContinueWith((x)=> {
+            policyService.addPolicy(newpolicy).ContinueWith((x) =>
+            {
 
-            string message = "";
-            message = x.Result != null ? "Policy is successfully created" : "Policy could not be created";
-            showDialog(message);
+                string message = "";
+                message = x.Result != null ? "Policy is successfully created" : "Policy could not be created";
+                showDialog(message);
 
-        });
+            });
+        }
+
     }
 
 
@@ -136,7 +144,7 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Policy", paramaters, options).Result;
-            if (message != "Policy could not be created")
+            if (message != "Policy could not be created" && message != "Please provide a name for the policy")
             {
                 UriHelper.NavigateTo("/Policy");
             }
