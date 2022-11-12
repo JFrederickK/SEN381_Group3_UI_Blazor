@@ -7,27 +7,28 @@
 <h3>Create Family Member</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" OnClick="cancel">Back</MudIconButton>
 <EditForm Model="@postdata" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
     <MudGrid>
         <MudItem xs="6" sm="6">
-            <MudTextField T="string" Label="Name" @bind-Value=@name></MudTextField>
+            <MudTextField T="string" Label="Name" @bind-Value=postdata.MemberName For="@(()=> postdata.MemberName)" Immediate="true"></MudTextField>
         </MudItem>
         <MudItem xs="6" sm="6">
-            <MudTextField T="string" Label="Surname" @bind-Value=@surname></MudTextField>
+            <MudTextField T="string" Label="Surname" @bind-Value=postdata.MemberSurname For="@(()=> postdata.MemberSurname)" Immediate="true"></MudTextField>
         </MudItem>
 
         <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Address" @bind-Value=@address></MudTextField>
+            <MudTextField T="string" Label="Address" @bind-Value=postdata.Address For="@(()=> postdata.Address)" Immediate="true"></MudTextField>
         </MudItem>
 
         <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Email" @bind-Value=@email Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})"></MudTextField>
+            <MudTextField T="string" Label="Email" @bind-Value=postdata.Email For="@(()=> postdata.Email)" Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" Immediate="true"></MudTextField>
         </MudItem>
         <MudItem xs="6" sm="6">
-            <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value=@phonenumber></MudTextField>
+            <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value=postdata.PhoneNumber For="@(()=> postdata.PhoneNumber)" Immediate="true"></MudTextField>
         </MudItem>
 
         <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Role" @bind-Value=@role></MudTextField>
+            <MudTextField T="string" Label="Role" @bind-Value=postdata.Role For="@(()=> postdata.Role)" Immediate="true"></MudTextField>
         </MudItem>
 
     </MudGrid>
@@ -38,7 +39,7 @@
             <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" OnClick="@cancel">Cancel Changes</MudButton>
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@saveFamilyMember" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
         </MudItem>
     </MudGrid>
 </EditForm>
@@ -58,10 +59,13 @@
     private string phonenumber { get; set; }
     private string role { get; set; }
 
+    bool success;
+
+
     private async void saveFamilyMember()
     {
 
-        FamilyMember newFam = new FamilyMember(id, name, surname, phonenumber, email, address,role,clientID);
+        FamilyMember newFam = new FamilyMember(id, postdata.MemberName, postdata.MemberSurname, postdata.PhoneNumber, postdata.Email, postdata.Address,postdata.Role,clientID);
         await new FamilyMemberService().postFamilyMember(newFam).ContinueWith((x) =>
         {
             string message = "";
@@ -72,6 +76,11 @@
 
     private void OnValidSubmit(EditContext context)
     {
+        success = true;
+        if (success)
+        {
+            saveFamilyMember();
+        }
         StateHasChanged();
     }
     private void cancel()

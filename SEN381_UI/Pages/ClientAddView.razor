@@ -7,31 +7,32 @@
 <h3>Client Add View</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Client">Back</MudIconButton>
 <EditForm Model="@postdata" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
     <MudGrid>
     <MudItem xs="6" sm="6">
-            <MudTextField T="string" Label="Name" @bind-Value=@name></MudTextField>
+            <MudTextField T="string" Label="Name" @bind-Value=postdata.ClientName  Immediate="true" For="@(()=> postdata.ClientName)"></MudTextField>
     </MudItem>
     <MudItem xs="6" sm="6">
-            <MudTextField T="string" Label="Surname" @bind-Value=@surname></MudTextField>
+            <MudTextField T="string" Label="Surname" @bind-Value=postdata.ClientSurname Immediate="true"  For="@(()=> postdata.ClientSurname)"></MudTextField>
     </MudItem> 
 
     <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Address" @bind-Value=@address></MudTextField>
+            <MudTextField T="string" Label="Address" @bind-Value=postdata.ClientAddress For="@(()=> postdata.ClientAddress)"></MudTextField>
     </MudItem>
 
     <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Email" @bind-Value=@email Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})"></MudTextField>
+            <MudTextField T="string" Label="Email" @bind-Value=postdata.ClientEmail For="@(()=> postdata.ClientEmail)" Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})"></MudTextField>
     </MudItem>
     <MudItem xs="6" sm="6">
-            <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value=@phonenumber></MudTextField>
+            <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value=postdata.ClientPhoneNumber For="@(()=> postdata.ClientPhoneNumber)"></MudTextField>
     </MudItem>
 
     <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Status" @bind-Value=@status></MudTextField>
+            <MudTextField T="string" Label="Status" @bind-Value=postdata.ClientStatus For="@(()=> postdata.ClientStatus)"></MudTextField>
     </MudItem>
 
     <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Notes" @bind-Value=@notes></MudTextField>
+            <MudTextField T="string" Label="Notes" @bind-Value=postdata.ClientAdHocNotes> For="@(() => postdata.ClientAdHocNotes)"</MudTextField>
     </MudItem>
 
 </MudGrid>
@@ -90,27 +91,34 @@
             <MudButton Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" OnClick="@cancel">Cancel Changes</MudButton>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" OnClick="@saveClint" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" ButtonType="ButtonType.Submit" Class="ml-auto">Save Changes</MudButton>
     </MudItem>
 </MudGrid>
 </EditForm>
 
 
 @code {
-    private Client postdata = new Client();
+    private Client postdata = new();
     private string id = "";
+
     private string name { get; set; }
     private string surname { get; set; }
     private string address { get; set; }
 
+
     private string email { get; set; }
     private string phonenumber { get; set; }
+
     private ClientPolicy? clientPolicy { get; set; }
+
     private Policy? selectedPolicy;
+
     private string status { get; set; }
+
     private string notes { get; set; }
 
     public List<Policy> policies = new List<Policy>();
+    bool success;
 
     protected async override Task OnInitializedAsync(){
         await LoadPolicies();
@@ -129,7 +137,7 @@
         if (selectedPolicy == null) clientPolicy = new ClientPolicy(null,null,null);
         else clientPolicy = new ClientPolicy(selectedPolicy.PolicyId, selectedPolicy.PolicyName, selectedPolicy.PolicyStatus);
 
-        Client newClient = new Client(id, name, surname, address, email, phonenumber, clientPolicy, status, notes);
+        Client newClient = new Client(id, postdata.ClientName, postdata.ClientSurname, postdata.ClientAddress, postdata.ClientEmail, postdata.ClientPhoneNumber, clientPolicy, postdata.ClientStatus, postdata.ClientAdHocNotes);
         await new ClientService().postClientDetails(newClient).ContinueWith((x) =>
         {
             string message = "";
@@ -140,6 +148,11 @@
 
     private void OnValidSubmit(EditContext context)
     {
+        success = true;
+        if (success)
+        {
+            saveClint();  
+        }
         StateHasChanged();
     }
     private void cancel()
@@ -173,5 +186,11 @@
         if (selectedPolicy != null) policies.Add(selectedPolicy);
         policies.Remove(pol);
         selectedPolicy = pol;
+    }
+    private IEnumerable<string> MaxCharacters(string ch)
+    {
+        
+        if (!string.IsNullOrEmpty(ch) && 25 < ch?.Length && ch.All(Char.IsLetter))
+            yield return "Max 25 characters, Or make sure that is is only letters";
     }
 }

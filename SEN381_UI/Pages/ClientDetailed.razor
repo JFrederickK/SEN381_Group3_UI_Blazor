@@ -22,33 +22,30 @@
                 </MudItem>
 
                 <MudItem xs="6" sm="6">
-                    <MudTextField T="string" Label="Client Name" @bind-Value=@name Text="@name"></MudTextField>
+                    <MudTextField T="string" Label="Client Name" @bind-Value=@name Text="@name" HelperText="@Val_string" Style="@nameColour"></MudTextField>
                 </MudItem>
 
                 <MudItem xs="6" sm="6">
-                    <MudTextField T="string" Label="Client Surname" @bind-Value=@surname Text="@surname"></MudTextField>
+                    <MudTextField T="string" Label="Client Surname" @bind-Value=@surname Text="@surname" HelperText="@Val_Surstring" Style="@surnameColour"></MudTextField>
                 </MudItem>
                 <MudItem xs="6" sm="6">
-                    <MudTextField T="string" Label="Client Address" @bind-Value=@address Text="@address"></MudTextField>
-                </MudItem>
-
-                <MudItem xs="6" sm="6">
-                    <MudTextField T="string" Label="Client Email" @bind-Value=@email Text="@email"></MudTextField>
+                    <MudTextField T="string" Label="Client Address" @bind-Value=@address Text="@address" HelperText="@Val_Address" Style="@AddressColour"></MudTextField>
                 </MudItem>
 
                 <MudItem xs="6" sm="6">
-                    <MudTextField T="string" Label="Client Phone number" @bind-Value=@phonenumber Text="@phonenumber"></MudTextField>
-                </MudItem>
-                @*<MudItem xs="6" sm="6">
-                    <MudTextField T="string" Label="Client Polisies" @bind-Value=@clientpolicies Text="@clientpolicies"></MudTextField>
-                </MudItem>*@
-
-                <MudItem xs="6" sm="6">
-                    <MudTextField T="string" Label="Client status" @bind-Value=@status Text="@status"></MudTextField>
+                    <MudTextField T="string" Label="Client Email" @bind-Value=@email Text="@email" HelperText="@Val_Email" Style="@EmailColour"></MudTextField>
                 </MudItem>
 
                 <MudItem xs="6" sm="6">
-                    <MudTextField T="string" Label="Client Notes" @bind-Value=@notes Text="@notes"></MudTextField>
+                    <MudTextField T="string" Label="Client Phone number" @bind-Value=@phonenumber Text="@phonenumber" ></MudTextField>
+                </MudItem>
+
+                <MudItem xs="6" sm="6">
+                    <MudTextField T="string" Label="Client status" @bind-Value=@status Text="@status" HelperText="@Val_Status_string" Style="@StatusColour"></MudTextField>
+                </MudItem>
+
+                <MudItem xs="6" sm="6">
+                    <MudTextField T="string" Label="Client Notes" @bind-Value=@notes Text="@notes" HelperText="@Val_Notes_string" Style="@NotesColour"></MudTextField>
                 </MudItem>
 
                 @*Treatment Details *@
@@ -119,6 +116,20 @@
 
 
 @code {
+    private string nameColour = "";
+    private string Val_string = "";
+    private string surnameColour = "";
+    private string Val_Surstring = "";
+    private string PhoneColour = "";
+    private string Val_Phone = "";
+    private string AddressColour = "";
+    private string Val_Address = "";
+    private string EmailColour = "";
+    private string Val_Email = "";
+    private string StatusColour = "";
+    private string Val_Status_string = "";
+    private string NotesColour = "";
+    private string Val_Notes_string = "";
     private Client clientDetails = new Client();
     private Client newDetails = new Client();
 
@@ -183,20 +194,23 @@
 
     private async void updateClient()
     {
-        if (selectedPolicy != null) clientPolicy = new ClientPolicy(selectedPolicy.PolicyId, selectedPolicy.PolicyName, selectedPolicy.PolicyStatus);
-        else clientPolicy = new ClientPolicy(null,null,null);
-        Client newClient = new Client(id, name, surname, address, email, phonenumber,clientPolicy , status, notes);
-        if (!newClient.Equals(originalClient))
-        {
-            await new ClientService().updateClient(newClient).ContinueWith((x) =>
-            {
-                string message = "";
-                message = x.Result != null ? "Client successfully updated" : "Client could not be updated";
-                showDialog(message);
-            });
-        }
-        else showDialog("No changes to apply.");
+        if (ValidateName(name) && ValidateSurname(surname) && ValidateAddress(address) && ValidatePhonenumber(phonenumber)&& ValidateStats(status) && ValidateNotes(notes))
 
+        {
+            if (selectedPolicy != null) clientPolicy = new ClientPolicy(selectedPolicy.PolicyId, selectedPolicy.PolicyName, selectedPolicy.PolicyStatus);
+            else clientPolicy = new ClientPolicy(null, null, null);
+            Client newClient = new Client(id, name, surname, address, email, phonenumber, clientPolicy, status, notes);
+            if (!newClient.Equals(originalClient))
+            {
+                await new ClientService().updateClient(newClient).ContinueWith((x) =>
+                {
+                    string message = "";
+                    message = x.Result != null ? "Client successfully updated" : "Client could not be updated";
+                    showDialog(message);
+                });
+            }
+            else showDialog("No changes to apply.");
+        }
 
     }
     private void cancel()
@@ -241,6 +255,126 @@
 
     private void navigateToFamilyMembers(){
         UriHelper.NavigateTo($"/FamilyMembers/{id}");
+    }
+    public bool ValidateName(string name)
+    {
+        Validation validation = new Validation();
+
+        if (validation.StringOnly(name) == false)
+        {
+            nameColour = "color:red";
+            Val_string = "The Name contains invalid characters.";
+            return false;
+        }
+        else
+        {
+            nameColour = "color:black";
+            Val_string = "";
+            return true;
+        }
+    }
+    public bool ValidateSurname(string name)
+    {
+        Validation validation = new Validation();
+
+        if (validation.StringOnly(name) == false)
+        {
+            surnameColour = "color:red";
+            Val_Surstring = " Surename contains invalid characters.";
+            return false;
+        }
+        else
+        {
+            surnameColour = "color:black";
+            Val_Surstring = "";
+            return true;
+        }
+    }
+
+    public bool ValidatePhonenumber(string phone)
+    {
+        Validation validation = new Validation();
+
+        if (validation.numberOnlu(phone) == false)
+        {
+            PhoneColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Phone = "Invalid phone number.";
+            return false;
+        }
+        else
+        {
+            PhoneColour = "color:black";
+            Val_Phone = "";
+            return true;
+        }
+    }
+    public bool ValidateAddress(string address)
+    {
+        Validation validation = new Validation();
+
+        if (validation.AddressFormat(address) == false)
+        {
+            AddressColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Address = "Wrong address format.";
+            return false;
+        }
+        else
+        {
+            AddressColour = "color:black";
+            Val_Address = "";
+            return true;
+        }
+    }
+    public bool ValidateEmail(string email)
+    {
+        Validation validation = new Validation();
+
+        if (validation.EmailFormat(email) == false)
+        {
+            AddressColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Address = "Wrong email format.";
+            return false;
+        }
+        else
+        {
+            AddressColour = "color:black";
+            Val_Address = "";
+            return true;
+        }
+    }
+    public bool ValidateStats(string name)
+    {
+        Validation validation = new Validation();
+
+        if (validation.StringOnly(name) == false)
+        {
+            StatusColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Status_string = "Status contains invalid characters.";
+            return false;
+        }
+        else
+        {
+            StatusColour = "color:black";
+            Val_Status_string = "";
+            return true;
+        }
+    }
+        public bool ValidateNotes(string name)
+    {
+        Validation validation = new Validation();
+
+        if (validation.StringOnly(name) == false)
+        {
+            NotesColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Notes_string = "Status contains invalid characters.";
+            return false;
+        }
+        else
+        {
+            NotesColour = "color:black";
+            Val_Notes_string = "";
+            return true;
+        }
     }
 
 }

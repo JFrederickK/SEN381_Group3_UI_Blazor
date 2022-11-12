@@ -13,35 +13,33 @@
                     <MudIconButton OnClick="navigateToFamilyMembers" Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%">Back</MudIconButton>
                 </CardHeaderAvatar>
             </MudCardHeader>
-            <MudForm Class="p-5">
+        <MudForm Class="p-5">
                 <MudGrid>
 
                 @*Medical Condition Basic Details*@
                     <MudItem xs="6" sm="6">
-                        <MudTextField T="string" Label="Family Member ID" ReadOnly="true" Text="@memberID"></MudTextField>
+                    <MudTextField T="string" Label="Family Member ID" ReadOnly="true" Text="@memberID" > </MudTextField>
                     </MudItem>
 
                     <MudItem xs="6" sm="6">
-                        <MudTextField T="string" Label="Family Member Name" @bind-Value=@name Text="@name"></MudTextField>
+                    <MudTextField T="string" Label="Family Member Name" @bind-Value=@name Text="@name" HelperText="@Val_string" Style="@nameColour"></MudTextField>
                     </MudItem>
 
                     <MudItem xs="6" sm="6">
-                        <MudTextField T="string" Label="Family Member Surname" @bind-Value=@surname Text="@surname"></MudTextField>
+                    <MudTextField T="string" Label="Family Member Surname" @bind-Value=@surname Text="@surname" HelperText="@Val_Surstring" Style="@surnameColour"></MudTextField>
+                    </MudItem>
+                <MudItem xs="6" sm="6">
+                    <MudTextField T="string" Label="Family Member Email" @bind-Value=@email Text="@email" HelperText="@Val_Email" Style="@EmailColour"></MudTextField>
+                </MudItem>
+                    <MudItem xs="6" sm="6">
+                    <MudTextField T="string" Label="Family Member Address" @bind-Value=@address Text="@address" HelperText="@Val_Address" Style="@AddressColour"></MudTextField>
                     </MudItem>
                     <MudItem xs="6" sm="6">
-                        <MudTextField T="string" Label="Family Member Address" @bind-Value=@address Text="@address"></MudTextField>
-                    </MudItem>
-
-                    <MudItem xs="6" sm="6">
-                        <MudTextField T="string" Label="Family Member Email" @bind-Value=@email Text="@email"></MudTextField>
-                    </MudItem>
-
-                    <MudItem xs="6" sm="6">
-                        <MudTextField T="string" Label="Family Member Phone Number" @bind-Value=@phonenumber Text="@phonenumber"></MudTextField>
+                    <MudTextField T="string" Label="Family Member Phone Number" @bind-Value=@phonenumber MaxLength="10" Text="@phonenumber" HelperText="@Val_Phone" Style="@PhoneColour"></MudTextField>
                     </MudItem>
 
                     <MudItem xs="6" sm="6">
-                        <MudTextField T="string" Label="Family Member Role" @bind-Value=@role Text="@role"></MudTextField>
+                    <MudTextField T="string" Label="Family Member Role" @bind-Value=@role Text="@role" HelperText="@Val_Rolestring" Style="@roleColour"></MudTextField>
                     </MudItem>
 
                     <MudGrid>
@@ -62,6 +60,18 @@
 
 
 @code {
+    private string nameColour = "";
+    private string Val_string = "";
+    private string surnameColour = "";
+    private string Val_Surstring = "";
+    private string roleColour = "";
+    private string Val_Rolestring = "";
+    private string PhoneColour = "";
+    private string Val_Phone = "";
+    private string AddressColour = "";
+    private string Val_Address = "";
+    private string EmailColour = "";
+    private string Val_Email = "";
     private FamilyMember memberDetails = new FamilyMember();
     private FamilyMember newDetails = new FamilyMember();
 
@@ -101,24 +111,22 @@
             originalMember = new FamilyMember(memberID, name, surname, phonenumber, email, address, role,clientID);
         });
     }
-
-
-
-
     private async void updateClient()
     {
-        FamilyMember newMember = new FamilyMember(memberID, name, surname, phonenumber, email, address, role, clientID);
-        if (!newMember.Equals(originalMember))
+        if (ValidateName(name) && ValidateSurname(surname) && ValidateRole(role) && ValidateAddress(address) && ValidatePhonenumber(phonenumber))
         {
-            await new FamilyMemberService().updateFamilyMember(newMember).ContinueWith((x) =>
+            FamilyMember newMember = new FamilyMember(memberID, name, surname, phonenumber, email, address, role, clientID);
+            if (!newMember.Equals(originalMember))
             {
-                string message = "";
-                message = x.Result != null ? "Family Member successfully updated" : "Family Member could not be updated";
-                showDialog(message);
-            });
+                await new FamilyMemberService().updateFamilyMember(newMember).ContinueWith((x) =>
+                {
+                    string message = "";
+                    message = x.Result != null ? "Family Member successfully updated" : "Family Member could not be updated";
+                    showDialog(message);
+                });
+            }
+            else showDialog("No changes to apply.");
         }
-        else showDialog("No changes to apply.");
-
 
     }
     private void cancel()
@@ -142,5 +150,107 @@
     {
         UriHelper.NavigateTo($"/FamilyMembers/{clientID}");
     }
+    public bool ValidateName(string name) { 
+        Validation validation = new Validation();
+
+        if (validation.StringOnly(name) == false)
+        {
+            nameColour = "color:red";
+            Val_string = "The Name contains invalid characters.";
+            return false;
+        }
+        else
+        {
+            nameColour = "color:black";
+            Val_string = "";
+            return true;
+        }
+    }
+    public bool ValidateSurname(string name)
+    {
+        Validation validation = new Validation();
+
+        if (validation.StringOnly(name) == false)
+        {
+            surnameColour = "color:red";
+            Val_Surstring = " Surename contains invalid characters.";
+            return false;
+        }
+        else
+        {
+            surnameColour = "color:black";
+            Val_Surstring = "";
+            return true;
+        }
+    }
+    public bool ValidateRole(string name)
+    {
+        Validation validation = new Validation();
+
+        if (validation.StringOnly(name) == false)
+        {
+            roleColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Rolestring = "Role contains invalid characters.";
+            return false;
+        }
+        else
+        {
+            roleColour = "color:black";
+            Val_Rolestring = "";
+            return true;
+        }
+    }
+    public bool ValidatePhonenumber(string phone) { 
+        Validation validation = new Validation();
+
+        if (validation.numberOnlu(phone) == false)
+        {
+            PhoneColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Phone = "Invalid phone number.";
+            return false;
+        }
+        else
+        {
+            PhoneColour = "color:black";
+            Val_Phone = "";
+            return true;
+        }
+    }
+    public bool ValidateAddress(string address)
+    {
+        Validation validation = new Validation();
+
+        if (validation.AddressFormat(address) == false)
+        {
+            AddressColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Address = "Wrong address format.";
+            return false;
+        }
+        else
+        {
+            AddressColour = "color:black";
+            Val_Address = "";
+            return true;
+        }
+    }
+        public bool ValidateEmail(string email)
+    {
+        Validation validation = new Validation();
+
+        if (validation.EmailFormat(email) == false)
+        {
+            AddressColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Address = "Wrong Email format.";
+            return false;
+        }
+        else
+        {
+            AddressColour = "color:black";
+            Val_Address = "";
+            return true;
+        }
+    }
+
+
 
 }
