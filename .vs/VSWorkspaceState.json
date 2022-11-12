@@ -5,8 +5,10 @@
     "\\SEN381_UI\\BusinessLayer",
     "\\SEN381_UI\\BusinessLayer\\Services",
     "\\SEN381_UI\\Data",
-    "\\SEN381_UI\\Pages"
+    "\\SEN381_UI\\Pages",
+    "\\SEN381_UI\\Shared",
+    "\\SEN381_UI\\Shared\\MockData"
   ],
-  "SelectedNode": "\\SEN381_UI\\Pages\\ClaimDetailedView.razor",
+  "SelectedNode": "\\SEN381_UI\\Shared\\MockData\\TreatmentCoverageMock.cs",
   "PreviewInSolutionExplorer": false
 }

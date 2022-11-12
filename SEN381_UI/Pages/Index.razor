@@ -1,22 +1,24 @@
 ﻿@page "/"
 @using System.ComponentModel.DataAnnotations
-<h1>Welcome</h1>
-@*<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+@inject NavigationManager UriHelper
+@inject IDialogService DialogService
+<h1>Login</h1>
+<EditForm Model="@model">
     <DataAnnotationsValidator />
     <MudGrid>
         <MudItem xs="12" sm="12">
             <MudCard>
                 <MudCardContent>
-                    <MudTextField Label="First name" HelperText="Max. 8 characters"
-                                  @bind-Value="model.Username" For="@(() => model.Username)" />
+                    <MudTextField Label="First name" HelperText="Max. 20 characters"
+                                  @bind-Value="Username" For="@(() => model.EmployeeName)" />
                     <MudTextField Label="Email" Class="mt-3"
-                                  @bind-Value="model.Email" For="@(() => model.Email)" />
+                                  @bind-Value="Email" For="@(() => model.EmployeeEmail)" />
                     <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
-                                  @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                                  @bind-Value="Password" For="@(() => model.EmployeePassword)" InputType="InputType.Password" />
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Login</MudButton>
-                    <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Secondary" Class="ml-auto">
+                    <MudButton  Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@Validate">Login</MudButton>
+                    <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Secondary" Class="ml-auto" Href="/Register">
                         <NavLink href="/Register">register</NavLink>
                     </MudButton>
 
@@ -36,29 +38,48 @@
 
 
 @code {
-    RegisterAccountForm model = new RegisterAccountForm();
+    EmployeeDetails model = new EmployeeDetails();
+    List<EmployeeDetails> checkDetail = new List<EmployeeDetails>();
 
+    [Required]
+    [StringLength(20, ErrorMessage = "Username must be at least 8 characters long.", MinimumLength = 8)]
+    public string Username { get; set; }
 
-    public class RegisterAccountForm
-    {
-        [Required]
-        [StringLength(8, ErrorMessage = "Name length can't be more than 8.")]
-        public string Username { get; set; }
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; }
 
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+    [Required]
+    [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
+    public string Password { get; set; }
 
-        [Required]
-        [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
-        public string Password { get; set; }
+    public async void Validate() {
+        model.EmployeeName = Username;
+        model.EmployeeEmail = Email;
+        model.EmployeePassword = Password;
 
+        await new LoginService().getLoginByEmail(model.EmployeeEmail, model.EmployeePassword, model.EmployeeName).ContinueWith((x) =>
+        { 
+            string message = "";
+            message = (x!=null && !x.IsFaulted && x.Result != null) ? "Welcome back" : "Information was incorrect";
+            showDialog(message);
+        });
 
     }
-
-    private void OnValidSubmit(EditContext context)
+    private async void showDialog(string message)
     {
-        StateHasChanged();
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+            var result = await DialogService.Show<Dialogue>("Employee", paramaters, options).Result;
+            if (message != "Information was incorrect")
+            {
+                UriHelper.NavigateTo("/Client",true);
+            }
+        });
     }
 
 

@@ -1,4 +1,6 @@
 ﻿@page "/Register"
+@inject NavigationManager UriHelper
+@inject IDialogService DialogService
 
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
@@ -13,16 +15,16 @@ align-text: center" ;>
         <MudItem xs="12" sm="12">
             <MudCard>
                 <MudCardContent>
-                    <MudTextField Label="First name" HelperText="Max. 8 characters"
-                                  @bind-Value="model.Username" For="@(() => model.Username)" />
+                    <MudTextField Label="First name" HelperText="Max. 20 characters"
+                                  @bind-Value="@Username" For="@(() => model.EmployeeName)" />
                     <MudTextField Label="Email" Class="mt-3"
-                                  @bind-Value="model.Email" For="@(() => model.Email)" />
+                                  @bind-Value="@Email" For="@(() => model.EmployeeEmail)" />
                     <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
-                                  @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                                  @bind-Value="Password" For="@(() => model.EmployeePassword)" InputType="InputType.Password" />
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
-                    <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Secondary" Class="ml-auto">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@saveEmployee">Register</MudButton>
+                    <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Secondary" Class="ml-auto" Href="/">
                         <NavLink href="/">Login</NavLink>
                     </MudButton>
                 </MudCardActions>
@@ -38,23 +40,51 @@ align-text: center" ;>
 
 
 @code {
-    RegisterAccountForm model = new RegisterAccountForm();
+    EmployeeDetails model = new EmployeeDetails();
+    EmployeeDetails modelByID = new EmployeeDetails();
 
-    public class RegisterAccountForm
+
+    [Required]
+    [StringLength(8, ErrorMessage = "Name length can't be more than 8.")]
+    public string Username { get; set; }
+
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; }
+
+    [Required]
+    [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
+    public string Password { get; set; }
+
+
+    private async void saveEmployee()
     {
-        [Required]
-        [StringLength(8, ErrorMessage = "Name length can't be more than 8.")]
-        public string Username { get; set; }
+        EmployeeDetails model = new EmployeeDetails();
+        model.EmployeeName = Username;
+        model.EmployeeEmail = Email;
+        model.EmployeePassword = Password;
 
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [Required]
-        [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
-        public string Password { get; set; }
-
-
+        await new LoginService().postEmployee(model).ContinueWith((x) =>
+        {
+            string message = "";
+            message = x.Result != null ? "Employee is successfully created" : "Employee could not be created";
+            showDialog(message);
+        });
+    }
+    private async void showDialog(string message)
+    {
+        DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+        DialogParameters paramaters = new DialogParameters();
+        paramaters.Add("ContentText", message);
+        paramaters.Add("ButtonText", "Close Dialogue");
+        await InvokeAsync(async () =>
+        {
+            var result = await DialogService.Show<Dialogue>("Employee", paramaters, options).Result;
+            if (message != "Employee could could not be created")
+            {
+                UriHelper.NavigateTo("/");
+            }
+        });
     }
 
     private void OnValidSubmit(EditContext context)
