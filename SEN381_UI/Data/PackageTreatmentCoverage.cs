@@ -2,8 +2,8 @@
 {
     public class PackageTreatmentCoverage
     {
-        private Treatment treatment;
-        private Coverage coverage;
+        private Treatment? treatment;
+        private Coverage? coverage;
 
         public PackageTreatmentCoverage(Treatment treatment, Coverage coverage)
         {

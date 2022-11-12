@@ -1,5 +1,4 @@
 ﻿@page "/Client/{id}"
-@using SEN381_UI.Shared.MockData
 @inject IDialogService DialogService
 @inject NavigationManager UriHelper
 
@@ -141,11 +140,12 @@
     private Client newClient = new Client();
 
 
-    List<Policy> policies = new PolicyMock().getMockPolicies();
+    List<Policy> policies = new List<Policy>();
     Policy? selectedPolicy;
 
     protected async override Task OnInitializedAsync()
     {
+        await LoadPolicies();
         await LoadClient();
         load = true;
     }
@@ -172,7 +172,13 @@
         });
     }
 
-
+    private async Task LoadPolicies()
+    {
+        await new PolicyService().getPolicies(1000,1).ContinueWith((x) =>
+        {
+            if (x.Result != null) policies = x.Result;
+        });
+    }
 
 
     private async void updateClient()
