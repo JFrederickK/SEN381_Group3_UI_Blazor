@@ -2,6 +2,7 @@
 @using SEN381_UI.Data
 @inject IDialogService DialogService
 @inject NavigationManager UriHelper
+@using System.Text.RegularExpressions;
 <h3>Claim Detailed View</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/Claim">Back</MudIconButton>
 @if (load)
@@ -17,7 +18,7 @@
             <MudAutocomplete T="string" Label="Place of treatment" @bind-Value=@placeOfTreatment Text="@placeOfTreatment" SearchFunc="@PlaceOfTreatment" Margin="Margin.Dense" Dense="true" />
         </MudItem> 
         <MudItem xs="12" sm="6">
-            <MudTextField T="string" Label="Call Details" @bind-Value=@callDetails Text="@callDetails"></MudTextField>
+            <MudTextField T="string" Label="Call Details" @bind-Value=@callDetails Text="@callDetails" ReadOnly="true"></MudTextField>
         </MudItem>
         <MudItem xs="12" sm="6">
             <MudTextField T="string" Label="Claime Status" @bind-Value=@claimeStatus Text="@claimeStatus"></MudTextField>
@@ -154,7 +155,7 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Claim", paramaters, options).Result;
-            if (message != "Claim could not be created")
+            if (message != "Claim could not be created" && message != "Status cannot be empty." && message != "Status should only contain letters")
             {
                 UriHelper.NavigateTo("/Claim");
             }
@@ -166,22 +167,56 @@
     }
     private async void updateClaims()
     {
-        Claim newClaim = new Claim(int.Parse(id), clientName, placeOfTreatment, int.Parse(callDetails), claimeStatus);
-        if (!originalClaim.Equals(newClaim))
+        if (claimeStatus == null)
         {
-            await new ClaimService().updateClaim(newClaim).ContinueWith((x) =>
-            {
-
-                string message = "";
-                message = x.Result != null ? "Client could not be updated" : "Client successfully updated";
-                showDialog(message);
-            });
+            showDialog("Status cannot be empty.");
         }
         else
         {
-            showDialog("No changes to apply.");
+            if (!StringOnly(claimeStatus))
+            {
+                showDialog("Status should only contain letters");
+            }
+            else { 
+                Claim newClaim = new Claim(int.Parse(id), clientName, placeOfTreatment, int.Parse(callDetails), claimeStatus);
+                if (!originalClaim.Equals(newClaim))
+                {
+                    await new ClaimService().updateClaim(newClaim).ContinueWith((x) =>
+                    {
+
+                        string message = "";
+                        message = x.Result != null ? "Client could not be updated" : "Client successfully updated";
+                        showDialog(message);
+                    });
+                }
+                else
+                {
+                    showDialog("No changes to apply.");
+                }
+            }
+
         }
 
+
+
+    }
+    public bool StringOnly(string word)
+    {
+        var Inputletters = @"^[a-zA-Z]{2,}$";
+        bool val = Regex.IsMatch(word, Inputletters);
+
+        return val;
+    }
+    public bool find(string values) { 
+        foreach (string item in placesOfTreatment)
+        {
+            if (values.Equals(item))
+            {
+                return true;  
+            } 
+
+        }
+        return false;
 
     }
 

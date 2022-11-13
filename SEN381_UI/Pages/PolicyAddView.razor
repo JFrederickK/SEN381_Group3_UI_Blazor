@@ -1,6 +1,7 @@
 ﻿@page "/PolicyAdd"
 @inject NavigationManager UriHelper
 @inject IDialogService DialogService
+@using System.Text.RegularExpressions;
 
 <MudCard style="max-height:1000px; overflow: auto;">
 
@@ -110,17 +111,30 @@
 
     private void addPolicy()
     {
-        Policy newpolicy = new Policy(policyId, policyName, "", _dateRange.Start, _dateRange.End, selectedPackages);
+        if (policyName == null)
+        {
+            showDialog("Please provide a name for the policy");
+        }
+        else if (StringOnly(policyName))
+        {
+            Policy newpolicy = new Policy(policyId, policyName, "", _dateRange.Start, _dateRange.End, selectedPackages);
 
-        PolicyService policyService = new PolicyService();
+            PolicyService policyService = new PolicyService();
 
-        policyService.addPolicy(newpolicy).ContinueWith((x)=> {
+            policyService.addPolicy(newpolicy).ContinueWith((x) =>
+            {
 
-            string message = "";
-            message = x.Result != null ? "Policy is successfully created" : "Policy could not be created";
-            showDialog(message);
+                string message = "";
+                message = x.Result != null ? "Policy is successfully created" : "Policy could not be created";
+                showDialog(message);
 
-        });
+            });
+        }
+        else { 
+            showDialog("Please provide a name for the policy that contains only letter");
+        }
+
+
     }
 
 
@@ -136,7 +150,7 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Policy", paramaters, options).Result;
-            if (message != "Policy could not be created")
+            if (message != "Policy could not be created" && message != "Please provide a name for the policy")
             {
                 UriHelper.NavigateTo("/Policy");
             }
@@ -157,6 +171,13 @@
     private void removePackage(Package package)
     {
         selectedPackages.Remove(package);
+    }
+    public bool StringOnly(string word)
+    {
+        var Inputletters = @"^[a-zA-Z]{2,}$";
+        bool val = Regex.IsMatch(word, Inputletters);
+
+        return val;
     }
 }
 
