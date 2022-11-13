@@ -111,12 +111,21 @@
 
     public void createPackage()
     {
-        new PackageService().addPackage(new Package("0", _dateRange.Start, _dateRange.End, selectedPTC.Count != 0 ? selectedPTC:new List<PackageTreatmentCoverage>())).ContinueWith((x) =>
+        if (validateDates(_dateRange.Start, _dateRange.End))
         {
-            string message = "";
-            message = x.Result != null ? "Package Created successfilly" : "Package could not be created";
+            new PackageService().addPackage(new Package("0", _dateRange.Start, _dateRange.End, selectedPTC.Count != 0 ? selectedPTC:new List<PackageTreatmentCoverage>())).ContinueWith((x) =>
+                                                    {
+                                                        string message = "";
+                                                        message = x.Result != null ? "Package Created successfilly" : "Package could not be created";
+                                                        showDialog(message);
+                                                    });
+        }
+        else
+        {
+            string message = "Invalid dates in daterange";
             showDialog(message);
-        });
+        }
+
     }
 
     private void addPCT(Treatment treat)
@@ -127,6 +136,83 @@
     private void removePCT(Treatment treat)
     {
         selectedPTC = selectedPTC.Where((x) => !x.Treatment.Equals(treat)).ToList();
+    }
+
+    // validate start date
+    public bool validateStartDate(DateTime? start)
+    {
+        DateTime now = DateTime.Today;
+        if (start < now)
+        {
+            return false;
+        }
+
+        else
+        {
+            return true;
+        }
+    }
+
+    // validate end date
+    public bool validateEndDate(DateTime? end)
+    {
+        DateTime now = DateTime.Today;
+        if (end > now.AddYears(1))
+        {
+            return false;
+        }
+
+        else
+        {
+            return true;
+        }
+    }
+
+
+    // validate both start and end date
+    public bool validateDates(DateTime? start, DateTime? end)
+    {
+        if (validateStartDate(start) && validateEndDate(end))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    // determine field colour
+
+    public string dateFieldColour(DateTime date, string type)
+    {
+        if (type == "start")
+        {
+            if(validateStartDate(date))
+            {
+                return "color:black";
+            }
+
+            else
+            {
+                return "color:red";
+            }
+        }
+
+        else
+        {
+            if(validateStartDate(date))
+            {
+                return "color:black";
+            }
+
+            else
+            {
+                return "color:red";
+            }
+        }
+
+        }
     }
 
 }
