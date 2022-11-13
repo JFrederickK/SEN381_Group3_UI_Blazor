@@ -24,7 +24,7 @@
                         <MudTextField T="string" Label="Medical Condition ID" ReadOnly="true" Text="@id"></MudTextField>
                     </MudItem>
                     <MudItem xs="6" sm="6">
-                        <MudTextField T="string" Label="Medical Condition name" @bind-Value=@name Text="@name"></MudTextField>
+                        <MudTextField T="string" Label="Medical Condition name" @bind-Value=@name Text="@name" HelperText="@Val_string" Style="@nameColour"></MudTextField>
                     </MudItem>
                     <MudItem xs="6" sm="6">
 
@@ -84,6 +84,9 @@
 
 
 @code {
+    private string nameColour = "";
+    private string Val_string = "";
+
     private int[] pageSizeOptions = new int[] { 5, 10, 15 };
     private string searchString = "";
     private MedicalConditionTreatment selectedItem = null;
@@ -134,20 +137,33 @@
 
 
     private async void saveMedicalCondtion() {
-        MedicalCondition newMC = new MedicalCondition(int.Parse(id), name, description);
-        if (!newMC.GetHashCode().Equals(medicalDetails.GetHashCode()))
+        if (name == null)
         {
-            await new MedicalConditionService().updateMedical(newMC).ContinueWith((x)=> { 
-                string message = "";
-                message = x.Result != null ? "Medical Condition successfully updated" : "Medical Condition could not be updated";
-                showDialog(message);
+                       showDialog("The name field cannot be null"); 
+        }
+        else if (description == null)
+        {
+            showDialog("The description field cannot be null");
+        }
+        else if (ValidateName(name))
+        {
+            MedicalCondition newMC = new MedicalCondition(int.Parse(id), name, description);
+            if (!newMC.GetHashCode().Equals(medicalDetails.GetHashCode()))
+            {
+                await new MedicalConditionService().updateMedical(newMC).ContinueWith((x) =>
+                {
+                    string message = "";
+                    message = x.Result != null ? "Medical Condition successfully updated" : "Medical Condition could not be updated";
+                    showDialog(message);
 
-            });
+                });
+            }
+            else
+            {
+                showDialog("No changes to apply.");
+            }
         }
-        else
-        {
-            showDialog("No changes to apply.");
-        }
+
 
     }
     private async void deleteMedical()
@@ -184,6 +200,10 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Medical Condition", paramaters, options).Result;
+            if (message != "Medical Condition could not be updated" && message != "The name field cannot be null" && message != "The description field cannot be null")
+            {
+                UriHelper.NavigateTo("/MedicalConditions");
+            }
         });
     }
     private bool FilterFunc(MedicalConditionTreatment element) => FilterFunc(element, searchString);
@@ -196,6 +216,23 @@
             return true;
         return false;
 
+    }
+    public bool ValidateName(string name)
+    {
+        Validation validation = new Validation();
+
+        if (validation.StringOnly(name) == false)
+        {
+            nameColour = "color:red";
+            Val_string = "The Name contains invalid characters.";
+            return false;
+        }
+        else
+        {
+            nameColour = "color:black";
+            Val_string = "";
+            return true;
+        }
     }
 
 }
