@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel.DataAnnotations;
 
 namespace SEN381_UI.Data {
     public class Client : IEqualityComparer<Client> 
@@ -29,15 +30,28 @@ namespace SEN381_UI.Data {
             this.clientStatus = clientStatus;
             this.clientAdHocNotes = clientAdHocNotes;
         }
-
         public string ClientID { get => clientID; set => clientID = value; }
+        [Required]
+        [StringLength(50, ErrorMessage = "Name length can't be more than 50.")]
+        [RegularExpression(@"^[a-zA-Z]{2,}$", ErrorMessage = "The Name contains invalid characters.")]
         public string ClientName { get => clientName; set => clientName = value; }
+        [Required]
+        [StringLength(50, ErrorMessage = "Name length can't be more than 50.")]
+        [RegularExpression(@"^[a-zA-Z]{2,}$", ErrorMessage = " Surename contains invalid characters.")]
         public string ClientSurname { get => clientSurname; set => clientSurname = value; }
+        [Required]
+        [RegularExpression(@"^[0-9]+\s[a-zA-Z\s\-']{2,}.\s?[a-zA-Z\s\(\),]{2,}$", ErrorMessage = "Wrong address format.")]
         public string ClientAddress { get => clientAddress; set => clientAddress = value; }
+        [Required]
+        [EmailAddress]
         public string ClientEmail { get => clientEmail; set => clientEmail = value; }
+        [Required]
+        [RegularExpression(@"^([+]?\d{1,2}[-\s]?|)\d{3}[-\s]?\d{3}[-\s]?\d{4}$", ErrorMessage = "Invalid phone number.")]
         public string ClientPhoneNumber { get => clientPhoneNumber; set => clientPhoneNumber = value; }
         public ClientPolicy? Policy { get => policy; set => policy = value; }
+        [Required]
         public string ClientStatus { get => clientStatus; set => clientStatus = value; }
+        [Required]
         public string ClientAdHocNotes { get => clientAdHocNotes; set => clientAdHocNotes = value; }
 
         public   bool Equals(Client? x, Client? y)
