@@ -11,16 +11,16 @@
         <MudTextField T="string" Label="Provider ID" ReadOnly="true" Text="@id" Variant="Variant.Outlined"></MudTextField>
     </MudItem>
     <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Name" @bind-Value="@providerName"></MudTextField>
+        <MudTextField T="string" Label="Name" @bind-Value="@providerName" HelperText="@Val_string" Style="@nameColour"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Address" @bind-Value="providerAddress"></MudTextField>
+        <MudTextField T="string" Label="Address" @bind-Value="providerAddress" HelperText="@Val_Address" Style="@AddressColour"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Email" @bind-Value="Email"></MudTextField>
+        <MudTextField T="string" Label="Email" @bind-Value="Email" HelperText="@Val_Email" Style="@EmailColour"></MudTextField>
     </MudItem>
     <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value="providerPhone"></MudTextField>
+        <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value="providerPhone " HelperText="@Val_Phone" Style="@PhoneColour"></MudTextField>
     </MudItem>
 </MudGrid>
 
@@ -33,12 +33,20 @@
     </MudItem>
 </MudGrid>
 @code {
+    private string nameColour = "";
+    private string Val_string = "";
+    private string PhoneColour = "";
+    private string Val_Phone = "";
+    private string AddressColour = "";
+    private string Val_Address = "";
+    private string EmailColour = "";
+    private string Val_Email = "";
     [Parameter]
     public string? id { get; set; }
 
     public string providerName { get; set; }
     public string providerAddress { get; set; }
-    
+
     [EmailAddress]
     public string Email { get; set; }
     public string providerPhone { get; set; }
@@ -58,13 +66,17 @@
 
     private void updateProvider()
     {
-        newProvider = new MedicalServiceProvider(id, providerName, providerAddress, Email, providerPhone);
-        new MedicalServiceProviderService().updateProvider(newProvider).ContinueWith((x) =>
+        if (ValidateName(providerName) && ValidateAddress(providerAddress) && ValidatePhonenumber(providerPhone))
         {
-            string message = "";
-            message = x.Result != null ? "Provider Updated successfully" : "Provider could not be updated";
-            showDialog(message);
-        });
+            newProvider = new MedicalServiceProvider(id, providerName, providerAddress, Email, providerPhone);
+            new MedicalServiceProviderService().updateProvider(newProvider).ContinueWith((x) =>
+            {
+                string message = "";
+                message = x.Result != null ? "Provider Updated successfully" : "Provider could not be updated";
+                showDialog(message);
+            });
+        }
+
     }
 
     private void resetProvider()
@@ -92,4 +104,73 @@
             var result = await DialogService.Show<Dialogue>("Medical Service Provider", paramaters, options).Result;
         });
     }
+    public bool ValidateName(string name)
+    {
+        Validation validation = new Validation();
+
+        if (validation.StringOnly(name) == false)
+        {
+            nameColour = "color:red";
+            Val_string = "The Name contains invalid characters.";
+            return false;
+        }
+        else
+        {
+            nameColour = "color:black";
+            Val_string = "";
+            return true;
+        }
+    }
+    public bool ValidatePhonenumber(string phone)
+    {
+        Validation validation = new Validation();
+
+        if (validation.numberOnlu(phone) == false)
+        {
+            PhoneColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Phone = "Invalid phone number.";
+            return false;
+        }
+        else
+        {
+            PhoneColour = "color:black";
+            Val_Phone = "";
+            return true;
+        }
+    }
+    public bool ValidateAddress(string address)
+    {
+        Validation validation = new Validation();
+
+        if (validation.AddressFormat(address) == false)
+        {
+            AddressColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Address = "Wrong address format.";
+            return false;
+        }
+        else
+        {
+            AddressColour = "color:black";
+            Val_Address = "";
+            return true;
+        }
+    }
+    public bool ValidateEmail(string email)
+    {
+        Validation validation = new Validation();
+
+        if (validation.EmailFormat(email) == false)
+        {
+            AddressColour = "color:red;border-bottom:red;margin-bottom:red";
+            Val_Address = "Wrong email format.";
+            return false;
+        }
+        else
+        {
+            AddressColour = "color:black";
+            Val_Address = "";
+            return true;
+        }
+    }
+
 }

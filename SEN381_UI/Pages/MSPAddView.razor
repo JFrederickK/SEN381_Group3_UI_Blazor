@@ -5,41 +5,40 @@
 
 <h3>Create Medical service Provider</h3>
 <MudIconButton Icon="@Icons.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Primary" aria-label="back" Style="margin-bottom:1%" Href="/MedicalServiceProvider">Back</MudIconButton>
-<MudGrid>
-    <MudItem xs="6" sm="6">
-        <MudTextField T="string" Label="Name" @bind-Value="providerName"></MudTextField>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Address" @bind-Value="providerAddress"></MudTextField>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Email" @bind-Value="Email"></MudTextField>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value="providerPhone"></MudTextField>
-    </MudItem>
-</MudGrid>
+<EditForm Model="@provider" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary/>
+    <MudGrid>
+        <MudItem xs="6" sm="6">
+            <MudTextField T="string" Label="Name" @bind-Value="@provider.PolicyProviderName" For="@(()=> provider.PolicyProviderName)" Immediate="true"></MudTextField>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField T="string" Label="Address" @bind-Value="@provider.PolicyProviderAddresses" For="@(()=> provider.PolicyProviderAddresses)" Immediate="true"></MudTextField>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField T="string" Label="Email" @bind-Value="@provider.PolicyProviderEmail" For="@(()=> provider.PolicyProviderEmail)" Immediate="true"></MudTextField>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField T="string" Label="Phone number" MaxLength="10" @bind-Value="@provider.PolicProviderPhone" For="@(()=> provider.PolicProviderPhone)" Immediate="true"></MudTextField>
+        </MudItem>
+    </MudGrid>
+
+</EditForm>
+
 
 <MudGrid Style="margin-top:auto">
     <MudItem xs="12" sm="6">
-        <MudButton OnClick="@insertProvider" Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true">Create Provider</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" ButtonType="ButtonType.Submit" OnClick="@insertProvider">Create Provider</MudButton>
     </MudItem>
 </MudGrid>
 @code {
-    public string providerName { get; set; }
-
-    public string providerAddress { get; set; }
-
-    [EmailAddress]
-    public string Email { get; set; }
-
-    public string providerPhone { get; set; }
-    protected override void OnInitialized()
-    {
-    }
+    MedicalServiceProvider provider = new();
+    bool success;
 
     private async void insertProvider(){
-        await new MedicalServiceProviderService().addProvider(new MedicalServiceProvider("temp",providerName,providerAddress,Email,providerPhone)).ContinueWith((x)=>{
+        MedicalServiceProvider newProvider = new MedicalServiceProvider("temp", provider.PolicyProviderName, provider.PolicyProviderAddresses, provider.PolicyProviderEmail, provider.PolicProviderPhone);
+        await new MedicalServiceProviderService().addProvider(newProvider).ContinueWith((x) =>
+        {
             string message = x.Result!=null ?"Provider created sucessfully":"Provider could not be created";
             showDialog(message);
         });
@@ -60,5 +59,13 @@
                 navigate.NavigateTo("/MedicalServiceProvider");
             }
         });
+    }
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        if (success)
+        {
+            insertProvider();
+        }
     }
 }
