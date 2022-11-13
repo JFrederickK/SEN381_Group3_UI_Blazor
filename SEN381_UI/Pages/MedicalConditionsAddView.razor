@@ -20,7 +20,7 @@
         <MudForm Class="p-5">
             <MudGrid>
                 <MudItem lg="12" sm="6">
-                    <MudTextField T="string" Label="Medical Condition Name" @bind-Value=@mcName ></MudTextField>
+                    <MudTextField T="string" Label="Medical Condition Name" @bind-Value=@mcName HelperText="@Val_string" Style="@nameColour"></MudTextField>
                     <MudTextField T="string" Label="Medical Condition Description" @bind-Value=@mcDescription ></MudTextField>
                 </MudItem>
 
@@ -86,6 +86,9 @@
 
 
 @code {
+    private string nameColour = "";
+    private string Val_string = "";
+    private InsertMedicalConditionRequest newMC = new();
     private HashSet<MedicalConditionTreatment> selectedItems = new HashSet<MedicalConditionTreatment>();
     private List<string> selectedItemIDs = new List<string>();
     public List<MedicalConditionTreatment> medicalConditionT = new List<MedicalConditionTreatment>();
@@ -116,13 +119,26 @@
         {
             selectedItemIDs.Add(item.TreatmentID);
         }
-        InsertMedicalConditionRequest newMedicalCondition = new InsertMedicalConditionRequest(mcName, mcDescription, selectedItemIDs, selectedItemIDs.Count);
-        await new MedicalConditionService().postMedicalConditionDetails(newMedicalCondition).ContinueWith((x) =>
+
+        if (mcName == null && mcDescription == null)
         {
-            string message = "";
-            message = x.Result != false ? "Medical Condition is successfully created" : "Medical Condition could not be created";
-            showDialog(message);
-        });
+            showDialog("Please give a name & a discription");
+        }
+        else if (selectedItemIDs == null)
+        {
+            showDialog("No treatments were selected");
+        }
+        else if (ValidateName(mcName))
+        {
+            InsertMedicalConditionRequest newMedicalCondition = new InsertMedicalConditionRequest(mcName, mcDescription, selectedItemIDs, selectedItemIDs.Count);
+            await new MedicalConditionService().postMedicalConditionDetails(newMedicalCondition).ContinueWith((x) =>
+            {
+                string message = "";
+                message = x.Result != false ? "Medical Condition is successfully created" : "Medical Condition could not be created";
+                showDialog(message);
+            });
+        }
+
     }
 
     private void navigateBack()
@@ -142,7 +158,7 @@
         await InvokeAsync(async () =>
         {
             var result = await DialogService.Show<Dialogue>("Medical Conditions", paramaters, options).Result;
-            if (message != "Medical Conditions could not be created")
+            if (message != "Medical Conditions could not be created" && message != "Please give a name & a discription" && message != "No treatments were selected")
             {
                 UriHelper.NavigateTo("/MedicalConditions");
             }
@@ -158,5 +174,22 @@
             return true;
         return false;
 
+    }
+    public bool ValidateName(string name)
+    {
+        Validation validation = new Validation();
+
+        if (validation.StringOnly(name) == false)
+        {
+            nameColour = "color:red";
+            Val_string = "The Name contains invalid characters.";
+            return false;
+        }
+        else
+        {
+            nameColour = "color:black";
+            Val_string = "";
+            return true;
+        }
     }
 }
